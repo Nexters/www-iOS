@@ -6,15 +6,15 @@
 //
 
 import UIKit
+import RxSwift
 
-class ViewController: UIViewController {
+class SampleViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.view.backgroundColor = .blue
     }
-
 
 }
 
