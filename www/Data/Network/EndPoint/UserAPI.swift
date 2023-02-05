@@ -5,35 +5,51 @@
 //  Created by Chanhee Jeong on 2023/02/01.
 //
 
+import Foundation
 import Moya
 import RxMoya
 import RxSwift
 
-enum SampleAPI {
-    
+enum UserAPI {
+    case join(param: LoginRequestDTO)
 }
 
 
-extension SampleAPI: TargetType {
+extension UserAPI: TargetType {
     var baseURL: URL {
-        <#code#>
+        return URL(string: "http://alpha-api.whenwheres.com:8080/users/")!
     }
     
     var path: String {
-        <#code#>
+        switch self {
+        case .join:
+            return "join"
+        }
     }
     
     var method: Moya.Method {
-        <#code#>
+        switch self {
+        case .join:
+            return .post
+        }
     }
     
     var task: Moya.Task {
-        <#code#>
+        switch self {
+        case .join(let param):
+            return .requestParameters(parameters: try! param.asDictionary(), encoding: URLEncoding.default)
+        }
     }
     
     var headers: [String : String]? {
-        <#code#>
+        switch self {
+        case .join:
+            return nil
+        }
     }
     
-    
+}
+
+struct UserAPIManager {
+    let provider = RxMoyaProvider<UserAPI>()
 }
