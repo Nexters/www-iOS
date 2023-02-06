@@ -10,6 +10,21 @@ import UIKit
 import SnapKit
 
 // TODO: 색깔적용
+/// ProgressView : Progress 상황에서 사용
+/// - current: 표시 / total : 전체
+/// - 레이아웃:  Top 과 가로만 맞추면됩니다
+///
+/// ```
+/// // 속성
+/// private let progressView = ProgressView(current: 1, total: 6)
+///
+/// // 레이아웃
+/// progressView.snp.makeConstraints {
+///    $0.top.equalTo(view.safeAreaLayoutGuide)
+///    $0.horizontalEdges.equalToSuperview()
+/// }
+/// ```
+///
 final class ProgressView: UIView {
     
     private lazy var progressView = UIProgressView()
@@ -33,7 +48,7 @@ extension ProgressView {
         progressView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()
             make.width.equalToSuperview()
-            make.height.equalTo(3)
+            make.height.equalTo(2)
         }
     }
 }
