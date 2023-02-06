@@ -9,6 +9,8 @@
 import UIKit
 import SnapKit
 
+// TODO: 폰트 및 색깔적용
+
 /// LargeButton : 기본으로 사용되는 검정 버튼
 /// - init(state isEnabled: Bool ) : 선택사항이며, 버튼 비활성 여부 결정 가능
 /// - .setTitle("다음", for: .normal) : 버튼 이름 설정
@@ -16,9 +18,8 @@ import SnapKit
 /// 버튼 높이 및 양옆 마진을 잡아서 사용해주세요
 /// ```
 /// // 버튼 속성 예시
-/// private lazy var nextButton: LargeButton(state: true)
-/// nextButton.setTitle("다음", for: .normal)
-/// nextButton.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
+///     private let titleView = MainTitleView(title: "약속방에서 사용하실\n닉네임을 알려주세요.",
+///                                             subTitle: "최소 인원 입장 완료 시, 투표가 시작됩니다.")
 ///
 /// // 레이아웃 예시
 /// $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
