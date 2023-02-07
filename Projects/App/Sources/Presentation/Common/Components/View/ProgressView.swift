@@ -9,7 +9,6 @@
 import UIKit
 import SnapKit
 
-// TODO: 색깔적용
 /// ProgressView : Progress 상황에서 사용
 /// - current: 표시 / total : 전체
 /// - 레이아웃:  Top 과 가로만 맞추면됩니다
@@ -42,8 +41,8 @@ final class ProgressView: UIView {
 extension ProgressView {
     private func setUI(prog: Float) {
         self.addSubview(progressView)
-        progressView.trackTintColor = .lightGray
-        progressView.progressTintColor = .black
+        progressView.trackTintColor = UIColor.wwwColor(.Gray150)
+        progressView.progressTintColor = UIColor.wwwColor(.WWWGreen)
         progressView.progress = prog
         progressView.snp.makeConstraints { make in
             make.leading.trailing.equalToSuperview()

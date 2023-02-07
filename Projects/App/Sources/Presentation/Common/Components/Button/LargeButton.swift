@@ -9,8 +9,6 @@
 import UIKit
 import SnapKit
 
-// TODO: 폰트 및 색깔적용
-
 /// LargeButton : 기본으로 사용되는 검정 버튼
 /// - init(state isEnabled: Bool ) : 선택사항이며, 버튼 비활성 여부 결정 가능
 /// - .setTitle("다음", for: .normal) : 버튼 이름 설정
@@ -45,15 +43,14 @@ final class LargeButton: UIButton {
     
     override func setTitle(_ title: String?, for state: UIControl.State) {
         guard let title = title else { return }
-        // TODO: 폰트 적용
-        let attributes: [NSAttributedString.Key: Any] = [.font: UIFont.systemFont(ofSize: 15, weight: .medium)]
+        let attributes: [NSAttributedString.Key: Any] = [.font: UIFont.www.body1 as Any]
         let attributedString = NSAttributedString(string: title, attributes: attributes)
         setAttributedTitle(attributedString, for: state)
     }
     
     func setButtonState(_ isEnabled: Bool) {
         isUserInteractionEnabled = isEnabled
-        backgroundColor = isEnabled ? .black : .systemGray2
+        backgroundColor = isEnabled ? UIColor.wwwColor(.WWWBlack) : UIColor.wwwColor(.Gray250)
     }
     
 }
@@ -63,8 +60,8 @@ extension LargeButton {
     private func setUI() {
         configuration = .plain()
         configuration?.contentInsets = .init(top: 0, leading: 20, bottom: 0, trailing: 20)
-        tintColor = .white
-        backgroundColor = .black
+        tintColor = UIColor.wwwColor(.WWWWhite)
+        backgroundColor = UIColor.wwwColor(.WWWBlack)
         clipsToBounds = true
         layer.cornerRadius = 26 // height/2
         

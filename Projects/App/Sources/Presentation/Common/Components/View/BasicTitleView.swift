@@ -9,8 +9,6 @@
 import UIKit
 import SnapKit
 
-// TODO: 폰트 및 색깔적용
-
 /// BasicTitleView : 기본타이틀뷰
 ///
 /// 레이아웃
@@ -54,13 +52,13 @@ extension BasicTitleView {
         titleStackView.distribution = .fill
 
         titleLabel.numberOfLines = 0
-        titleLabel.textColor = .black
-        titleLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        titleLabel.textColor = UIColor.wwwColor(.WWWBlack)
+        titleLabel.font = UIFont.www.heading3
 
         if !subTitle.isEmpty {
-            subtitleLabel.textColor = .gray
+            subtitleLabel.textColor = UIColor.wwwColor(.Gray450)
             subtitleLabel.numberOfLines = 0
-            subtitleLabel.font = .systemFont(ofSize: 16, weight: .regular)
+            subtitleLabel.font = UIFont.www.body4
         }
         
         
