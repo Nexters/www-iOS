@@ -10,10 +10,6 @@ import UIKit
 
 final class RoomNameViewController: UIViewController {
     
-    //    public var titleLabel = UILabel()
-    //    public var subtitleLabel = UILabel()
-    //    private let titleStackView = UIStackView()
-    
     // MARK: - Properties
     
     private let progressView = ProgressView(current: 1, total: 6)
@@ -27,7 +23,7 @@ final class RoomNameViewController: UIViewController {
         $0.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
         return $0
     }(LargeButton(state: true))
-    
+
     
     // MARK: - LifeCycle
     
@@ -41,13 +37,14 @@ final class RoomNameViewController: UIViewController {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
-    
+
 }
 
 // MARK: - Binding
 extension RoomNameViewController {
-    
-    
+    private func bind() {
+        
+    }
 }
 
 // MARK: - Function
@@ -100,8 +97,9 @@ extension RoomNameViewController {
     }
     
     @objc func nextButtonDidTap() {
-        //        input.send(.nextButtonDidTap)
+//        input.send(.nextButtonDidTap)
         print("다음버튼이 눌렸어요!")
+        textField.setErrorMode(message: "존재하지 않는 참여 코드에요.")
     }
     
 }
