@@ -9,18 +9,35 @@
 import SwiftUI
 import UIKit
 
-
+///
+/// 🔡 WWW 폰트 사용방법
+///
+/// ```
+/// label.font = UIFont.www.title1
+/// label.font = UIFont.www(size: 30, family: .Bold)
+/// ```
+///
 extension UIFont {
-    
-    static let theme = WWWFont()
+
+    static let www = WWWFont()
     
     enum Family: String {
         case Bold, Medium, Regular, Light, Thin
     }
     
-    /// let spoqahansansneoBold = UIFont.www(size: 10, family: .Bold)
-    static func www(size: CGFloat = 10, family: Family = .Regular) -> UIFont {
-        return UIFont(name: "SpoqaHanSansNeo-\(family)", size: size)!
+    static func www(size: CGFloat, family: Family = .Regular) -> UIFont? {
+        switch family {
+        case .Bold:
+            return AppFontFamily.SpoqaHanSansNeo.bold.font(size: size)
+        case .Medium:
+            return AppFontFamily.SpoqaHanSansNeo.medium.font(size: size)
+        case .Regular:
+            return AppFontFamily.SpoqaHanSansNeo.regular.font(size: size)
+        case .Light:
+            return AppFontFamily.SpoqaHanSansNeo.light.font(size: size)
+        case .Thin:
+            return AppFontFamily.SpoqaHanSansNeo.thin.font(size: size)
+        }
     }
 
 }
