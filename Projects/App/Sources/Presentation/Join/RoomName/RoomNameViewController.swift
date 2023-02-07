@@ -17,7 +17,6 @@ final class RoomNameViewController: UIViewController {
     // MARK: - Properties
     
     private let progressView = ProgressView(current: 1, total: 6)
-    private let progressLabel = UILabel()
     
     private let titleView = BasicTitleView(title: "약속방의\n이름을 알려주세요.")
     
@@ -73,14 +72,17 @@ extension RoomNameViewController {
         }
     }
     
-    private func setNavigationBar() {
-        let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "chevron.left"), style: .plain, target: self, action: #selector(backButtonDidTap))
+    /* Temp */
+    private func setNavigationBar(title: String = "") {
+        let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
         backButton.tintColor = .black
+        let progressLabel = UILabel()
         progressLabel.text = "1/6"
+        progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
         navigationItem.rightBarButtonItem = progressItem
-        navigationItem.title = "넥스터즈 뒷풀이"
+        navigationItem.title = title
     }
     
     @objc func backButtonDidTap() {
