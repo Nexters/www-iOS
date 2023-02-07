@@ -10,9 +10,9 @@ import UIKit
 
 final class RoomNameViewController: UIViewController {
     
-//    public var titleLabel = UILabel()
-//    public var subtitleLabel = UILabel()
-//    private let titleStackView = UIStackView()
+    //    public var titleLabel = UILabel()
+    //    public var subtitleLabel = UILabel()
+    //    private let titleStackView = UIStackView()
     
     // MARK: - Properties
     
@@ -20,12 +20,14 @@ final class RoomNameViewController: UIViewController {
     
     private let titleView = BasicTitleView(title: "약속방의\n이름을 알려주세요.")
     
+    private lazy var textField = BasicTextFieldView(placeholder: "약속방 이름 입력")
+    
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
         $0.addTarget(self, action: #selector(nextButtonDidTap), for: .touchUpInside)
         return $0
     }(LargeButton(state: true))
-
+    
     
     // MARK: - LifeCycle
     
@@ -36,7 +38,10 @@ final class RoomNameViewController: UIViewController {
         setNavigationBar()
     }
     
-
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
+    
 }
 
 // MARK: - Binding
@@ -54,7 +59,7 @@ extension RoomNameViewController {
     }
     
     private func layout() {
-        view.addSubviews(nextButton, titleView, progressView)
+        view.addSubviews(nextButton, titleView, progressView, textField)
         
         progressView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
@@ -62,12 +67,17 @@ extension RoomNameViewController {
         }
         
         titleView.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.top.equalTo(progressView.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
         }
         
+        textField.snp.makeConstraints {
+            $0.top.equalTo(titleView.snp.bottom).inset(-32)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
         nextButton.snp.makeConstraints {
-            $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
+            $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-20)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
     }
@@ -90,7 +100,7 @@ extension RoomNameViewController {
     }
     
     @objc func nextButtonDidTap() {
-//        input.send(.nextButtonDidTap)
+        //        input.send(.nextButtonDidTap)
         print("다음버튼이 눌렸어요!")
     }
     
