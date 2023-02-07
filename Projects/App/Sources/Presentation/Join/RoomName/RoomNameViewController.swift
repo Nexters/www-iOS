@@ -7,16 +7,19 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class RoomNameViewController: UIViewController {
     
     // MARK: - Properties
+    private let disposeBag = DisposeBag()
     
     private let progressView = ProgressView(current: 1, total: 6)
     
     private let titleView = BasicTitleView(title: "약속방의\n이름을 알려주세요.")
     
-    private lazy var textField = BasicTextFieldView(placeholder: "약속방 이름 입력")
+    private lazy var textFieldView = BasicTextFieldView(placeholder: "약속방 이름 입력")
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
@@ -41,7 +44,11 @@ final class RoomNameViewController: UIViewController {
 // MARK: - Binding
 extension RoomNameViewController {
     private func bind() {
-        
+        textFieldView.textField.rx.controlEvent([.editingDidEndOnExit])
+            .subscribe(onNext: { [weak self] in
+                self?.textFieldView.resignFirstResponder()
+            })
+            .disposed(by: disposeBag)
     }
 }
 
@@ -51,10 +58,11 @@ extension RoomNameViewController {
     
     private func attributes() {
         self.view.backgroundColor = .white
+        textFieldView.textField.becomeFirstResponder()
     }
     
     private func layout() {
-        view.addSubviews(nextButton, titleView, progressView, textField)
+        view.addSubviews(nextButton, titleView, progressView, textFieldView)
         
         progressView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
@@ -66,7 +74,7 @@ extension RoomNameViewController {
             $0.horizontalEdges.equalToSuperview()
         }
         
-        textField.snp.makeConstraints {
+        textFieldView.snp.makeConstraints {
             $0.top.equalTo(titleView.snp.bottom).inset(-32)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
@@ -95,8 +103,7 @@ extension RoomNameViewController {
     }
     
     @objc func nextButtonDidTap() {
-        //        input.send(.nextButtonDidTap)
-        print("다음버튼이 눌렸어요!")
+        textFieldView.setErrorMode(message: "에러메세지도 나와요")
     }
     
 }

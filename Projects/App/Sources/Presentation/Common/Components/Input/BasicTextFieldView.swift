@@ -114,7 +114,7 @@ extension BasicTextFieldView {
         }
     }
     
-    public func setNormalMode(message: String) {
+    public func setNormalMode() {
         DispatchQueue.main.async { [weak self] in
             self?.msgLabel.text = ""
             self?.makeNormalUI()
