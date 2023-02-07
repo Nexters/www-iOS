@@ -15,6 +15,29 @@ public final class BasicTextFieldView: UIView {
     public let textField = UITextField()
     private let leftImage = UIImageView()
     private let backgroundView = UIView()
+    
+    private let msgView: UIStackView = {
+        $0.axis = .horizontal
+        $0.distribution = .fill
+        $0.spacing = 5
+        return $0
+    }(UIStackView())
+    
+    private let icon: UIImageView = {
+        $0.image = UIImage(.info)
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
+    
+    
+    private let msgLabel: UILabel = {
+        $0.numberOfLines = 0
+        $0.textColor = UIColor.wwwColor(.WWWRed)
+        $0.font = UIFont.www(size: 11)
+        return $0
+    }(UILabel())
+    
+    
     private let cornerRadius: CGFloat = 52/2
     
     public init(placeholder: String) {
@@ -39,7 +62,6 @@ extension BasicTextFieldView {
         backgroundView.layer.cornerRadius = cornerRadius
         backgroundView.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
         backgroundView.clipsToBounds = true
-
         
         addSubviews(backgroundView, textField)
         
@@ -52,12 +74,51 @@ extension BasicTextFieldView {
             $0.edges.equalToSuperview()
             $0.height.equalTo(52)
         }
+        
     }
+    
+    private func makeErrorUI() {
+        addSubviews(msgView)
+        msgView.addArrangedSubviews(icon, msgLabel)
+        backgroundView.layer.borderColor = UIColor.wwwColor(.WWWRed).cgColor
+
+        icon.snp.makeConstraints {
+            $0.leading.equalTo(backgroundView.snp.leading)
+            $0.height.width.equalTo(12)
+        }
+
+        msgView.snp.makeConstraints {
+            $0.top.equalTo(backgroundView.snp.bottom).offset(6)
+            $0.horizontalEdges.equalToSuperview().inset(20)
+        }
+    }
+
+    private func makeNormalUI() {
+        backgroundView.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
+        msgView.removeFromSuperview()
+        icon.removeFromSuperview()
+        msgView.removeFromSuperview()
+    }
+    
 }
 
 extension BasicTextFieldView {
     public func setBorderColor(_ color: CGColor) {
         backgroundView.layer.borderColor = color
+    }
+    
+    public func setErrorMode(message: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.msgLabel.text = message
+            self?.makeErrorUI()
+        }
+    }
+    
+    public func setNormalMode(message: String) {
+        DispatchQueue.main.async { [weak self] in
+            self?.msgLabel.text = ""
+            self?.makeNormalUI()
+        }
     }
     
 }
