@@ -23,7 +23,7 @@ final class SampleViewModel: BaseViewModel {
     
     init() {}
 
-    func transform(input: Input) -> Output {
+    func transform(input: Input, disposeBag: RxSwift.DisposeBag) -> Output {
         return Output.init() // 샘플임...!
     }
     
