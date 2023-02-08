@@ -9,7 +9,7 @@
 import RxCocoa
 import RxSwift
 
-enum UserNamePager {
+enum RoomCodePager {
     case back
     case nickName
     case error
@@ -29,7 +29,7 @@ final class RoomCodeViewModel: BaseViewModel {
     struct Output {
         var roomNameTextFieldText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
-        var navigatePage = PublishRelay<RoomNamePager>()
+        var navigatePage = PublishRelay<RoomCodePager>()
     }
     
     init(joinGuestUseCase: JoinGuestUseCase) {
