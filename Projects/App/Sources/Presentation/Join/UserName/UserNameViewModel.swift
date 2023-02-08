@@ -23,15 +23,16 @@ final class UserNameViewModel: BaseViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
-        let codeTextFieldDidEdit: Observable<String>
+        let userNameDidEdit: Observable<String>
         let nextButtonDidTap: Observable<Void>
         let backButtonDidTap: Observable<Void>
     }
     
     struct Output {
+        var naviTitleText = BehaviorRelay<String>(value: "")
         var roomNameTextFieldText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
-        var navigatePage = PublishRelay<RoomCodePager>()
+        var navigatePage = PublishRelay<UserNamePager>()
     }
     
     init(joinGuestUseCase: JoinGuestUseCase) {
@@ -45,18 +46,18 @@ final class UserNameViewModel: BaseViewModel {
     }
     
     private func handleInput(_ input: Input, disposeBag: DisposeBag) {
-        input.codeTextFieldDidEdit
-            .bind(to: self.usecase.roomCode)
+        input.userNameDidEdit
+            .bind(to: self.usecase.userName)
             .disposed(by: disposeBag)
     }
     
     private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
         
-        self.usecase.roomCode
+        self.usecase.userName
             .compactMap { $0 }
-            .subscribe(onNext: { roomname in
-                if roomname != "" {
+            .subscribe(onNext: { userName in
+                if userName != "" {
                     output.nextButtonMakeEnable.accept(true)
                 } else {
                     output.nextButtonMakeEnable.accept(false)
@@ -70,9 +71,15 @@ final class UserNameViewModel: BaseViewModel {
             })
             .disposed(by: disposeBag)
         
+        input.viewDidLoad
+            .subscribe(onNext: {
+                output.naviTitleText.accept(self.usecase.roomName)
+            })
+            .disposed(by: disposeBag)
+        
         input.nextButtonDidTap
             .subscribe(onNext: {
-                output.navigatePage.accept(.nickName)
+                output.navigatePage.accept(.timeslot)
             })
             .disposed(by: disposeBag)
         

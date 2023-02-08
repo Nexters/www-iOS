@@ -29,6 +29,13 @@ final class UserNameViewController: UIViewController {
         return $0
     }(LargeButton(state: false))
     
+    
+    // Navigation Items
+    private let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: UserNameViewController.self, action: #selector(backButtonDidTap))
+    
+    private let progressLabel = UILabel()
+
+    
     // MARK: - LifeCycle
     init(viewModel: UserNameViewModel, userMode: UserType) {
         self.viewModel = viewModel
@@ -47,6 +54,7 @@ final class UserNameViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        setNavigationBar()
         bindViewModel()
     }
     
@@ -60,16 +68,6 @@ final class UserNameViewController: UIViewController {
 extension UserNameViewController {
     
     private func setUI() {
-        
-        // TODO: rx적용
-        switch userMode {
-        case .host:
-            progressView.setProgress(current: 2, total: 6)
-            self.setNavigationBar(title: "넥스터즈 뒷풀이", step: "2/6")
-        case .guest:
-            progressView.setProgress(current: 2, total: 4)
-            self.setNavigationBar(title: "넥스터즈 뒷풀이", step: "2/4")
-        }
         
         self.view.backgroundColor = .white
 //        textFieldView.textField.becomeFirstResponder()
@@ -101,9 +99,7 @@ extension UserNameViewController {
     
     /* Temp */
     private func setNavigationBar(title: String = "", step: String = "") {
-        let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
         backButton.tintColor = .black
-        let progressLabel = UILabel()
         progressLabel.text = step
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
@@ -122,7 +118,7 @@ private extension UserNameViewController {
         let input = UserNameViewModel.Input(
             viewDidLoad:
                 Observable.just(()).asObservable(),
-            codeTextFieldDidEdit:
+            userNameDidEdit:
                 textFieldView.textField.rx.text.orEmpty.asObservable(),
             nextButtonDidTap:
                 self.nextButton.rx.tap.asObservable(),
@@ -133,6 +129,22 @@ private extension UserNameViewController {
         let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
+        
+        output?.naviTitleText
+            .asDriver()
+            .drive(onNext: { [weak self] title in
+                switch self?.userMode {
+                case .host:
+                    self?.progressView.setProgress(current: 2, total: 6)
+                    self?.setNavigationBar(title: "넥스터즈 뒷풀이", step: "2/6")
+                case .guest:
+                    self?.progressView.setProgress(current: 2, total: 4)
+                    self?.setNavigationBar(title: title, step: "2/4")
+                case .none:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
         
         output?.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
@@ -154,9 +166,11 @@ private extension UserNameViewController {
                 switch page {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
-                case .nickName:
-                    // TODO: 다음페이지 연결
-                    print("다음페이지로 넘어갑니다")
+                case .calendar:
+                    print("calendar로 넘어갑니다")
+                case .timeslot:
+                    print("timeslot로 넘어갑니다")
+                    
                 case .error: break
                 }
             })
