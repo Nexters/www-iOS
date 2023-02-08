@@ -32,8 +32,8 @@ class SampleViewController: UIViewController {
     }
     
     @objc func testButtonDidTap() {
-        let viewModel = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
-        self.navigationController?.pushViewController(RoomNameViewController(viewModel: viewModel), animated: true)
+        let viewModel = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
+        self.navigationController?.pushViewController(RoomCodeController(viewModel: viewModel), animated: true)
     }
 }
 
