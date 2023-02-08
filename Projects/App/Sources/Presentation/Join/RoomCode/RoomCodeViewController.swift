@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 import RxCocoa
 import RxSwift
 
@@ -137,6 +138,7 @@ private extension RoomCodeController {
                     self?.navigationController?.popViewController(animated: true)
                 case .nickName:
                     // VM에서 코드 검증 단계
+                    self?.textFieldView.textField.resignFirstResponder()
                     let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase())
                     self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .guest), animated: true)
                 case .error: break

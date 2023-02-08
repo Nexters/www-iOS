@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 import RxCocoa
 import RxSwift
 
@@ -132,8 +133,9 @@ private extension RoomNameViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .nickName:
-                    // TODO: 다음페이지 연결
-                    print("다음페이지로 넘어갑니다")
+                    self?.textFieldView.textField.resignFirstResponder()
+                    let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase())
+                    self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .host), animated: true)
                 case .error: break
                 }
             })

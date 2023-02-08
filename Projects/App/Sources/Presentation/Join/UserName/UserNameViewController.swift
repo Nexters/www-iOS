@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SnapKit
 import RxCocoa
 import RxSwift
 
@@ -21,7 +22,7 @@ final class UserNameViewController: UIViewController {
     
     private let titleView = BasicTitleView(title: "약속방에서 사용하실\n닉네임을 알려주세요.")
     
-    private lazy var textFieldView = BasicTextFieldView(placeholder: "참여 코드 입력")
+    private lazy var textFieldView = BasicTextFieldView(placeholder: "닉네임 입력")
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
@@ -39,6 +40,10 @@ final class UserNameViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        textFieldView.textField.becomeFirstResponder()
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
@@ -67,7 +72,7 @@ extension UserNameViewController {
         }
         
         self.view.backgroundColor = .white
-        textFieldView.textField.becomeFirstResponder()
+//        textFieldView.textField.becomeFirstResponder()
         
         self.view.addSubview(progressView)
         progressView.snp.makeConstraints {
