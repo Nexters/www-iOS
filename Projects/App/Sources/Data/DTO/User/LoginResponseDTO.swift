@@ -10,5 +10,5 @@ import Foundation
 struct LoginResponseDTO: ModelType {
     let code: Int
     let message: String
-    let result: Data
+    let result: String
 }

@@ -37,7 +37,7 @@ extension UserAPI: TargetType {
     var task: Moya.Task {
         switch self {
         case .join(let param):
-            return .requestParameters(parameters: try! param.asDictionary(), encoding: URLEncoding.default)
+            return .requestParameters(parameters: try! param.asDictionary(), encoding: JSONEncoding.default)
         }
     }
     
@@ -51,5 +51,5 @@ extension UserAPI: TargetType {
 }
 
 struct UserAPIManager {
-    let provider = RxMoyaProvider<UserAPI>()
+    static let provider = RxMoyaProvider<UserAPI>()
 }
