@@ -10,12 +10,12 @@ import Foundation
 import RxSwift
 
 
-protocol JoinAdminUseCaseProtocol {
+protocol JoinHostUseCaseProtocol {
     var roomName: BehaviorSubject<String> { get }
     var nickName: String { get set }
 }
 
-final class JoinAdminUseCase: JoinAdminUseCaseProtocol {
+final class JoinHostUseCase: JoinHostUseCaseProtocol {
     
     // MARK: - Properties
     var roomName = BehaviorSubject<String>(value: "")
@@ -29,6 +29,6 @@ final class JoinAdminUseCase: JoinAdminUseCaseProtocol {
 }
 
 // MARK: - Privates
-private extension JoinAdminUseCaseProtocol {
+private extension JoinHostUseCase {
     
 }

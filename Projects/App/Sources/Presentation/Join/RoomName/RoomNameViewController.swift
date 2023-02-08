@@ -153,7 +153,7 @@ import SwiftUI
 
 struct RoomNameViewController_Preview: PreviewProvider {
     static var previews: some View {
-        let viewModel = RoomNameViewModel(joinAdminUseCase: JoinAdminUseCase())
+        let viewModel = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
         RoomNameViewController(viewModel: viewModel).toPreview()
     }
 }

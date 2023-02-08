@@ -18,7 +18,7 @@ enum RoomNamePager {
 final class RoomNameViewModel: BaseViewModel {
     
     // MARK: - Properties
-    private let usecase: JoinAdminUseCase
+    private let usecase: JoinHostUseCase
     
     struct Input {
         let roomNameTextFieldDidEdit: Observable<String>
@@ -32,7 +32,7 @@ final class RoomNameViewModel: BaseViewModel {
         var navigatePage = PublishRelay<RoomNamePager>()
     }
     
-    init(joinAdminUseCase: JoinAdminUseCase) {
+    init(joinAdminUseCase: JoinHostUseCase) {
         self.usecase = joinAdminUseCase
     }
 
