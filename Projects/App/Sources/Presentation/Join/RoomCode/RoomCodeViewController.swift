@@ -136,8 +136,9 @@ private extension RoomCodeController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .nickName:
-                    // TODO: 다음페이지 연결
-                    print("다음페이지로 넘어갑니다")
+                    // VM에서 코드 검증 단계
+                    let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase())
+                    self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .guest), animated: true)
                 case .error: break
                 }
             })
