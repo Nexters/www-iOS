@@ -63,7 +63,8 @@ extension BasicTextFieldView {
         backgroundView.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
         backgroundView.clipsToBounds = true
         
-        addSubviews(backgroundView, textField)
+        addSubviews(backgroundView, textField, msgView)
+        msgView.addArrangedSubviews(icon, msgLabel)
         
         textField.snp.makeConstraints {
             $0.centerY.equalToSuperview()
@@ -78,10 +79,8 @@ extension BasicTextFieldView {
     }
     
     private func makeErrorUI() {
-        addSubviews(msgView)
-        msgView.addArrangedSubviews(icon, msgLabel)
         backgroundView.layer.borderColor = UIColor.wwwColor(.WWWRed).cgColor
-
+        msgView.isHidden = false
         icon.snp.makeConstraints {
             $0.leading.equalTo(backgroundView.snp.leading)
             $0.height.width.equalTo(12)
@@ -95,9 +94,7 @@ extension BasicTextFieldView {
 
     private func makeNormalUI() {
         backgroundView.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
-        msgView.removeFromSuperview()
-        icon.removeFromSuperview()
-        msgView.removeFromSuperview()
+        msgView.isHidden = true
     }
     
 }
