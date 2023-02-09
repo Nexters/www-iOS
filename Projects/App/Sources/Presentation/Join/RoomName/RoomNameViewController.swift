@@ -118,11 +118,7 @@ private extension RoomNameViewController {
         output?.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
-                if isEnabled == true {
-                    self?.nextButton.setButtonState(true)
-                } else {
-                    self?.nextButton.setButtonState(false)
-                }
+                self?.nextButton.setButtonState(isEnabled)
             })
             .disposed(by: disposeBag)
         
