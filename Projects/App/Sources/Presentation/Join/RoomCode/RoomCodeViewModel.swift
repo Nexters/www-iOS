@@ -6,7 +6,7 @@
 //  Copyright © 2023 com.promise8. All rights reserved.
 //
 
-import RxCocoa
+import RxRelay
 import RxSwift
 
 enum RoomCodePager {
