@@ -25,7 +25,6 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     // MARK: - Methods
     init() {}
 
-    
 }
 
 // MARK: - Privates

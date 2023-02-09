@@ -41,6 +41,10 @@ final class RoomNameViewModel: BaseViewModel {
         return makeOutput(with:  input, disposeBag: disposeBag)
     }
     
+    func getUseCase() -> JoinHostUseCase {
+        return self.usecase
+    }
+    
     private func handleInput(_ input: Input, disposeBag: DisposeBag) {
         input.roomNameTextFieldDidEdit
             .bind(to: self.usecase.roomName)

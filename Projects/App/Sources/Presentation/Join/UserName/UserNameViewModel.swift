@@ -112,17 +112,15 @@ extension UserNameViewModel {
         self.usecaseHost!.userName
             .compactMap { $0 }
             .subscribe(onNext: { userName in
-                if userName != "" {
-                    output.nextButtonMakeEnable.accept(true)
-                } else {
-                    output.nextButtonMakeEnable.accept(false)
-                }
+                output.nextButtonMakeEnable.accept(userName != "" ? true : false)
             })
             .disposed(by: disposeBag)
         
-        self.usecaseHost!.roomName
-            .map { $0 }
-            .bind(to: output.naviTitleText)
+        input.viewDidLoad
+            .subscribe(onNext: {
+                guard let roomName = try? self.usecaseHost!.roomName.value() else { return }
+                output.naviTitleText.accept(roomName)
+            })
             .disposed(by: disposeBag)
         
         input.backButtonDidTap

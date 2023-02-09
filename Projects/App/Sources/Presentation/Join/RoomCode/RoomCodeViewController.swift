@@ -139,7 +139,7 @@ private extension RoomCodeController {
                 case .nickName:
                     // VM에서 코드 검증 단계
                     self?.textFieldView.textField.resignFirstResponder()
-                    let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase())
+                    let viewModel = UserNameViewModel(joinGuestUseCase: self?.viewModel?.getUseCase())
                     self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .guest), animated: true)
                 case .error: break
                 }

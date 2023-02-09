@@ -135,6 +135,7 @@ private extension UserNameViewController {
             .drive(onNext: { [weak self] title in
                 switch self?.userMode {
                 case .host:
+                    print(title)
                     self?.progressView.setProgress(current: 2, total: 6)
                     self?.setNavigationBar(title: title, step: "2/6")
                 case .guest:
