@@ -30,7 +30,6 @@ final class JoinUserUseCase: JoinUserUseCaseProtocol {
     
 }
 
-// MARK: - Privates
 private extension JoinUserUseCaseProtocol {
     
 }
