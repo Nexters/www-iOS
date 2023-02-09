@@ -11,4 +11,5 @@ import Foundation
 public enum WWWAssset: String {
     case chevron_left
     case link
+    case info
 }
