@@ -136,7 +136,7 @@ private extension UserNameViewController {
                 switch self?.userMode {
                 case .host:
                     self?.progressView.setProgress(current: 2, total: 6)
-                    self?.setNavigationBar(title: "넥스터즈 뒷풀이", step: "2/6")
+                    self?.setNavigationBar(title: title, step: "2/6")
                 case .guest:
                     self?.progressView.setProgress(current: 2, total: 4)
                     self?.setNavigationBar(title: title, step: "2/4")
@@ -186,7 +186,7 @@ import SwiftUI
 
 struct UserNameViewController_Preview: PreviewProvider {
     static var previews: some View {
-        let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase())
+        let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase(), joinHostUseCase: nil)
         UserNameViewController(viewModel: viewModel, userMode: .host).toPreview()
     }
 }

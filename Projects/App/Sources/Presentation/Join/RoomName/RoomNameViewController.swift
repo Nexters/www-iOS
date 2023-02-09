@@ -134,7 +134,7 @@ private extension RoomNameViewController {
                     self?.navigationController?.popViewController(animated: true)
                 case .nickName:
                     self?.textFieldView.textField.resignFirstResponder()
-                    let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase())
+                    let viewModel = UserNameViewModel(joinHostUseCase: JoinHostUseCase())
                     self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .host), animated: true)
                 case .error: break
                 }

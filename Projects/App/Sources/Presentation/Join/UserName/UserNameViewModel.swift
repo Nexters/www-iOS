@@ -6,7 +6,7 @@
 //  Copyright © 2023 com.promise8. All rights reserved.
 //
 
-import RxCocoa
+import RxRelay
 import RxSwift
 
 enum UserNamePager {
@@ -19,7 +19,8 @@ enum UserNamePager {
 final class UserNameViewModel: BaseViewModel {
     
     // MARK: - Properties
-    private let usecase: JoinGuestUseCase
+    private let usecaseGuest: JoinGuestUseCase?
+    private let usecaseHost: JoinHostUseCase?
     
     struct Input {
         let viewDidLoad: Observable<Void>
@@ -30,38 +31,46 @@ final class UserNameViewModel: BaseViewModel {
     
     struct Output {
         var naviTitleText = BehaviorRelay<String>(value: "")
-        var roomNameTextFieldText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<UserNamePager>()
     }
     
-    init(joinGuestUseCase: JoinGuestUseCase) {
-        self.usecase = joinGuestUseCase
+    init(joinGuestUseCase: JoinGuestUseCase? = nil, joinHostUseCase: JoinHostUseCase? = nil) {
+        self.usecaseGuest = joinGuestUseCase
+        self.usecaseHost = joinHostUseCase
     }
 
     // MARK: - Transform
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
-        self.handleInput(input, disposeBag: disposeBag)
-        return makeOutput(with:  input, disposeBag: disposeBag)
+        if usecaseGuest != nil {
+            // Guest
+            self.handleInputGuest(input, disposeBag: disposeBag)
+            return makeOutputGuest(with: input, disposeBag: disposeBag)
+        } else {
+            // Host
+            self.handleInputHost(input, disposeBag: disposeBag)
+            return makeOutputHost(with: input, disposeBag: disposeBag)
+        }
     }
+}
+
+// MARK: - Guest
+
+extension UserNameViewModel {
     
-    private func handleInput(_ input: Input, disposeBag: DisposeBag) {
+    private func handleInputGuest(_ input: Input, disposeBag: DisposeBag) {
         input.userNameDidEdit
-            .bind(to: self.usecase.userName)
+            .bind(to: self.usecaseGuest!.userName)
             .disposed(by: disposeBag)
     }
     
-    private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
+    private func makeOutputGuest(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
         
-        self.usecase.userName
+        self.usecaseGuest!.userName
             .compactMap { $0 }
             .subscribe(onNext: { userName in
-                if userName != "" {
-                    output.nextButtonMakeEnable.accept(true)
-                } else {
-                    output.nextButtonMakeEnable.accept(false)
-                }
+                output.nextButtonMakeEnable.accept(userName != "" ? true : false)
             })
             .disposed(by: disposeBag)
         
@@ -73,13 +82,58 @@ final class UserNameViewModel: BaseViewModel {
         
         input.viewDidLoad
             .subscribe(onNext: {
-                output.naviTitleText.accept(self.usecase.roomName)
+                output.naviTitleText.accept(self.usecaseGuest!.roomName)
             })
             .disposed(by: disposeBag)
         
         input.nextButtonDidTap
             .subscribe(onNext: {
                 output.navigatePage.accept(.timeslot)
+            })
+            .disposed(by: disposeBag)
+        
+        return output
+    }
+}
+
+// MARK: - HOST
+
+extension UserNameViewModel {
+    
+    private func handleInputHost(_ input: Input, disposeBag: DisposeBag) {
+        input.userNameDidEdit
+            .bind(to: self.usecaseHost!.userName)
+            .disposed(by: disposeBag)
+    }
+    
+    private func makeOutputHost(with input: Input, disposeBag: DisposeBag) -> Output {
+        let output = Output()
+        
+        self.usecaseHost!.userName
+            .compactMap { $0 }
+            .subscribe(onNext: { userName in
+                if userName != "" {
+                    output.nextButtonMakeEnable.accept(true)
+                } else {
+                    output.nextButtonMakeEnable.accept(false)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        self.usecaseHost!.roomName
+            .map { $0 }
+            .bind(to: output.naviTitleText)
+            .disposed(by: disposeBag)
+        
+        input.backButtonDidTap
+            .subscribe(onNext: {
+                output.navigatePage.accept(.back)
+            })
+            .disposed(by: disposeBag)
+        
+        input.nextButtonDidTap
+            .subscribe(onNext: {
+                output.navigatePage.accept(.calendar)
             })
             .disposed(by: disposeBag)
         

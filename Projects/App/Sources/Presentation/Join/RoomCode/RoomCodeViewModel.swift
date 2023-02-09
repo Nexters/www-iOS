@@ -54,11 +54,7 @@ final class RoomCodeViewModel: BaseViewModel {
         self.usecase.roomCode
             .compactMap { $0 }
             .subscribe(onNext: { roomname in
-                if roomname != "" {
-                    output.nextButtonMakeEnable.accept(true)
-                } else {
-                    output.nextButtonMakeEnable.accept(false)
-                }
+                output.nextButtonMakeEnable.accept(roomname != "" ? true : false)
             })
             .disposed(by: disposeBag)
         
