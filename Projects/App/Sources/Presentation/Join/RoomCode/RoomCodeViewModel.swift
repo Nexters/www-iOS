@@ -27,7 +27,6 @@ final class RoomCodeViewModel: BaseViewModel {
     }
     
     struct Output {
-        var roomNameTextFieldText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<RoomCodePager>()
     }
