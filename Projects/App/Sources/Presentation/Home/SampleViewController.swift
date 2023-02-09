@@ -17,10 +17,19 @@ class SampleViewController: UIViewController {
         return $0
     }(LargeButton(state: true))
 
-    private var viewModel = SampleViewModel()
+    private var viewModel: SampleViewModel?
     
     private var bag = DisposeBag()
-
+    
+    init(viewModel: SampleViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
@@ -50,9 +59,9 @@ class SampleViewController: UIViewController {
     }
     
     private func bindRx() {
-        let output = viewModel.transform(input: SampleViewModel.Input(viewDidLoad: Single<Void>.just(()) ))
+        let output = viewModel?.transform(input: SampleViewModel.Input(viewDidLoad: Single<Void>.just(()) ))
         
-        output.loginResult.subscribe {
+        output?.loginResult.subscribe {
             print("loginResult is", $0)
         }.disposed(by: bag)
     }
