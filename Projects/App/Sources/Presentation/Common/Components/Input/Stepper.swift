@@ -10,21 +10,20 @@
 import UIKit
 import SnapKit
 
-struct StepperViewData {
-    let color: UIColor
-    let minimum: Double = 1
-    let maximum: Double = 20
-    let stepValue: Double
-}
-
 public class Stepper: UIControl {
     
-    private lazy var plusButton = stepperButton(color: viewData.color, text: "+", value: 1)
-    private lazy var minusButton = stepperButton(color: viewData.color, text: "-", value: -1)
+    private let minimum: Double = 1.0
+    private let maximum: Double = 20.0
+    private let stepValue: Double = 1.0
+    private (set) var value: Double = 0
     
-    private lazy var numberLabel: UILabel = {
+    private lazy var plusButton = stepperButton(text: "+", value: 1)
+    private lazy var minusButton = stepperButton(text: "-", value: -1)
+    
+    private lazy var counterLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.www(size: 72, family: .Light)
+        label.translatesAutoresizingMaskIntoConstraints = false
         label.textAlignment = .center
         label.text = "1"
         return label
@@ -32,41 +31,43 @@ public class Stepper: UIControl {
     
     private lazy var container: UIStackView = {
         let stack = UIStackView()
-        stack.distribution = .fillEqually
+        stack.distribution = .fill
+        stack.spacing = 38 - 21.5
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
     
-    private (set) var value: Double = 0
-    private let viewData: StepperViewData
-    
-    init(viewData: StepperViewData) {
-        self.viewData = viewData
+    init() {
         super.init(frame: .zero)
         setup()
     }
     
-    @available(*, unavailable)
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     func setValue(_ newValue: Double) {
-        updateValue(min(viewData.maximum, max(viewData.minimum, newValue)))
+        updateValue(min(maximum, max(minimum, newValue)))
     }
     
     private func setup() {
-        backgroundColor = .white
-        addSubview(container)
+        backgroundColor = .wwwColor(.WWWWhite)
+        self.addSubview(container)
         
-        NSLayoutConstraint.activate([
-            container.topAnchor.constraint(equalTo: topAnchor),
-            container.leadingAnchor.constraint(equalTo: leadingAnchor),
-            container.trailingAnchor.constraint(equalTo: trailingAnchor),
-            container.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
+        container.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
         
-        [minusButton, counterLabel, plusButton].forEach(container.addArrangedSubview)
+        container.addArrangedSubviews(minusButton, counterLabel, plusButton)
+        
+        minusButton.snp.makeConstraints {
+            $0.width.height.equalTo(24)
+        }
+        
+        plusButton.snp.makeConstraints {
+            $0.width.height.equalTo(24)
+        }
+        
     }
     
     public override func layoutSubviews() {
@@ -76,31 +77,28 @@ public class Stepper: UIControl {
     }
     
     private func didPressedStepper(value: Double) {
-        updateValue(value * viewData.stepValue)
+        updateValue(value * stepValue)
     }
     
     private func updateValue(_ newValue: Double) {
-        guard (viewData.minimum...viewData.maximum) ~= (value + newValue) else {
+        guard (minimum...maximum) ~= (value + newValue) else {
             return
         }
         value += newValue
+        print(value)
         counterLabel.text = String(value.formatted())
         sendActions(for: .valueChanged)
-    
     }
     
-    private func stepperButton(color: UIColor, text: String, value: Int) -> UIButton {
+    private func stepperButton(text: String, value: Int) -> UIButton {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
-        button.setTitle(text, for: .normal)
         button.tag = value
-        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .bold)
-        button.setTitleColor(.white, for: .normal)
-        button.setTitleColor(color.withAlphaComponent(0.5), for: .highlighted)
-        button.backgroundColor = color
-        button.layer.borderColor = color.cgColor
-        button.layer.borderWidth = 1
+        button.setImage(UIImage(value == 1 ? .add : .delete),
+                        for: .disabled)
+        button.setImage(UIImage(value == 1 ? .add_fill : .delete_fill),
+                        for: .normal)
         return button
     }
     

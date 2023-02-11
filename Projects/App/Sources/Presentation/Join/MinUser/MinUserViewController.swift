@@ -19,10 +19,7 @@ final class MinUserViewController: UIViewController {
     
     private let progressView = ProgressView(current: 1, total: 6)
     
-    private let stepperView = Stepper(viewData: StepperViewData(color: .black,
-                                                            minimum: 1.0,
-                                                            maximum: 20.0,
-                                                            stepValue: 1.0))
+    private let stepperView = Stepper()
     
     private let titleView = BasicTitleView(title: "최소 인원을 설정해 주세요.",
                                            subTitle: "최소 인원 입장 완료 시, 투표가 시작됩니다.")
@@ -77,7 +74,8 @@ extension MinUserViewController {
         stepperView.snp.makeConstraints {
             $0.top.equalTo(titleView.snp.bottom).offset(132)
             $0.centerX.equalToSuperview()
-            $0.width.equalTo(104)
+            $0.width.equalTo(167)
+            $0.height.equalTo(80)
         }
         
         self.view.addSubview(nextButton)
