@@ -90,7 +90,7 @@ extension MinUserViewController {
         let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
         backButton.tintColor = .black
         let progressLabel = UILabel()
-        progressLabel.text = "1/6"
+        progressLabel.text = "3/6"
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
