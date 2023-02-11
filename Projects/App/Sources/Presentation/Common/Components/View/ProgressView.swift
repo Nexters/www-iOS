@@ -50,4 +50,9 @@ extension ProgressView {
             make.height.equalTo(2)
         }
     }
+    
+    public func setProgress(current: Int, total: Int) {
+        setUI(prog: Float(current) / Float(total))
+    }
+    
 }

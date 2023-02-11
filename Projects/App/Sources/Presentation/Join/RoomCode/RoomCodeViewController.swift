@@ -1,8 +1,8 @@
 //
-//  RoomNameViewController.swift
+//  UserNameViewController.swift
 //  App
 //
-//  Created by Chanhee Jeong on 2023/02/07.
+//  Created by Chanhee Jeong on 2023/02/09.
 //  Copyright © 2023 com.promise8. All rights reserved.
 //
 
@@ -11,17 +11,17 @@ import SnapKit
 import RxCocoa
 import RxSwift
 
-final class RoomNameViewController: UIViewController {
+final class RoomCodeController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: RoomNameViewModel?
+    var viewModel: RoomCodeViewModel?
     
-    private let progressView = ProgressView(current: 1, total: 6)
+    private let progressView = ProgressView(current: 1, total: 4)
     
-    private let titleView = BasicTitleView(title: "약속방의\n이름을 알려주세요.")
+    private let titleView = BasicTitleView(title: "친구에게 받은\n참여 코드를 입력해주세요.")
     
-    private lazy var textFieldView = BasicTextFieldView(placeholder: "약속방 이름 입력")
+    private lazy var textFieldView = BasicTextFieldView(placeholder: "참여 코드 입력")
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
@@ -29,7 +29,7 @@ final class RoomNameViewController: UIViewController {
     }(LargeButton(state: false))
     
     // MARK: - LifeCycle
-    init(viewModel: RoomNameViewModel) {
+    init(viewModel: RoomCodeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -52,7 +52,7 @@ final class RoomNameViewController: UIViewController {
 
 // MARK: - Function
 
-extension RoomNameViewController {
+extension RoomCodeController {
     
     private func setUI() {
         self.view.backgroundColor = .white
@@ -88,7 +88,7 @@ extension RoomNameViewController {
         let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
         backButton.tintColor = .black
         let progressLabel = UILabel()
-        progressLabel.text = "1/6"
+        progressLabel.text = "1/4"
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
@@ -101,10 +101,10 @@ extension RoomNameViewController {
 }
 
 // MARK: - Binding
-private extension RoomNameViewController {
+private extension RoomCodeController {
     func bindViewModel() {
-        let input = RoomNameViewModel.Input(
-            roomNameTextFieldDidEdit:
+        let input = RoomCodeViewModel.Input(
+            codeTextFieldDidEdit:
                 textFieldView.textField.rx.text.orEmpty.asObservable(),
             nextButtonDidTap:
                 self.nextButton.rx.tap.asObservable(),
@@ -119,13 +119,17 @@ private extension RoomNameViewController {
         output?.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
-                self?.nextButton.setButtonState(isEnabled)
+                if isEnabled == true {
+                    self?.nextButton.setButtonState(true)
+                } else {
+                    self?.nextButton.setButtonState(false)
+                }
             })
             .disposed(by: disposeBag)
         
     }
     
-    func bindPager(output: RoomNameViewModel.Output?){
+    func bindPager(output: RoomCodeViewModel.Output?){
         output?.navigatePage
             .asDriver(onErrorJustReturn: .error)
             .drive(onNext: { [weak self] page in
@@ -133,9 +137,10 @@ private extension RoomNameViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .nickName:
+                    // VM에서 코드 검증 단계
                     self?.textFieldView.textField.resignFirstResponder()
-                    let viewModel = UserNameViewModel(joinHostUseCase: self?.viewModel?.getUseCase())
-                    self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .host), animated: true)
+                    let viewModel = UserNameViewModel(joinGuestUseCase: self?.viewModel?.getUseCase())
+                    self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .guest), animated: true)
                 case .error: break
                 }
             })
@@ -149,10 +154,10 @@ private extension RoomNameViewController {
 #if canImport(SwiftUI) && DEBUG
 import SwiftUI
 
-struct RoomNameViewController_Preview: PreviewProvider {
+struct RoomCodeController_Preview: PreviewProvider {
     static var previews: some View {
-        let viewModel = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
-        RoomNameViewController(viewModel: viewModel).toPreview()
+        let viewModel = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
+        RoomCodeController(viewModel: viewModel).toPreview()
     }
 }
 #endif

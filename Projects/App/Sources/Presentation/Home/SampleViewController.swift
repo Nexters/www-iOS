@@ -32,8 +32,15 @@ class SampleViewController: UIViewController {
     }
     
     @objc func testButtonDidTap() {
-        let viewModel = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
-        self.navigationController?.pushViewController(RoomNameViewController(viewModel: viewModel), animated: true)
+ 
+        // 방장 플로우
+//        let viewModel = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
+//        self.navigationController?.pushViewController(RoomNameViewController(viewModel: viewModel), animated: true)
+        
+        // 참가자 플로우
+        let viewModel = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
+        self.navigationController?.pushViewController(RoomCodeController(viewModel: viewModel), animated: true)
+        
     }
 }
 
