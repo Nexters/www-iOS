@@ -59,7 +59,7 @@ class SampleViewController: UIViewController {
     }
     
     private func bindRx() {
-        let output = viewModel?.transform(input: SampleViewModel.Input(viewDidLoad: Single<Void>.just(()) ))
+        let output = viewModel?.transform(input: SampleViewModel.Input(viewDidLoad: Single<Void>.just(()) ), disposeBag: DisposeBag())
         
         output?.loginResult.subscribe {
             print("loginResult is", $0)
