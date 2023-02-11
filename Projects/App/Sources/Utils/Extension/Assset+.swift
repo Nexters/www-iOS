@@ -12,4 +12,8 @@ public enum WWWAssset: String {
     case chevron_left
     case link
     case info
+    case add
+    case add_fill
+    case delete
+    case delete_fill
 }
