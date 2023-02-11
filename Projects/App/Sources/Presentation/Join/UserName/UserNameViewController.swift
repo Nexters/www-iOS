@@ -86,7 +86,7 @@ extension UserNameViewController {
         
         self.view.addSubview(textFieldView)
         textFieldView.snp.makeConstraints {
-            $0.top.equalTo(titleView.snp.bottom).inset(-32)
+            $0.top.equalTo(titleView.snp.bottom).offset(32)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
         
