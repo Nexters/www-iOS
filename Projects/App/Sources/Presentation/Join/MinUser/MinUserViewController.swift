@@ -17,7 +17,7 @@ final class MinUserViewController: UIViewController {
     private let disposeBag = DisposeBag()
     var viewModel: MinUserViewModel?
     
-    private let progressView = ProgressView(current: 1, total: 6)
+    private let progressView = ProgressView(current: 3, total: 6)
     
     private let stepperView = Stepper()
     
