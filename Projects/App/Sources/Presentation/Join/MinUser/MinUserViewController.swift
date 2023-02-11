@@ -106,8 +106,12 @@ extension MinUserViewController {
 private extension MinUserViewController {
     func bindViewModel() {
         let input = MinUserViewModel.Input(
-//            roomNameTextFieldDidEdit:
-//                textFieldView.textField.rx.text.orEmpty.asObservable(),
+            plusButtonDidTap:
+                self.stepperView.plusButton.rx.tap.asObservable(),
+            minusButtonDidTap:
+                self.stepperView.minusButton.rx.tap.asObservable(),
+            stepperTextDidChange:
+            self.stepperView.counterText.rx.text.orEmpty.asObservable(),
             nextButtonDidTap:
                 self.nextButton.rx.tap.asObservable(),
             backButtonDidTap:
@@ -117,6 +121,20 @@ private extension MinUserViewController {
         let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
+        
+        output?.plusValue
+            .asDriver(onErrorJustReturn: ())
+            .drive(onNext: { [weak self] isEnabled in
+                self?.stepperView.plusValue()
+            })
+            .disposed(by: disposeBag)
+        
+        output?.minusValue
+            .asDriver(onErrorJustReturn: ())
+            .drive(onNext: { [weak self] isEnabled in
+                self?.stepperView.minusValue()
+            })
+            .disposed(by: disposeBag)
         
         output?.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)

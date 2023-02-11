@@ -22,7 +22,9 @@ final class MinUserViewModel: BaseViewModel {
     private let usecase: JoinHostUseCase
     
     struct Input {
-//        let roomNameTextFieldDidEdit: Observable<String>
+        let plusButtonDidTap: Observable<Void>
+        let minusButtonDidTap: Observable<Void>
+        let stepperTextDidChange: Observable<String>
         let nextButtonDidTap: Observable<Void>
         let backButtonDidTap: Observable<Void>
     }
@@ -30,6 +32,8 @@ final class MinUserViewModel: BaseViewModel {
     struct Output {
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<MinUserPager>()
+        var plusValue = PublishRelay<Void>()
+        var minusValue = PublishRelay<Void>()
     }
     
     init(joinAdminUseCase: JoinHostUseCase) {
@@ -47,22 +51,32 @@ final class MinUserViewModel: BaseViewModel {
     }
     
     private func handleInput(_ input: Input, disposeBag: DisposeBag) {
-//        input.roomNameTextFieldDidEdit
-//            .bind(to: self.usecase.roomName)
-//            .disposed(by: disposeBag)
+        input.stepperTextDidChange
+            .map { Int($0)!}
+            .bind(to: self.usecase.minUser)
+            .disposed(by: disposeBag)
+        print(usecase.minUser)
     }
     
     private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
         
-        self.usecase.roomName
+        self.usecase.minUser
             .compactMap { $0 }
-            .subscribe(onNext: { roomname in
-                if roomname != "" {
-                    output.nextButtonMakeEnable.accept(true)
-                } else {
-                    output.nextButtonMakeEnable.accept(false)
-                }
+            .subscribe(onNext: { minUser in
+                output.nextButtonMakeEnable.accept(minUser>1)
+            })
+            .disposed(by: disposeBag)
+        
+        input.plusButtonDidTap
+            .subscribe(onNext: {
+                output.plusValue.accept(Void())
+            })
+            .disposed(by: disposeBag)
+        
+        input.minusButtonDidTap
+            .subscribe(onNext: {
+                output.minusValue.accept(Void())
             })
             .disposed(by: disposeBag)
         

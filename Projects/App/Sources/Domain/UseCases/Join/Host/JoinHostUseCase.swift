@@ -13,6 +13,7 @@ import RxSwift
 protocol JoinHostUseCaseProtocol {
     var roomName: BehaviorSubject<String> { get }
     var userName: BehaviorSubject<String> { get }
+    var minUser: BehaviorSubject<Int> { get }
 }
 
 final class JoinHostUseCase: JoinHostUseCaseProtocol {
@@ -20,6 +21,7 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     // MARK: - Properties
     var roomName = BehaviorSubject<String>(value: "")
     var userName = BehaviorSubject<String>(value: "")
+    var minUser = BehaviorSubject<Int>(value: 1)
     
     
     // MARK: - Methods

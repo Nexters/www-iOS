@@ -14,30 +14,31 @@ final class Stepper: UIControl {
     private let minimum: Double = 1.0
     private let maximum: Double = 20.0
     private var value: Int = 0
-    
-    public lazy var counterLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.www(size: 72, family: .Light)
-        label.textAlignment = .center
-        label.text = String(value.formatted())
-        return label
+ 
+    public lazy var counterText: UITextField = {
+        let text = UITextField()
+        text.isEnabled = false
+        text.font = UIFont.www(size: 72, family: .Light)
+        text.textAlignment = .center
+        text.text = String(value.formatted())
+        return text
     }()
     
-    public lazy var container: UIStackView = {
+    private lazy var container: UIStackView = {
         let stack = UIStackView()
         stack.distribution = .fill
         stack.spacing = 38 - 21.5
         return stack
     }()
     
-    private lazy var plusButton: UIButton = {
+    public lazy var plusButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(.add), for: .disabled)
         button.setImage(UIImage(.add_fill), for: .normal)
         return button
     }()
     
-    private lazy var minusButton: UIButton = {
+    public lazy var minusButton: UIButton = {
         let button = UIButton()
         button.isEnabled = false
         button.setImage(UIImage(.delete),  for: .disabled)
@@ -73,7 +74,7 @@ final class Stepper: UIControl {
             $0.edges.equalToSuperview()
         }
         
-        container.addArrangedSubviews(minusButton, counterLabel, plusButton)
+        container.addArrangedSubviews(minusButton, counterText, plusButton)
         
         minusButton.snp.makeConstraints {
             $0.width.height.equalTo(24)
@@ -95,7 +96,7 @@ final class Stepper: UIControl {
 extension Stepper {
     func plusValue() {
         value += 1
-        counterLabel.text = String(value.formatted())
+        counterText.text = String(value.formatted())
         if value == 2 {
             minusButton.isEnabled = true
         }
@@ -104,14 +105,25 @@ extension Stepper {
         }
     }
     
-    func minusValue() {
+    public func minusValue() {
         value -= 1
-        counterLabel.text = String(value.formatted())
+        counterText.text = String(value.formatted())
         if value == 19 {
             plusButton.isEnabled = true
         }
         if value == 1 {
             minusButton.isEnabled = false
+        }
+    }
+    
+    public func setValue(with newValue: Int) {
+        value = newValue
+        counterText.text = String(newValue.formatted())
+        if value == 2 {
+            minusButton.isEnabled = true
+        }
+        if value == 20 {
+            plusButton.isEnabled = false
         }
     }
 }
