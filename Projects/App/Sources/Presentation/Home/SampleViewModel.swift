@@ -25,13 +25,13 @@ final class SampleViewModel: BaseViewModel {
 
     var disposeBag = DisposeBag()
     
-    private let joinUserUseCase: JoinUserUseCaseProtocol
+    private let joinUserUseCase: JoinUserUseCase
     
-    init(joinUserUseCase: JoinUserUseCaseProtocol) {
+    init(joinUserUseCase: JoinUserUseCase) {
         self.joinUserUseCase = joinUserUseCase
     }
 
-    func transform(input: Input) -> Output {
+    func transform(input: Input, disposeBag: DisposeBag) -> Output {
         let loginResult = input.viewDidLoad.flatMap { _ -> Single<LoginResponseDTO> in
             return self.joinUserUseCase.excute(deviceId: "device1", fcmToken: "fcmToken1", userName: "kokojong")
         }
