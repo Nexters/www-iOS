@@ -12,3 +12,9 @@ struct LoginResponseDTO: ModelType {
     let message: String
     let result: String
 }
+
+extension LoginResponseDTO {
+    func toDomain() -> CommonResponse {
+        return .init(code: code, message: message, result: result)
+    }
+}

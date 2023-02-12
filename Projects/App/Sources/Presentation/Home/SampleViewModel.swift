@@ -20,7 +20,7 @@ final class SampleViewModel: BaseViewModel {
     }
     
     struct Output {
-        let loginResult: Single<LoginResponseDTO>
+        let loginResult: Single<CommonResponse>
     }
 
     var disposeBag = DisposeBag()
@@ -32,7 +32,7 @@ final class SampleViewModel: BaseViewModel {
     }
 
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
-        let loginResult = input.viewDidLoad.flatMap { _ -> Single<LoginResponseDTO> in
+        let loginResult = input.viewDidLoad.flatMap { _ -> Single<CommonResponse> in
             return self.joinUserUseCase.excute(deviceId: "device1", fcmToken: "fcmToken1", userName: "kokojong")
         }
         

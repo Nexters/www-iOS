@@ -9,5 +9,5 @@
 import RxSwift
 
 protocol UserRepository {
-    func joinUser(deviceId: String, fcmToken: String, userName: String) -> Single<LoginResponseDTO>
+    func joinUser(deviceId: String, fcmToken: String, userName: String) -> Single<CommonResponse>
 }

@@ -11,7 +11,7 @@ import Foundation
 import RxSwift
 
 protocol JoinUserUseCaseProtocol {
-    func excute(deviceId: String, fcmToken: String, userName: String) -> Single<LoginResponseDTO>
+    func excute(deviceId: String, fcmToken: String, userName: String) -> Single<CommonResponse>
 }
 
 final class JoinUserUseCase: JoinUserUseCaseProtocol {
@@ -24,7 +24,7 @@ final class JoinUserUseCase: JoinUserUseCaseProtocol {
         self.userRepository = userRepository
     }
     
-    func excute(deviceId: String, fcmToken: String, userName: String) -> Single<LoginResponseDTO> {
+    func excute(deviceId: String, fcmToken: String, userName: String) -> Single<CommonResponse> {
         return self.userRepository.joinUser(deviceId: deviceId, fcmToken: fcmToken, userName: userName)
     }
     
