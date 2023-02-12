@@ -17,13 +17,13 @@ enum UserAPI {
 
 extension UserAPI: TargetType {
     var baseURL: URL {
-        return URL(string: "http://alpha-api.whenwheres.com:8080/users/")!
+        return APIConstants.baseUrl
     }
     
     var path: String {
         switch self {
         case .join:
-            return "join"
+            return "users/join"
         }
     }
     
