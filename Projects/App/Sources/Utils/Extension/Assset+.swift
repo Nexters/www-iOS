@@ -35,4 +35,7 @@ public enum WWWAssset: String {
     case time_default
     case time_disabled
     case time_selected
+    case users
+    case calendar
+    case place
 }
