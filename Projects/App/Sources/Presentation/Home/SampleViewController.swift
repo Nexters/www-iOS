@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import RxSwift
 
 class SampleViewController: UIViewController {
     
@@ -16,10 +17,23 @@ class SampleViewController: UIViewController {
         return $0
     }(LargeButton(state: true))
 
-
+    private var viewModel: SampleViewModel?
+    
+    private var bag = DisposeBag()
+    
+    init(viewModel: SampleViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        bindRx()
     }
 
     private func setUI() {
@@ -30,6 +44,8 @@ class SampleViewController: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(20)
         }
     }
+
+
     
     @objc func testButtonDidTap() {
  
@@ -40,7 +56,14 @@ class SampleViewController: UIViewController {
         // 참가자 플로우
         let viewModel = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
         self.navigationController?.pushViewController(RoomCodeController(viewModel: viewModel), animated: true)
+    }
+    
+    private func bindRx() {
+        let output = viewModel?.transform(input: SampleViewModel.Input(viewDidLoad: Single<Void>.just(()) ), disposeBag: DisposeBag())
         
+        output?.loginResult.subscribe {
+            print("loginResult is", $0)
+        }.disposed(by: bag)
     }
 }
 

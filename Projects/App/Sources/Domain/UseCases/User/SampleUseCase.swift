@@ -28,6 +28,6 @@ final class SampleUseCase: SampleUseCaseProtocol {
 }
 
 // MARK: - Privates
-private extension SampleUseCaseProtocol {
+private extension SampleUseCase {
     
 }

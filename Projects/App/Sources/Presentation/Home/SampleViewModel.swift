@@ -6,25 +6,36 @@
 //
 
 import RxRelay
+import Foundation
+import RxCocoa
 import RxSwift
 
 
 final class SampleViewModel: BaseViewModel {
     
+    private var bag = DisposeBag()
+    
     struct Input {
-        
+        let viewDidLoad: Single<Void>
     }
     
     struct Output {
-        
+        let loginResult: Single<CommonResponse>
     }
 
     var disposeBag = DisposeBag()
     
-    init() {}
-
-    func transform(input: Input, disposeBag: RxSwift.DisposeBag) -> Output {
-        return Output.init() // 샘플임...!
-    }
+    private let joinUserUseCase: JoinUserUseCase
     
+    init(joinUserUseCase: JoinUserUseCase) {
+        self.joinUserUseCase = joinUserUseCase
+    }
+
+    func transform(input: Input, disposeBag: DisposeBag) -> Output {
+        let loginResult = input.viewDidLoad.flatMap { _ -> Single<CommonResponse> in
+            return self.joinUserUseCase.excute(deviceId: "device1", fcmToken: "fcmToken1", userName: "kokojong")
+        }
+        
+        return Output.init(loginResult: loginResult)
+    }
 }
