@@ -8,6 +8,7 @@
 
 import UIKit
 import SnapKit
+import RxCocoa
 import RxSwift
 
 final class MainHomeViewController: UIViewController {
@@ -102,6 +103,7 @@ final class MainHomeViewController: UIViewController {
         super.viewDidLoad()
         setUI()
         applyData()
+        bindRx()
     }
 }
 
@@ -161,6 +163,17 @@ extension MainHomeViewController {
         self.dataSource.apply(snapshot, animatingDifferences: true)
     }
     
+    private func bindRx() {
+        let input = MainHomeViewModel.Input(viewDidLoad: Observable.just(()).asObservable())
+        
+        let output = viewModel?.transform(input: input, disposeBag: bag)
+        
+        output?.mainHomeMeeting.subscribe(onSuccess: {
+            print("mainHomeMeeting",$0)
+        }).disposed(by: bag)
+        
+    }
+    
 }
 
 // MARK: - Preview
@@ -170,9 +183,7 @@ import SwiftUI
 
 struct MainHomeViewController_Preview: PreviewProvider {
     static var previews: some View {
-//        let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase(), joinHostUseCase: nil)
-//        UserNameViewController(viewModel: viewModel, userMode: .host).toPreview()
-        let viewModel = MainHomeViewModel()
+        let viewModel = MainHomeViewModel(mainHomeUseCase: MainHomeUseCase(meetingRepository: MainHomeDAO(network: MeetingAPIManager.provider)))
         MainHomeViewController(viewModel: viewModel).toPreview()
     }
 }

@@ -10,16 +10,27 @@ import RxSwift
 
 final class MainHomeViewModel: BaseViewModel {
     
+    private let mainHomeUseCase: MainHomeUseCase?
+    
     struct Input {
-        
+        let viewDidLoad: Observable<Void>
     }
     
     struct Output {
-        
+        var mainHomeMeeting: Single<MainHomeMeeting>
+    }
+    
+    init(mainHomeUseCase: MainHomeUseCase?) {
+        self.mainHomeUseCase = mainHomeUseCase
     }
     
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
-        return Output()
+        let mainHomeMeeting = input.viewDidLoad.asSingle().flatMap {
+            _ -> Single<MainHomeMeeting> in
+            return self.mainHomeUseCase!.fetchMainHomeMeeting()
+        }
+        
+        return Output(mainHomeMeeting: mainHomeMeeting)
     }
     
     
