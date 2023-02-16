@@ -30,6 +30,11 @@ final class BasicChipCell: SelfSizingCollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+      super.prepareForReuse()
+      self.configure("")
+    }
+    
     private func setUI() {
         self.contentView.backgroundColor = UIColor.wwwColor(.WWWGreen).withAlphaComponent(0.08)
         self.contentView.layer.cornerRadius = 8
