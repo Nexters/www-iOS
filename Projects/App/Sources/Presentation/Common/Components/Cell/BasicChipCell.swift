@@ -15,6 +15,9 @@ final class BasicChipCell: SelfSizingCollectionViewCell {
     
     private lazy var placeLabel: UILabel = {
         let label = UILabel()
+        label.textColor = UIColor.wwwColor(.Gray700)
+        label.numberOfLines = 1
+        label.font = UIFont.www.body4
         return label
     }()
     
@@ -34,6 +37,10 @@ final class BasicChipCell: SelfSizingCollectionViewCell {
         self.contentView.layer.borderColor = UIColor.wwwColor(.WWWGreen).cgColor
         
         self.contentView.addSubview(placeLabel)
+        
+        self.contentView.snp.makeConstraints { make in
+            make.height.equalTo(34)
+        }
         
         placeLabel.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview().inset(6)

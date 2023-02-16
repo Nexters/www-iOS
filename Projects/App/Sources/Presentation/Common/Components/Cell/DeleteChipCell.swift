@@ -16,13 +16,15 @@ final class DeleteChipCell: SelfSizingCollectionViewCell {
     
     private lazy var placeLabel: UILabel = {
         let label = UILabel()
+        label.textColor = UIColor.wwwColor(.Gray700)
+        label.numberOfLines = 1
+        label.font = UIFont.www.body4
         return label
     }()
     
     private lazy var deleteButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(systemName: "xmark")?.withTintColor(.wwwColor(.WWWGreen)),
-                        for: .normal)
+        button.setImage(UIImage(.delete_green), for: .normal)
         return button
     }()
     
@@ -41,18 +43,24 @@ final class DeleteChipCell: SelfSizingCollectionViewCell {
         self.contentView.layer.cornerRadius = 8
         self.contentView.layer.borderWidth = 1
         self.contentView.layer.borderColor = UIColor.wwwColor(.WWWGreen).cgColor
-        
         self.contentView.addSubviews(placeLabel, deleteButton)
+        
+        self.contentView.snp.makeConstraints { make in
+            make.height.equalTo(34)
+        }
         
         placeLabel.snp.makeConstraints { make in
             make.top.bottom.equalToSuperview().inset(6)
-            make.leading.trailing.equalToSuperview().inset(12)
+            make.leading.equalToSuperview().inset(12)
+            make.trailing.equalToSuperview().inset(34)
+            make.height.equalTo(34)
         }
         
         deleteButton.snp.makeConstraints { make in
-            make.leading.equalTo(self.placeLabel.snp.trailing).offset(28)
+            make.leading.equalTo(self.placeLabel.snp.trailing)
             make.trailing.equalToSuperview().inset(12)
             make.centerY.equalToSuperview()
+            make.height.width.equalTo(16)
         }
     }
     
