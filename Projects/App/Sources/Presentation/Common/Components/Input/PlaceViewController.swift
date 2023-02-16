@@ -25,7 +25,7 @@ final class PlaceViewController: UIViewController {
     private let titleView = BasicTitleView(title: "원하는 장소를 입력해 주세요.",
                                            subTitle: "*필수 항목이 아니에요.")
     
-    private lazy var textFieldView = BasicTextFieldView(placeholder: "장소 입력")
+    private lazy var textFieldView = PlustTextFieldView(placeholder: "장소 입력")
     
     private lazy var placeLabel: UILabel = {
         let label = UILabel()

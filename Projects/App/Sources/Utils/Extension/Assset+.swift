@@ -17,4 +17,6 @@ public enum WWWAssset: String {
     case delete
     case delete_fill
     case delete_green
+    case plus_gray
+    case plus_black
 }
