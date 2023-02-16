@@ -67,9 +67,11 @@ final class MainHomeViewController: UIViewController {
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .yellow
+//        collectionView.backgroundColor = .yellow
+        collectionView.backgroundColor = .wwwColor(.Gray200)
         collectionView.isPagingEnabled = true
         collectionView.register(MainHomePromiseCell.self, forCellWithReuseIdentifier: MainHomePromiseCell.identifier)
+//        collectionView.isHidden = true
         return collectionView
     }()
     
@@ -133,7 +135,8 @@ extension MainHomeViewController {
         
         promiseContentView.addSubview(emptyPromiseView)
         emptyPromiseView.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.top.equalToSuperview().inset(90)
+            $0.centerX.equalToSuperview()
         }
         
         promiseContentView.addSubview(collectionView)

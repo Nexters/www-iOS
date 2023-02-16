@@ -13,26 +13,44 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     // MARK: - UI
     private let statusLabel: PaddingLabel = {
-        let label = PaddingLabel()
+        let label = PaddingLabel(padding: UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10))
         label.backgroundColor = .wwwColor(.WWWGreen)
         label.font = UIFont.www.title8
-        label.clipsToBounds = true
-        label.layer.cornerRadius = 15
+        label.textColor = .wwwColor(.WWWWhite)
+        label.setRoundCorners([.topLeft, .topRight], radius: 6)
         return label
     }()
     
-    private let titleLabel: PaddingLabel = {
-        let label = PaddingLabel(padding: .init(top: 8, left: 24, bottom: 8, right: 24))
-        label.backgroundColor = .wwwColor(.WWWWhite)
-        label.clipsToBounds = true
-        label.layer.cornerRadius = 15
+    private let titleLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .wwwColor(.WWWBlack)
+        label.textAlignment = .left
         return label
+    }()
+    
+    private let titleLabelBgView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .wwwColor(.WWWGreen).withAlphaComponent(0.2)
+        return view
+    }()
+    
+    private let promiseView: UIImageView = {
+       let view = UIImageView()
+        view.image = UIImage(.promiseFrame)
+        return view
     }()
     
     private let characterImgView: UIImageView = {
         let imgView = UIImageView()
         imgView.image = UIImage(systemName: "heart")?.resized(to: .init(width: 200, height: 230))
         return imgView
+    }()
+    
+    private let usersView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .wwwColor(.WWWGreen).withAlphaComponent(0.1)
+        view.setRoundCorners([.topLeft, .topRight], radius: 6)
+        return view
     }()
     
     private let usersIcon: UIImageView = {
@@ -56,8 +74,9 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .www(size: 15, family: .Medium)
-        label.textColor = .wwwColor(.Gray750)
+        label.font = .www(size: 14, family: .Medium)
+        label.textColor = .wwwColor(.Gray700)
+        label.textAlignment = .left
         return label
     }()
     
@@ -69,8 +88,9 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     private let placeLabel: UILabel = {
         let label = UILabel()
-        label.font = .www(size: 15, family: .Medium)
-        label.textColor = .wwwColor(.Gray750)
+        label.font = .www(size: 14, family: .Medium)
+        label.textColor = .wwwColor(.Gray700)
+        label.textAlignment = .left
         return label
     }()
     
@@ -79,18 +99,11 @@ final class MainHomePromiseCell: UICollectionViewCell {
         label.backgroundColor = .wwwColor(.WWWWhite)
         label.clipsToBounds = true
         label.layer.cornerRadius = 26/2
+        label.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
+        label.layer.borderWidth = 1
         label.font = .www(size: 15, family: .Medium)
-        label.textColor = .wwwColor(.WWWGreen)
+        label.textColor = .wwwColor(.Gray450)
         return label
-    }()
-    
-    private let labelStackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .vertical
-        stackView.distribution = .equalSpacing
-        stackView.alignment = .leading
-        stackView.spacing = 10
-        return stackView
     }()
     
     override init(frame: CGRect) {
@@ -103,28 +116,84 @@ final class MainHomePromiseCell: UICollectionViewCell {
     }
     
     private func setUI() {
-        addSubview(statusLabel)
-        statusLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(30)
+        addSubview(promiseView)
+        promiseView.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(60)
             $0.centerX.equalToSuperview()
-            $0.height.equalTo(30)
         }
         
-        addSubview(labelStackView)
-        labelStackView.addArrangedSubviews(titleLabel, usersLabel, dateLabel, placeLabel, pageLabel)
-        labelStackView.snp.makeConstraints {
-            $0.top.equalTo(statusLabel.snp.bottom).offset(20)
-            $0.leading.equalToSuperview().inset(25)
+        promiseView.addSubviews(titleLabel, titleLabelBgView, calendarIcon, dateLabel, placeIcon, placeLabel)
+        titleLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(20)
+            $0.leading.equalToSuperview().inset(18)
         }
+        
+        titleLabelBgView.snp.makeConstraints {
+            $0.top.equalTo(titleLabel.snp.centerY)
+            $0.horizontalEdges.equalTo(titleLabel)
+            $0.height.equalTo(titleLabel).multipliedBy(0.5)
+        }
+        
+        calendarIcon.snp.makeConstraints {
+            $0.leading.equalTo(titleLabel)
+            $0.centerY.equalTo(dateLabel)
+        }
+        
+        dateLabel.snp.makeConstraints {
+            $0.leading.equalTo(calendarIcon.snp.trailing).offset(8)
+            $0.top.equalTo(titleLabel.snp.bottom).offset(10)
+        }
+        
+        placeIcon.snp.makeConstraints{
+            $0.leading.equalTo(titleLabel)
+            $0.centerY.equalTo(placeLabel)
+        }
+        
+        placeLabel.snp.makeConstraints {
+            $0.leading.equalTo(placeIcon.snp.trailing).offset(8)
+            $0.top.equalTo(dateLabel.snp.bottom).offset(10)
+        }
+        
+        
+        addSubview(statusLabel)
+        statusLabel.snp.makeConstraints {
+            $0.bottom.equalTo(promiseView.snp.top)
+        }
+        
+        addSubview(usersView)
+        usersView.snp.makeConstraints {
+            $0.bottom.equalTo(promiseView.snp.top)
+            $0.leading.equalTo(statusLabel.snp.trailing).offset(5)
+            $0.trailing.equalTo(promiseView).inset(16)
+        }
+        
+        usersView.addSubviews(usersIcon, usersLabel)
+        usersIcon.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(8)
+            $0.leading.equalToSuperview().inset(10)
+            $0.bottom.equalToSuperview().inset(4)
+        }
+        usersLabel.snp.makeConstraints {
+            $0.top.equalToSuperview().inset(3)
+            $0.trailing.equalToSuperview().inset(10)
+            $0.leading.equalTo(usersIcon.snp.trailing).offset(4)
+        }
+        
+        addSubview(pageLabel)
+        pageLabel.snp.makeConstraints {
+            $0.centerX.equalToSuperview()
+            $0.top.equalTo(promiseView.snp.bottom).offset(330)
+        }
+        
         
     }
     
     func setData(data: Int) {
-        statusLabel.text = "test\(data)"
+        statusLabel.text = "D-30"
         
-        titleLabel.text = "title"
+        titleLabel.text = "제주도로 놀러가자아아"
         usersLabel.text = "3/4명"
-        dateLabel.text = "23.02.13 오전"
+        dateLabel.text = "23.02.13 아침"
         placeLabel.text = "강남역"
         pageLabel.text = "1/3"
     }
