@@ -62,12 +62,14 @@ extension MinUserViewController {
         progressView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(2)
         }
         
         self.view.addSubview(titleView)
         titleView.snp.makeConstraints {
             $0.top.equalTo(progressView.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(100)
         }
         
         self.view.addSubview(stepperView)
