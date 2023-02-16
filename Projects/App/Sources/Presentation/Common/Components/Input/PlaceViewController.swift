@@ -27,7 +27,7 @@ final class PlaceViewController: UIViewController {
     
     private lazy var textFieldView = PlustTextFieldView(placeholder: "장소 입력")
     
-    private lazy var placeLabel: UILabel = {
+    lazy var placeLabel: UILabel = {
         let label = UILabel()
         label.text = "등록된 장소 후보"
         label.textColor = UIColor.wwwColor(.WWWBlack)
