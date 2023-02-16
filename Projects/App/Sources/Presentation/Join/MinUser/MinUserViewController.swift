@@ -111,7 +111,7 @@ private extension MinUserViewController {
             minusButtonDidTap:
                 self.stepperView.minusButton.rx.tap.asObservable(),
             stepperTextDidChange:
-            self.stepperView.counterText.rx.text.orEmpty.asObservable(),
+                self.stepperView.counterText.rx.observe(String.self, "text").asObservable(),
             nextButtonDidTap:
                 self.nextButton.rx.tap.asObservable(),
             backButtonDidTap:

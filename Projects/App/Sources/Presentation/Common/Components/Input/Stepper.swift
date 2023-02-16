@@ -13,15 +13,14 @@ final class Stepper: UIControl {
     
     private let minimum: Double = 1.0
     private let maximum: Double = 20.0
-    private var value: Int = 0
- 
-    public lazy var counterText: UITextField = {
-        let text = UITextField()
-        text.isEnabled = false
-        text.font = UIFont.www(size: 72, family: .Light)
-        text.textAlignment = .center
-        text.text = String(value.formatted())
-        return text
+    private var value: Int = 1
+    
+    public lazy var counterText: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.www(size: 72, family: .Light)
+        label.textAlignment = .center
+        label.text = String(value)
+        return label
     }()
     
     private lazy var container: UIStackView = {
@@ -94,7 +93,7 @@ final class Stepper: UIControl {
 }
 
 extension Stepper {
-    func plusValue() {
+    public func plusValue() {
         value += 1
         counterText.text = String(value.formatted())
         if value == 2 {

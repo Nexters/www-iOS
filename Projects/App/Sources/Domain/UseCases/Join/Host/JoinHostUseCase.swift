@@ -26,6 +26,13 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     
     // MARK: - Methods
     init() {}
+    
+    func updateMinUser(with value: Int) {
+        let current = try! self.minUser.value()
+        if current > 1 && current < 20 {
+            self.minUser.onNext(current + value)
+        }
+    }
 
 }
 

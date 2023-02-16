@@ -24,7 +24,7 @@ final class MinUserViewModel: BaseViewModel {
     struct Input {
         let plusButtonDidTap: Observable<Void>
         let minusButtonDidTap: Observable<Void>
-        let stepperTextDidChange: Observable<String>
+        let stepperTextDidChange: Observable<String?>
         let nextButtonDidTap: Observable<Void>
         let backButtonDidTap: Observable<Void>
     }
@@ -52,17 +52,27 @@ final class MinUserViewModel: BaseViewModel {
     
     private func handleInput(_ input: Input, disposeBag: DisposeBag) {
         input.stepperTextDidChange
-            .map { Int($0)!}
+            .map { Int($0!)! }
             .bind(to: self.usecase.minUser)
             .disposed(by: disposeBag)
-        print(usecase.minUser)
+
+        input.plusButtonDidTap
+            .subscribe(onNext: { [weak self] in
+                self?.usecase.updateMinUser(with: 1)
+            })
+            .disposed(by: disposeBag)
+        
+        input.minusButtonDidTap
+            .subscribe(onNext: { [weak self] in
+                self?.usecase.updateMinUser(with: -1)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
         
         self.usecase.minUser
-            .compactMap { $0 }
             .subscribe(onNext: { minUser in
                 output.nextButtonMakeEnable.accept(minUser>1)
             })
