@@ -16,12 +16,6 @@ final class MainHomeEmptyPromiseView: UIView {
         return label
     }()
     
-    private let emptyTicketImgView: UIImageView = {
-        let imgView = UIImageView()
-        imgView.image = UIImage(systemName: "star")?.resized(to: CGSize(width: 300, height: 200))
-        return imgView
-    }()
-    
     init(message: String) {
         super.init(frame: .zero)
         messageLabel.text = message
@@ -37,13 +31,6 @@ final class MainHomeEmptyPromiseView: UIView {
         messageLabel.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.centerX.equalToSuperview()
-        }
-        
-        addSubview(emptyTicketImgView)
-        emptyTicketImgView.snp.makeConstraints {
-            $0.top.equalTo(messageLabel.snp.bottom).offset(44)
-            $0.centerX.equalToSuperview()
-            $0.bottom.equalToSuperview()
         }
     }
     
