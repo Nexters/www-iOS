@@ -23,7 +23,7 @@ public final class PlustTextFieldView: UIView {
         return $0
     }(UIStackView())
     
-    private let plusButton: UIButton = {
+    let plusButton: UIButton = {
         $0.setImage(UIImage(.plus_black), for: .normal)
         $0.setImage(UIImage(.plus_gray), for: .disabled)
         $0.contentMode = .scaleAspectFit
@@ -58,7 +58,7 @@ public final class PlustTextFieldView: UIView {
 
 extension PlustTextFieldView {
     private func setUI() {
-        self.disablePlusButton()
+//        self.disablePlusButton()
         
         textField.placeholder = placeholder
         textField.clearButtonMode = .never
@@ -139,6 +139,11 @@ extension PlustTextFieldView {
     
     public func enablePlusButton() {
         self.plusButton.isEnabled = true
+    }
+    
+    public func plusButtonDidTap() {
+        self.textField.text = ""
+        self.disablePlusButton()
     }
     
 }

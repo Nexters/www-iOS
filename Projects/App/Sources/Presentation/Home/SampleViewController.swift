@@ -49,7 +49,7 @@ class SampleViewController: UIViewController {
     
     @objc func testButtonDidTap() {
  
-        self.navigationController?.pushViewController(PlaceViewController(viewModel: PlaceViewModel()), animated: true)
+        self.navigationController?.pushViewController(PlaceViewController(viewModel: PlaceViewModel(usecase: JoinHostUseCase())), animated: true)
     
     }
     

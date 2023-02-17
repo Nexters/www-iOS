@@ -9,11 +9,11 @@
 import Foundation
 import RxSwift
 
-
 protocol JoinHostUseCaseProtocol {
     var roomName: BehaviorSubject<String> { get }
     var userName: BehaviorSubject<String> { get }
     var minUser: BehaviorSubject<Int> { get }
+    var placeList: PublishSubject<[WrappedPlace]> { get }
 }
 
 final class JoinHostUseCase: JoinHostUseCaseProtocol {
@@ -22,7 +22,7 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     var roomName = BehaviorSubject<String>(value: "")
     var userName = BehaviorSubject<String>(value: "")
     var minUser = BehaviorSubject<Int>(value: 1)
-    
+    var placeList = PublishSubject<[WrappedPlace]>()
     
     // MARK: - Methods
     init() {}
@@ -33,10 +33,22 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
             self.minUser.onNext(current + value)
         }
     }
+    
+    func getPlaceList() -> [WrappedPlace] {
+        return Place.mockServerData
+            .map { WrappedPlace(isFromLocal: false, place: $0) }
+    }
+    
+    func addLocalPlace(_ place: String) {
+        self.placeList.onNext([WrappedPlace(isFromLocal: true,
+                                           place: Place(title: place))])
+    }
 
 }
 
 // MARK: - Privates
 private extension JoinHostUseCase {
+    
+
     
 }

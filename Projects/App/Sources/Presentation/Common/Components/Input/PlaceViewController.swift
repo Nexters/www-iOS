@@ -11,14 +11,21 @@ import SnapKit
 import RxCocoa
 import RxSwift
 
+typealias PlaceDataSource = UICollectionViewDiffableDataSource<Section, WrappedPlace>
+typealias PlaceSnapshot = NSDiffableDataSourceSnapshot<Section, WrappedPlace>
+
+
 enum Section {
     case place
 }
 
 final class PlaceViewController: UIViewController {
+    
+    // MARK: - Properties
+    private let disposeBag = DisposeBag()
     private let viewModel: PlaceViewModel
     
-    private var dataSource: UICollectionViewDiffableDataSource<Section, WrappedPlace>!
+    private lazy var dataSource = makeDataSource()
     
     private let progressView = ProgressView(current: 6, total: 6)
     
@@ -38,7 +45,7 @@ final class PlaceViewController: UIViewController {
     
     private lazy var placeNumberLabel: UILabel = {
         let label = UILabel()
-        label.text = "0"
+//        label.text = "0"
         label.textColor = UIColor.wwwColor(.WWWGreen)
         label.numberOfLines = 1
         label.font = UIFont.www.body1
@@ -65,7 +72,6 @@ final class PlaceViewController: UIViewController {
     init(viewModel: PlaceViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
-        setNavigationBar()
     }
     
     required init?(coder: NSCoder) {
@@ -74,11 +80,20 @@ final class PlaceViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        self.setNavigationBar()
+        self.bindViewModel()
         self.setUI()
-        self.setDataSource()
-        self.setSnapShot()
+        
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        self.view.endEditing(true)
+    }
+
+}
+
+// MARK: - Methods
+extension PlaceViewController {
     
     private func setUI() {
         self.view.backgroundColor = .wwwColor(.WWWWhite)
@@ -146,11 +161,104 @@ final class PlaceViewController: UIViewController {
     @objc func backButtonDidTap() {}
 }
 
+// MARK: - Binding
+
+private extension PlaceViewController {
+    func bindViewModel() {
+        let input = PlaceViewModel.Input(
+            viewDidLoad:
+                Observable.just(()).asObservable(),
+            placeTextFieldDidEdit:
+                textFieldView.textField.rx.text.orEmpty.asObservable(),
+            plusButtonDidTap:
+                self.textFieldView.plusButton.rx.tap.asObservable(),
+            placeCellDidTap:
+                self.chipCollectionView.rx.itemSelected.map{$0.row},
+            nextButtonDidTap:
+                self.nextButton.rx.tap.asObservable(),
+            backButtonDidTap:
+                self.navigationItem.leftBarButtonItem!.rx.tap.asObservable()
+        )
+        
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
+        self.bindCollectionView(output: output)
+        self.bindPager(output: output)
+        
+        output.flushTextField
+            .asDriver(onErrorJustReturn: Void())
+            .drive(onNext: { [weak self]  in
+                self?.textFieldView.textField.text = ""
+            })
+            .disposed(by: disposeBag)
+        
+        output.nextButtonMakeEnable
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] isEnabled in
+                if isEnabled == true {
+                    self?.nextButton.setButtonState(true)
+                } else {
+                    self?.nextButton.setButtonState(false)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+    }
+    
+    func bindCollectionView(output: PlaceViewModel.Output?){
+        output?.initPlaces
+            .asDriver()
+            .drive { [weak self] places in
+                self?.applySnapshot(places: places)
+                self?.placeNumberLabel.text = String(places.count)
+            }
+            .disposed(by: disposeBag)
+        
+        output?.updatePlaces
+            .asDriver()
+            .drive { [weak self] places in
+                self?.updateSnapshot(places: places)
+                let placelist = self?.dataSource.snapshot().itemIdentifiers(inSection: .place)
+                self?.placeNumberLabel.text = String(placelist?.count ?? 0)
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    func bindPager(output: PlaceViewModel.Output?){
+        output?.navigatePage
+            .asDriver(onErrorJustReturn: .error)
+            .drive(onNext: { [weak self] page in
+                switch page {
+                case .back:
+                    self?.navigationController?.popViewController(animated: true)
+                case .completion:
+                    print("완료페이지로 이동")
+                case .roomMain:
+                    print("방메인으로 이동")
+                case .error: break
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+}
+
+
 // MARK: - Privates
 
 private extension PlaceViewController {
-    func setDataSource() {
-        self.dataSource = UICollectionViewDiffableDataSource<Section, WrappedPlace>(collectionView: self.chipCollectionView) { (collectionView, indexPath, place: WrappedPlace) -> UICollectionViewCell? in
+    
+    func applySnapshot(places: [WrappedPlace]) {
+      var snapshot = PlaceSnapshot()
+      snapshot.appendSections([.place])
+      snapshot.appendItems(places, toSection: .place)
+      dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func makeDataSource() -> PlaceDataSource {
+      let dataSource = PlaceDataSource(
+        collectionView: chipCollectionView,
+        cellProvider: { (collectionView, indexPath, place: WrappedPlace) ->
+          UICollectionViewCell? in
             if place.isFromLocal {
                 guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeleteChipCell.identifier, for: indexPath)
                         as? DeleteChipCell else {
@@ -166,18 +274,19 @@ private extension PlaceViewController {
                 cell.configure(place.place.title)
                 return cell
             }
-        }
+      })
+      return dataSource
+    }
+ 
+     func updateSnapshot(places: [WrappedPlace]) {
+        var snapshot = dataSource.snapshot()
+        let previousItems = snapshot.itemIdentifiers(inSection: .place)
+        snapshot.deleteItems(previousItems)
+        snapshot.appendItems(places, toSection: .place)
+        snapshot.appendItems(previousItems, toSection: .place)
+        dataSource.apply(snapshot)
     }
     
-    func setSnapShot() {
-        let places = self.viewModel.getPlaces()
-        
-        var snapshot = NSDiffableDataSourceSnapshot<Section, WrappedPlace>()
-        snapshot.appendSections([.place])
-        snapshot.appendItems(places)
-        
-        self.dataSource.apply(snapshot, animatingDifferences: true)
-    }
 }
 
 
@@ -188,7 +297,7 @@ import SwiftUI
 
 struct PlaceViewController_Preview: PreviewProvider {
     static var previews: some View {
-        let viewModel = PlaceViewModel()
+        let viewModel = PlaceViewModel(usecase: JoinHostUseCase())
         PlaceViewController(viewModel: viewModel).toPreview()
     }
 }
