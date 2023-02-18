@@ -96,6 +96,8 @@ extension CompletionViewcController {
             make.height.equalTo(10)
         }
 
+        self.view.bringSubviewToFront(titleLabel)
+        
         self.view.addSubview(nextButton)
         nextButton.snp.makeConstraints {
             $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-20)
