@@ -38,4 +38,7 @@ public enum WWWAssset: String {
     case users
     case calendar
     case place
+    case promiseFrame
+    case union1
+    case union2
 }
