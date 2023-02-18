@@ -35,7 +35,23 @@ final class CompletionViewModel: BaseViewModel {
     }
 
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
-        return Output.init()
+        self.handleInput(input, disposeBag: disposeBag)
+        return makeOutput(with:  input, disposeBag: disposeBag)
+    }
+    
+    private func handleInput(_ input: Input, disposeBag: DisposeBag) {
+        
+    }
+    
+    private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
+        let output = Output()
+        input.nextButtonDidTap
+            .subscribe(onNext: {
+                output.navigatePage.accept(.roomMain)
+            })
+            .disposed(by: disposeBag)
+        
+        return output
     }
 }
 
