@@ -98,8 +98,8 @@ extension PlaceViewModel {
         
         input.plusButtonDidTap
             .subscribe(onNext: { [weak self] in
-                guard let place = try? self?.placeName.value() else { return }
-                if place != "" {
+                guard let placename = try? self?.placeName.value() else { return }
+                if placename != "" {
                     var placelist: [WrappedPlace] = []
                     self?.enteredPlaces
                         .asDriver()
@@ -107,8 +107,10 @@ extension PlaceViewModel {
                             placelist += places
                         }
                         .disposed(by: disposeBag)
-                    let place = WrappedPlace(isFromLocal: true, place: Place(title: place))
-                    guard placelist.contains(place) != true, self?.places.contains(place) != true else { return }
+                    let place = WrappedPlace(isFromLocal: true, place: Place(title: placename))
+                    let serverPlace = WrappedPlace(isFromLocal: false, place: Place(title: placename))
+                    
+                    guard placelist.contains(place) != true, self?.places.contains(serverPlace) != true else { return }
                     placelist.insert(contentsOf: [place], at: 0)
                     self?.enteredPlaces.accept(placelist)
                 }

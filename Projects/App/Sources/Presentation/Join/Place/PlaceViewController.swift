@@ -55,6 +55,7 @@ final class PlaceViewController: UIViewController {
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("스킵할래요", for: .normal)
+        $0.setButtonState(true)
         return $0
     }(LargeButton(state: false))
     
@@ -206,7 +207,8 @@ private extension PlaceViewController {
         output.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
-                self?.nextButton.setButtonState(isEnabled)
+                self?.nextButton.setTitle(isEnabled ? "다음" : "스킵할래요",
+                                          for: .normal)
             })
             .disposed(by: disposeBag)
         
