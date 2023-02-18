@@ -35,6 +35,12 @@ final class CompletionViewcController: UIViewController {
         return $0
     }(UILabel())
     
+    private let imageView: UIImageView = {
+        $0.image = UIImage(.completion)
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
+    
     public lazy var highlightView: UIView = {
         $0.backgroundColor = .wwwColor(.WWWGreen).withAlphaComponent(0.2)
         return $0
@@ -78,7 +84,7 @@ extension CompletionViewcController {
         
         self.view.addSubview(subTitleLabel)
         subTitleLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().offset(80)
+            make.top.equalTo(view.safeAreaLayoutGuide).offset(80)
             make.centerX.equalToSuperview()
         }
         
@@ -97,6 +103,15 @@ extension CompletionViewcController {
         }
 
         self.view.bringSubviewToFront(titleLabel)
+        
+        self.view.addSubview(imageView)
+        imageView.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(60)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(319.52)
+            make.height.equalTo(277.59)
+        }
+        
         
         self.view.addSubview(nextButton)
         nextButton.snp.makeConstraints {
