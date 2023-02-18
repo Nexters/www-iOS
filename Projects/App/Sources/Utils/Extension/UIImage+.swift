@@ -9,7 +9,7 @@
 import UIKit
 
 public extension UIImage {
-    convenience init?(_ asset: WWWAssset) {
+    convenience init?(_ asset: WWWAsset) {
         self.init(named: asset.rawValue, in: Bundle.module, with: nil)
     }
 
