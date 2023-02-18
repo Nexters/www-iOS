@@ -33,7 +33,6 @@ class SampleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
-//        bindRx()
     }
 
     private func setUI() {
@@ -59,9 +58,10 @@ class SampleViewController: UIViewController {
     private func bindRx() {
         let output = viewModel?.transform(input: SampleViewModel.Input(viewDidLoad: Single<Void>.just(()) ), disposeBag: DisposeBag())
         
-        output?.loginResult.subscribe {
-            print("loginResult is", $0)
-        }.disposed(by: bag)
+        // 참가자 플로우
+//        let viewModel = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
+//        self.navigationController?.pushViewController(RoomCodeController(viewModel: viewModel), animated: true)
+        
     }
 }
 
