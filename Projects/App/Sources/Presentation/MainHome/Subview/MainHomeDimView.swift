@@ -10,29 +10,31 @@ import UIKit
 
 final class MainHomeDimView: UIView {
     
-    private let addPromiseButton: UIButton = {
+    let addPromiseButton: UIButton = {
+        let button = UIButton()
+        button.backgroundColor = .wwwColor(.WWWBlack)
+        button.clipsToBounds = true
+        button.layer.cornerRadius = 46/2
+        button.setTitleColor(.wwwColor(.WWWWhite), for: .normal)
+        button.setTitle("새로운 약속 생성하기", for: .normal)
+        button.titleLabel?.font = .www(size: 14, family: .Bold)
+        button.contentEdgeInsets = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
+        return button
+    }()
+    
+    let enterWithCodeButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .wwwColor(.WWWWhite)
         button.clipsToBounds = true
         button.layer.cornerRadius = 46/2
         button.setTitleColor(.wwwColor(.WWWBlack), for: .normal)
-        button.setTitle("새로운 약속을 생성할래요", for: .normal)
-        button.titleEdgeInsets = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
+        button.setTitle("초대코드로 입장하기", for: .normal)
+        button.titleLabel?.font = .www(size: 14, family: .Bold)
+        button.contentEdgeInsets = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
         return button
     }()
     
-    private let enterWithCodeButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .wwwColor(.WWWWhite)
-        button.clipsToBounds = true
-        button.layer.cornerRadius = 46/2
-        button.setTitleColor(.wwwColor(.WWWBlack), for: .normal)
-        button.setTitle("초대코드로 입장할래요", for: .normal)
-        button.titleEdgeInsets = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
-        return button
-    }()
-    
-    private let floatingButton: UIButton = {
+    let floatingButton: UIButton = {
         let button = UIButton()
         button.backgroundColor = .wwwColor(.WWWBlack)
         button.clipsToBounds = true
