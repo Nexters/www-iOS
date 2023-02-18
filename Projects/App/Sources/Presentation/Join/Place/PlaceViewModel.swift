@@ -23,7 +23,7 @@ final class PlaceViewModel: BaseViewModel {
     
     private var places: [WrappedPlace] = []
     private var enteredPlaces = PublishRelay<[WrappedPlace]>()
-    private var placeName = ""
+    private var placeName = BehaviorSubject<String>(value: "")
     
     struct Input {
         let viewDidLoad: Observable<Void>
@@ -36,6 +36,7 @@ final class PlaceViewModel: BaseViewModel {
     
     struct Output {
         var flushTextField = PublishRelay<Void>()
+        var plusButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var initPlaces = BehaviorRelay<[WrappedPlace]>(value: [])
         var updatePlaces = BehaviorRelay<[WrappedPlace]>(value: [])
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
@@ -55,10 +56,7 @@ final class PlaceViewModel: BaseViewModel {
     private func handleInput(_ input: Input, disposeBag: DisposeBag) {
         
         input.placeTextFieldDidEdit
-            .map{ $0 }
-            .subscribe(onNext: {
-                self.placeName = $0
-            })
+            .bind(to: self.placeName)
             .disposed(by: disposeBag)
         
         input.placeCellDidTap
@@ -66,7 +64,6 @@ final class PlaceViewModel: BaseViewModel {
                 
                 guard let places = try? self?.enteredPlaces.values else { return }
                 print("✅\($0)",places)
-                
                 
 //                self?.enteredPlaces.accept()
             })
@@ -86,19 +83,27 @@ final class PlaceViewModel: BaseViewModel {
         
         input.plusButtonDidTap
             .subscribe(onNext: { [weak self] in
-                if self?.placeName != "" {
-                    let place = WrappedPlace(isFromLocal: true, place: Place(title: self!.placeName))
+                guard let place = try? self?.placeName.value() else { return }
+                if place != "" {
+                    let place = WrappedPlace(isFromLocal: true, place: Place(title: place))
                     self?.enteredPlaces.accept([place])
                 }
                 output.flushTextField.accept(())
+                output.plusButtonMakeEnable.accept(false)
+            })
+            .disposed(by: disposeBag)
+        
+        self.placeName
+            .subscribe(onNext: { [weak self] p in
+                guard let place = try? self?.placeName.value() else { return }
+                output.plusButtonMakeEnable.accept(place != "")
             })
             .disposed(by: disposeBag)
         
         self.enteredPlaces
             .subscribe(onNext: { enteredPlaces in
                 output.updatePlaces.accept(enteredPlaces)
-                
-                output.nextButtonMakeEnable.accept(enteredPlaces.count > 0 ? true : false)
+                output.nextButtonMakeEnable.accept(enteredPlaces.count > 0)
             })
             .disposed(by: disposeBag)
         

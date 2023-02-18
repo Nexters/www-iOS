@@ -191,14 +191,21 @@ private extension PlaceViewController {
             })
             .disposed(by: disposeBag)
         
+        output.plusButtonMakeEnable
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] isEnabled in
+                if isEnabled {
+                    self?.textFieldView.enablePlusButton()
+                } else {
+                    self?.textFieldView.disablePlusButton()
+                }
+            })
+            .disposed(by: disposeBag)
+        
         output.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
-                if isEnabled == true {
-                    self?.nextButton.setButtonState(true)
-                } else {
-                    self?.nextButton.setButtonState(false)
-                }
+                self?.nextButton.setButtonState(isEnabled)
             })
             .disposed(by: disposeBag)
         
