@@ -94,18 +94,6 @@ final class MainHomePromiseCell: UICollectionViewCell {
         return label
     }()
     
-    private let pageLabel: PaddingLabel = {
-        let label = PaddingLabel(padding: .init(top: 2, left: 14, bottom: 2, right: 14))
-        label.backgroundColor = .wwwColor(.WWWWhite)
-        label.clipsToBounds = true
-        label.layer.cornerRadius = 26/2
-        label.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
-        label.layer.borderWidth = 1
-        label.font = .www(size: 15, family: .Medium)
-        label.textColor = .wwwColor(.Gray450)
-        return label
-    }()
-    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setUI()
@@ -179,13 +167,6 @@ final class MainHomePromiseCell: UICollectionViewCell {
             $0.leading.equalTo(usersIcon.snp.trailing).offset(4)
         }
         
-        addSubview(pageLabel)
-        pageLabel.snp.makeConstraints {
-            $0.centerX.equalToSuperview()
-            $0.top.equalTo(promiseView.snp.bottom).offset(330)
-        }
-        
-        
     }
     
     func setData(data: Int) {
@@ -195,7 +176,6 @@ final class MainHomePromiseCell: UICollectionViewCell {
         usersLabel.text = "3/4명"
         dateLabel.text = "23.02.13 아침"
         placeLabel.text = "강남역"
-        pageLabel.text = "1/3"
     }
     
     

@@ -19,13 +19,18 @@ final class MainHomeViewController: UIViewController {
     enum Section: CaseIterable {
         case main
     }
+    var isOneStepPaging = true
+    var currentIndex: CGFloat = 0 {
+        didSet {
+            pageLabel.customAttributedString(text: "\(Int(currentIndex)+1)/5", highlightText: "\(Int(currentIndex)+1)", textFont: .www(size: 14)!, highlightTextFont: .www(size: 14)!, textColor: .wwwColor(.Gray450), highlightTextColor: .wwwColor(.WWWGreen))
+        }
+    }
     
     // MARK: - UI
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.text = "WWW"
-        label.font = UIFont.www(size: 24, family: .Bold)
-        label.textColor = .wwwColor(.WWWBlack)
+    private let titleLabel: UIImageView = {
+        let label = UIImageView()
+        label.contentMode = .scaleAspectFit
+        label.image = UIImage(.union2)
         return label
     }()
     
@@ -40,14 +45,19 @@ final class MainHomeViewController: UIViewController {
     private let proceedingPromiseButton: UIButton = {
         let button = UIButton()
         button.setTitle("진행 중 약속", for: .normal)
-        button.setTitleColor(.wwwColor(.WWWBlack), for: .normal)
+        button.setTitleColor(.wwwColor(.Gray250), for: .normal)
+        button.setTitleColor(.wwwColor(.WWWBlack), for: .disabled)
+        button.titleLabel?.font = .www(size: 18, family: .Bold)
+        button.isEnabled = false
         return button
     }()
     
     private let endedPromiseButton: UIButton = {
         let button = UIButton()
         button.setTitle("종료된 약속", for: .normal)
-        button.setTitleColor(.wwwColor(.WWWBlack), for: .normal)
+        button.setTitleColor(.wwwColor(.Gray250), for: .normal)
+        button.setTitleColor(.wwwColor(.WWWBlack), for: .disabled)
+        button.titleLabel?.font = .www(size: 18, family: .Bold)
         return button
     }()
     
@@ -61,17 +71,25 @@ final class MainHomeViewController: UIViewController {
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
+        
+        let cellWidth:CGFloat = WINDOW_WIDTH - 100
+        let cellHeight:CGFloat = 500
+        
+        let insetX = (WINDOW_WIDTH - cellWidth) / 2.0
+        
         layout.scrollDirection = .horizontal
-        layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-        layout.estimatedItemSize = .init(width: WINDOW_WIDTH, height: 500)
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
+        layout.itemSize = CGSize(width: cellWidth, height: cellHeight)
+        layout.minimumLineSpacing = 30
+        
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-//        collectionView.backgroundColor = .yellow
-        collectionView.backgroundColor = .wwwColor(.Gray200)
-        collectionView.isPagingEnabled = true
+        collectionView.backgroundColor = .wwwColor(.Gray100)
+        collectionView.isPagingEnabled = false
         collectionView.register(MainHomePromiseCell.self, forCellWithReuseIdentifier: MainHomePromiseCell.identifier)
-//        collectionView.isHidden = true
+        
+        collectionView.contentInset = UIEdgeInsets(top: 0, left: insetX, bottom: 0, right: insetX)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.decelerationRate = UIScrollView.DecelerationRate.fast
+        
         return collectionView
     }()
     
@@ -80,6 +98,18 @@ final class MainHomeViewController: UIViewController {
         cell.setData(data: itemIdentifier)
         return cell
     })
+    
+    lazy var pageLabel: PaddingLabel = {
+        let label = PaddingLabel(padding: .init(top: 2, left: 14, bottom: 2, right: 14))
+        label.backgroundColor = .wwwColor(.WWWWhite)
+        label.clipsToBounds = true
+        label.layer.cornerRadius = 26/2
+        label.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
+        label.layer.borderWidth = 1
+        label.customAttributedString(text: "\(Int(currentIndex)+1)/5", highlightText: "\(Int(currentIndex)+1)", textFont: .www(size: 14)!, highlightTextFont: .www(size: 14)!, textColor: .wwwColor(.Gray450), highlightTextColor: .wwwColor(.WWWGreen))
+
+        return label
+    }()
     
     private let floatingButton: UIButton = {
         let button = UIButton()
@@ -105,6 +135,7 @@ final class MainHomeViewController: UIViewController {
         super.viewDidLoad()
         setUI()
         applyData()
+        setAction()
         bindRx()
     }
 }
@@ -117,19 +148,21 @@ extension MainHomeViewController {
         titleLabel.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.leading.equalToSuperview().inset(20)
+            $0.width.equalTo(60)
+            $0.height.equalTo(26)
         }
         
         self.view.addSubview(promiseButtonTabStackView)
         promiseButtonTabStackView.snp.makeConstraints {
-            $0.top.equalTo(titleLabel.snp.bottom).offset(10)
-            $0.centerX.equalToSuperview()
+            $0.top.equalTo(titleLabel.snp.bottom).offset(26)
+            $0.leading.equalToSuperview().inset(20)
         }
         
         promiseButtonTabStackView.addArrangedSubviews(proceedingPromiseButton, endedPromiseButton)
         
         self.view.addSubview(promiseContentView)
         promiseContentView.snp.makeConstraints {
-            $0.top.equalTo(promiseButtonTabStackView.snp.bottom)
+            $0.top.equalTo(promiseButtonTabStackView.snp.bottom).offset(12)
             $0.horizontalEdges.bottom.equalToSuperview()
         }
         
@@ -141,7 +174,15 @@ extension MainHomeViewController {
         
         promiseContentView.addSubview(collectionView)
         collectionView.snp.makeConstraints {
-            $0.edges.equalToSuperview()
+            $0.top.leading.trailing.equalToSuperview()
+        }
+        collectionView.delegate = self
+        
+        promiseContentView.addSubview(pageLabel)
+        pageLabel.snp.makeConstraints {
+            $0.top.equalTo(collectionView.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(100)
         }
         
         self.view.addSubview(floatingButton)
@@ -156,14 +197,44 @@ extension MainHomeViewController {
             $0.edges.equalToSuperview()
         }
         dimView.isHidden = true
-        
     }
     
     private func applyData() {
         var snapshot = NSDiffableDataSourceSnapshot<Section,Int>()
         snapshot.appendSections([.main])
-        snapshot.appendItems([1,2,3])
+        snapshot.appendItems([1,2,3,4,5])
         self.dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    private func setAction() {
+        proceedingPromiseButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                // 진행중인 약속
+                self?.proceedingPromiseButton.isEnabled = false
+                self?.endedPromiseButton.isEnabled = true
+                
+            }).disposed(by: bag)
+        
+        endedPromiseButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                // 종료된 약속
+                self?.proceedingPromiseButton.isEnabled = true
+                self?.endedPromiseButton.isEnabled = false
+            }).disposed(by: bag)
+        
+        floatingButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                self?.dimView.isHidden = false
+            }).disposed(by: bag)
+        
+        dimView.floatingButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                self?.dimView.isHidden = true
+            }).disposed(by: bag)
     }
     
     private func bindRx() {
@@ -177,6 +248,39 @@ extension MainHomeViewController {
         
     }
     
+}
+
+extension MainHomeViewController: UICollectionViewDelegate {
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let layout = self.collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+        let cellWidthIncludingSpacing = layout.itemSize.width + layout.minimumLineSpacing
+        
+        var offset = targetContentOffset.pointee
+        let index = (offset.x + scrollView.contentInset.left) / cellWidthIncludingSpacing
+        var roundedIndex = round(index)
+        
+        if scrollView.contentOffset.x > targetContentOffset.pointee.x {
+            roundedIndex = floor(index)
+        } else if scrollView.contentOffset.x < targetContentOffset.pointee.x {
+            roundedIndex = ceil(index)
+        } else {
+            roundedIndex = round(index)
+        }
+        
+        if isOneStepPaging {
+            if currentIndex > roundedIndex {
+                currentIndex -= 1
+                roundedIndex = currentIndex
+            } else if currentIndex < roundedIndex {
+                currentIndex += 1
+                roundedIndex = currentIndex
+            }
+        }
+        
+        offset = CGPoint(x: roundedIndex * cellWidthIncludingSpacing - scrollView.contentInset.left, y: -scrollView.contentInset.top)
+        targetContentOffset.pointee = offset
+    
+    }
 }
 
 // MARK: - Preview
