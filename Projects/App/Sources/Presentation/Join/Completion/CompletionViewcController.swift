@@ -16,6 +16,8 @@ final class CompletionViewcController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     var viewModel: CompletionViewModel?
+    
+    private let hapticGenerator = UINotificationFeedbackGenerator()
 
     public lazy var subTitleLabel: UILabel = {
         $0.text = "함께할 친구들을 초대해 보세요."
@@ -143,8 +145,6 @@ extension CompletionViewcController {
         }
     }
     
-    @objc func backButtonDidTap() {}
-    
 }
 
 // MARK: - Binding
@@ -153,11 +153,20 @@ private extension CompletionViewcController {
         let input = CompletionViewModel.Input(
             viewDidLoad:
                 Observable.just(()).asObservable(),
+            copyButtonDidTap:
+                self.copyButton.rx.tap.asObservable(),
             nextButtonDidTap:
                 self.nextButton.rx.tap.asObservable()
         )
         
         let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
+        
+        output?.copiedRoomInfo
+            .asDriver()
+            .drive(onNext: { [weak self] text in
+                self?.hapticGenerator.notificationOccurred(.success)
+            })
+            .disposed(by: disposeBag)
         
         self.bindPager(output: output)
         

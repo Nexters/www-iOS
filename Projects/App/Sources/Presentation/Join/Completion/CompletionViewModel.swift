@@ -22,11 +22,13 @@ final class CompletionViewModel: BaseViewModel {
     
     struct Input {
         let viewDidLoad: Observable<Void>
+        let copyButtonDidTap: Observable<Void>
         let nextButtonDidTap: Observable<Void>
     }
     
     struct Output {
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
+        var copiedRoomInfo = BehaviorRelay<String>(value: "")
         var navigatePage = PublishRelay<CompletionPager>()
     }
     
@@ -48,6 +50,13 @@ final class CompletionViewModel: BaseViewModel {
         input.nextButtonDidTap
             .subscribe(onNext: {
                 output.navigatePage.accept(.roomMain)
+            })
+            .disposed(by: disposeBag)
+        
+        input.copyButtonDidTap
+            .subscribe(onNext: {
+                // TODO: 서버통신
+                output.copiedRoomInfo.accept("방코드1234가 복사되었어요!")
             })
             .disposed(by: disposeBag)
         
