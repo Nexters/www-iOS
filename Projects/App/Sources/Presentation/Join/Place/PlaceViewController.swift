@@ -24,6 +24,7 @@ final class PlaceViewController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     private let viewModel: PlaceViewModel
+    private var fetchedPlace: [WrappedPlace] = []
     
     private lazy var dataSource = makeDataSource()
     
@@ -255,6 +256,7 @@ private extension PlaceViewController {
 private extension PlaceViewController {
     
     func applySnapshot(places: [WrappedPlace]) {
+      fetchedPlace = places
       var snapshot = PlaceSnapshot()
       snapshot.appendSections([.place])
       snapshot.appendItems(places, toSection: .place)
@@ -290,7 +292,7 @@ private extension PlaceViewController {
         let previousItems = snapshot.itemIdentifiers(inSection: .place)
         snapshot.deleteItems(previousItems)
         snapshot.appendItems(places, toSection: .place)
-        snapshot.appendItems(previousItems, toSection: .place)
+        snapshot.appendItems(fetchedPlace, toSection: .place)
         dataSource.apply(snapshot)
     }
     

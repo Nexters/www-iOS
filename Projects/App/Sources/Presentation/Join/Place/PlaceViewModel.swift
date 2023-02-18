@@ -22,7 +22,7 @@ final class PlaceViewModel: BaseViewModel {
     let usecase: JoinHostUseCase
     
     private var places: [WrappedPlace] = []
-    private var enteredPlaces = PublishRelay<[WrappedPlace]>()
+    private var enteredPlaces = BehaviorRelay<[WrappedPlace]>(value: [])
     private var placeName = BehaviorSubject<String>(value: "")
     
     struct Input {
@@ -54,20 +54,24 @@ final class PlaceViewModel: BaseViewModel {
     }
     
     private func handleInput(_ input: Input, disposeBag: DisposeBag) {
-        
         input.placeTextFieldDidEdit
             .bind(to: self.placeName)
             .disposed(by: disposeBag)
         
         input.placeCellDidTap
             .subscribe(onNext: { [weak self] in
-                
-                guard let places = try? self?.enteredPlaces.values else { return }
-                print("✅\($0)",places)
-                
-//                self?.enteredPlaces.accept()
+                var placelist: [WrappedPlace] = []
+                self?.enteredPlaces
+                    .asDriver()
+                    .drive { places in
+                        placelist += places
+                    }
+                    .disposed(by: disposeBag)
+                if placelist.count > 0 {
+                    placelist.remove(at: $0)
+                    self?.enteredPlaces.accept(placelist)
+                }
             })
-        
             .disposed(by: disposeBag)
     }
     
@@ -85,8 +89,17 @@ final class PlaceViewModel: BaseViewModel {
             .subscribe(onNext: { [weak self] in
                 guard let place = try? self?.placeName.value() else { return }
                 if place != "" {
+                    var placelist: [WrappedPlace] = []
+                    self?.enteredPlaces
+                        .asDriver()
+                        .drive { places in
+                            placelist += places
+                        }
+                        .disposed(by: disposeBag)
                     let place = WrappedPlace(isFromLocal: true, place: Place(title: place))
-                    self?.enteredPlaces.accept([place])
+                    guard placelist.contains(place) != true, self?.places.contains(place) != true else { return }
+                    placelist.insert(contentsOf: [place], at: 0)
+                    self?.enteredPlaces.accept(placelist)
                 }
                 output.flushTextField.accept(())
                 output.plusButtonMakeEnable.accept(false)
