@@ -25,5 +25,9 @@ public enum WWWAssset: String {
     
     // WWW Characters
     case completion
+    case monster
+    case donut
+    case heart_big
+    case heart_small
     
 }

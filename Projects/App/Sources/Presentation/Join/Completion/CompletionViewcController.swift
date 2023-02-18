@@ -18,6 +18,7 @@ final class CompletionViewcController: UIViewController {
     var viewModel: CompletionViewModel?
     
     private let hapticGenerator = UINotificationFeedbackGenerator()
+    private lazy var motionGenerator = WWWAnimationHelper()
 
     public lazy var subTitleLabel: UILabel = {
         $0.text = "함께할 친구들을 초대해 보세요."
@@ -37,11 +38,36 @@ final class CompletionViewcController: UIViewController {
         return $0
     }(UILabel())
     
+//    private lazy var imageView: UIImageView = {
+//        $0.image = UIImage(.completion)
+//        $0.contentMode = .scaleAspectFit
+//        return $0
+//    }(UIImageView())
+    
     private lazy var imageView: UIImageView = {
-        $0.image = UIImage(.completion)
+        $0.image = UIImage(.monster)
         $0.contentMode = .scaleAspectFit
         return $0
     }(UIImageView())
+    
+    private lazy var donutView: UIImageView = {
+        $0.image = UIImage(.donut)
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
+    
+    private lazy var heartView: UIImageView = {
+        $0.image = UIImage(.heart_big)
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
+    
+    private lazy var miniHeartView: UIImageView = {
+        $0.image = UIImage(.heart_small)
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
+    
 
     private let copyButton: UIButton = {
         $0.titleLabel?.adjustsFontForContentSizeCategory = true
@@ -122,17 +148,41 @@ extension CompletionViewcController {
 
         self.view.bringSubviewToFront(titleLabel)
         
-        self.view.addSubview(imageView)
+        
+        self.view.addSubviews(imageView, donutView, heartView, miniHeartView)
+        self.view.bringSubviewToFront(imageView)
         imageView.snp.makeConstraints { make in
             make.top.equalTo(titleLabel.snp.bottom).offset(60)
             make.centerX.equalToSuperview()
-            make.width.equalTo(319.52)
-            make.height.equalTo(277.59)
+            make.width.equalTo(278)
+            make.height.equalTo(246)
         }
+        
+        donutView.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(178)
+            make.leading.equalToSuperview().offset(30)
+            make.width.equalTo(143)
+            make.height.equalTo(126)
+        }
+        
+        heartView.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(96)
+            make.trailing.equalToSuperview().offset(-55)
+            make.width.equalTo(44)
+            make.height.equalTo(45)
+        }
+        
+        miniHeartView.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(88)
+            make.trailing.equalToSuperview().offset(-32)
+            make.width.equalTo(21.8)
+            make.height.equalTo(20.65)
+        }
+        
         
         self.view.addSubview(copyButton)
         copyButton.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(35)
+            make.top.equalTo(imageView.snp.bottom).offset(55) // TODO : 35
             make.centerX.equalToSuperview()
             make.width.equalTo(137)
             make.height.equalTo(42)
@@ -143,6 +193,13 @@ extension CompletionViewcController {
             $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-20)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
+    }
+    
+    private func setMotion() {
+        motionGenerator.applyParallaxEffect(to: imageView, magnitue: -30)
+        motionGenerator.applyParallaxEffect(to: donutView, magnitue: 30)
+        motionGenerator.applyParallaxEffect(to: heartView, magnitue: -30)
+        motionGenerator.applyParallaxEffect(to: miniHeartView, magnitue: 30)
     }
     
 }
