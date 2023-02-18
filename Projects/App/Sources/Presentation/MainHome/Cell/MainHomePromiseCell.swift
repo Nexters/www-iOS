@@ -162,7 +162,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
             $0.bottom.equalToSuperview().inset(4)
         }
         usersLabel.snp.makeConstraints {
-            $0.top.equalToSuperview().inset(3)
+            $0.centerY.equalTo(usersIcon)
             $0.trailing.equalToSuperview().inset(10)
             $0.leading.equalTo(usersIcon.snp.trailing).offset(4)
         }
