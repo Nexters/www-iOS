@@ -13,6 +13,7 @@ public enum WWWAssset: String {
     // WWW icon
     case chevron_left
     case link
+    case link_green
     case info
     case add
     case add_fill
