@@ -306,7 +306,7 @@ import SwiftUI
 
 struct PlaceViewController_Preview: PreviewProvider {
     static var previews: some View {
-        let viewModel = PlaceViewModel(usecase: JoinHostUseCase())
+        let viewModel = PlaceViewModel(guest: JoinGuestUseCase())
         PlaceViewController(viewModel: viewModel).toPreview()
     }
 }

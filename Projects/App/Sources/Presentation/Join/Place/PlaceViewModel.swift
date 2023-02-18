@@ -19,7 +19,8 @@ enum PlacePager {
 
 final class PlaceViewModel: BaseViewModel {
     
-    let usecase: JoinHostUseCase
+    private let hostUsecase: JoinHostUseCase?
+    private let guestUsecase: JoinGuestUseCase?
     
     private var places: [WrappedPlace] = []
     private var enteredPlaces = BehaviorRelay<[WrappedPlace]>(value: [])
@@ -43,17 +44,27 @@ final class PlaceViewModel: BaseViewModel {
         var navigatePage = PublishRelay<PlacePager>()
     }
     
-    init(usecase: JoinHostUseCase) {
-        self.usecase = usecase
-    }
-
-    // MARK: - Transform
-    func transform(input: Input, disposeBag: DisposeBag) -> Output {
-        self.handleInput(input, disposeBag: disposeBag)
-        return makeOutput(with:  input, disposeBag: disposeBag)
+    init(host: JoinHostUseCase? = nil, guest: JoinGuestUseCase? = nil) {
+        self.hostUsecase = host
+        self.guestUsecase = guest
     }
     
-    private func handleInput(_ input: Input, disposeBag: DisposeBag) {
+    // MARK: - Transform
+    func transform(input: Input, disposeBag: DisposeBag) -> Output {
+        if guestUsecase != nil {  // Guest
+            self.handleInputGuest(input, disposeBag: disposeBag)
+            return makeOutputGuest(with: input, disposeBag: disposeBag)
+        } else {  // Host
+            self.handleInputHost(input, disposeBag: disposeBag)
+            return makeOutputHost(with: input, disposeBag: disposeBag)
+        }
+    }
+}
+
+// MARK: - HOST
+extension PlaceViewModel {
+    
+    private func handleInputHost(_ input: Input, disposeBag: DisposeBag) {
         input.placeTextFieldDidEdit
             .bind(to: self.placeName)
             .disposed(by: disposeBag)
@@ -75,12 +86,12 @@ final class PlaceViewModel: BaseViewModel {
             .disposed(by: disposeBag)
     }
     
-    private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
+    private func makeOutputHost(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
         
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
-                self?.places = self?.usecase.getPlaceList() ?? []
+                self?.places = self?.hostUsecase!.getServerPlaceList() ?? []
                 output.initPlaces.accept(self?.places ?? [])
             })
             .disposed(by: disposeBag)
@@ -127,8 +138,112 @@ final class PlaceViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         input.nextButtonDidTap
-            .subscribe(onNext: {
+            .subscribe(onNext: { [weak self] in
+                var placelist: [WrappedPlace] = []
+                self?.enteredPlaces
+                    .asDriver()
+                    .drive { places in
+                        placelist += places
+                    }
+                    .disposed(by: disposeBag)
+                self?.hostUsecase?.addMyPlaces(placelist)
                 output.navigatePage.accept(.completion)
+            })
+            .disposed(by: disposeBag)
+        
+        return output
+        
+    }
+    
+}
+
+// MARK: - Guest
+extension PlaceViewModel {
+    
+    private func handleInputGuest(_ input: Input, disposeBag: DisposeBag) {
+        input.placeTextFieldDidEdit
+            .bind(to: self.placeName)
+            .disposed(by: disposeBag)
+        
+        input.placeCellDidTap
+            .subscribe(onNext: { [weak self] in
+                var placelist: [WrappedPlace] = []
+                self?.enteredPlaces
+                    .asDriver()
+                    .drive { places in
+                        placelist += places
+                    }
+                    .disposed(by: disposeBag)
+                if placelist.count > 0 {
+                    placelist.remove(at: $0)
+                    self?.enteredPlaces.accept(placelist)
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    private func makeOutputGuest(with input: Input, disposeBag: DisposeBag) -> Output {
+        let output = Output()
+        
+        input.viewDidLoad
+            .subscribe(onNext: { [weak self] in
+                self?.places = self?.guestUsecase!.getServerPlaceList() ?? []
+                output.initPlaces.accept(self?.places ?? [])
+            })
+            .disposed(by: disposeBag)
+        
+        input.plusButtonDidTap
+            .subscribe(onNext: { [weak self] in
+                guard let place = try? self?.placeName.value() else { return }
+                if place != "" {
+                    var placelist: [WrappedPlace] = []
+                    self?.enteredPlaces
+                        .asDriver()
+                        .drive { places in
+                            placelist += places
+                        }
+                        .disposed(by: disposeBag)
+                    let place = WrappedPlace(isFromLocal: true, place: Place(title: place))
+                    guard placelist.contains(place) != true, self?.places.contains(place) != true else { return }
+                    placelist.insert(contentsOf: [place], at: 0)
+                    self?.enteredPlaces.accept(placelist)
+                }
+                output.flushTextField.accept(())
+                output.plusButtonMakeEnable.accept(false)
+            })
+            .disposed(by: disposeBag)
+        
+        self.placeName
+            .subscribe(onNext: { [weak self] p in
+                guard let place = try? self?.placeName.value() else { return }
+                output.plusButtonMakeEnable.accept(place != "")
+            })
+            .disposed(by: disposeBag)
+        
+        self.enteredPlaces
+            .subscribe(onNext: { enteredPlaces in
+                output.updatePlaces.accept(enteredPlaces)
+                output.nextButtonMakeEnable.accept(enteredPlaces.count > 0)
+            })
+            .disposed(by: disposeBag)
+        
+        input.backButtonDidTap
+            .subscribe(onNext: {
+                output.navigatePage.accept(.back)
+            })
+            .disposed(by: disposeBag)
+        
+        input.nextButtonDidTap
+            .subscribe(onNext: { [weak self] in
+                var placelist: [WrappedPlace] = []
+                self?.enteredPlaces
+                    .asDriver()
+                    .drive { places in
+                        placelist += places
+                    }
+                    .disposed(by: disposeBag)
+                self?.hostUsecase?.addMyPlaces(placelist)
+                output.navigatePage.accept(.roomMain)
             })
             .disposed(by: disposeBag)
         

@@ -34,14 +34,13 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
         }
     }
     
-    func getPlaceList() -> [WrappedPlace] {
+    func getServerPlaceList() -> [WrappedPlace] {
         return Place.mockServerData
             .map { WrappedPlace(isFromLocal: false, place: $0) }
     }
     
-    func addLocalPlace(_ place: String) {
-        self.placeList.onNext([WrappedPlace(isFromLocal: true,
-                                           place: Place(title: place))])
+    func addMyPlaces(_ places: [WrappedPlace]) {
+        self.placeList.onNext(places)
     }
 
 }
