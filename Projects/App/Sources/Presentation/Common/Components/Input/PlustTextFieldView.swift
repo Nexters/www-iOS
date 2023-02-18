@@ -30,18 +30,18 @@ public final class PlustTextFieldView: UIView {
         return $0
     }(UIButton())
     
-    private let icon: UIImageView = {
-        $0.image = UIImage(.plus_black)
-        $0.contentMode = .scaleAspectFit
-        return $0
-    }(UIImageView())
-    
-    private let msgLabel: UILabel = {
-        $0.numberOfLines = 0
-        $0.textColor = UIColor.wwwColor(.WWWRed)
-        $0.font = UIFont.www(size: 11)
-        return $0
-    }(UILabel())
+//    private let icon: UIImageView = {
+//        $0.image = UIImage(.plus_black)
+//        $0.contentMode = .scaleAspectFit
+//        return $0
+//    }(UIImageView())
+//
+//    private let msgLabel: UILabel = {
+//        $0.numberOfLines = 0
+//        $0.textColor = UIColor.wwwColor(.WWWRed)
+//        $0.font = UIFont.www(size: 11)
+//        return $0
+//    }(UILabel())
     
     private let cornerRadius: CGFloat = 52/2
     
@@ -58,8 +58,6 @@ public final class PlustTextFieldView: UIView {
 
 extension PlustTextFieldView {
     private func setUI() {
-//        self.disablePlusButton()
-        
         textField.placeholder = placeholder
         textField.clearButtonMode = .never
         textField.returnKeyType = .done
@@ -75,7 +73,7 @@ extension PlustTextFieldView {
         backgroundView.clipsToBounds = true
         
         addSubviews(backgroundView, textField, msgView)
-        msgView.addArrangedSubviews(icon, msgLabel)
+//        msgView.addArrangedSubviews(icon, msgLabel)
         
         textField.snp.makeConstraints {
             $0.centerY.equalToSuperview()
@@ -92,7 +90,7 @@ extension PlustTextFieldView {
         }
         
     }
-    
+    /*
     private func makeErrorUI() {
         backgroundView.layer.borderColor = UIColor.wwwColor(.WWWRed).cgColor
         msgView.isHidden = false
@@ -111,6 +109,7 @@ extension PlustTextFieldView {
         backgroundView.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
         msgView.isHidden = true
     }
+     */
     
 }
 
@@ -118,7 +117,7 @@ extension PlustTextFieldView {
     public func setBorderColor(_ color: CGColor) {
         backgroundView.layer.borderColor = color
     }
-    
+    /*
     public func setErrorMode(message: String) {
         DispatchQueue.main.async { [weak self] in
             self?.msgLabel.text = message
@@ -132,6 +131,7 @@ extension PlustTextFieldView {
             self?.makeNormalUI()
         }
     }
+     */
     
     public func disablePlusButton() {
         self.plusButton.isEnabled = false
