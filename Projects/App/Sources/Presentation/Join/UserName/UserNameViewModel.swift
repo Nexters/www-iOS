@@ -81,8 +81,8 @@ extension UserNameViewModel {
             .disposed(by: disposeBag)
         
         input.viewDidLoad
-            .subscribe(onNext: {
-                output.naviTitleText.accept(self.usecaseGuest!.roomName)
+            .subscribe(onNext: { [weak self] in
+                output.naviTitleText.accept((self?.usecaseGuest!.roomName)!)
             })
             .disposed(by: disposeBag)
         
@@ -117,8 +117,8 @@ extension UserNameViewModel {
             .disposed(by: disposeBag)
         
         input.viewDidLoad
-            .subscribe(onNext: {
-                guard let roomName = try? self.usecaseHost!.roomName.value() else { return }
+            .subscribe(onNext: { [weak self] in
+                guard let roomName = try? self?.usecaseHost!.roomName.value() else { return }
                 output.naviTitleText.accept(roomName)
             })
             .disposed(by: disposeBag)
