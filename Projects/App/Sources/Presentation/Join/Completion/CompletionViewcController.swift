@@ -35,11 +35,27 @@ final class CompletionViewcController: UIViewController {
         return $0
     }(UILabel())
     
-    private let imageView: UIImageView = {
+    private lazy var imageView: UIImageView = {
         $0.image = UIImage(.completion)
         $0.contentMode = .scaleAspectFit
         return $0
     }(UIImageView())
+
+    private let copyButton: UIButton = {
+        $0.titleLabel?.adjustsFontForContentSizeCategory = true
+        $0.setImage(UIImage(.link_green), for: .normal)
+        $0.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
+        $0.layer.borderWidth = 1
+        $0.layer.cornerRadius = 21
+        $0.setTitle(" 링크 복사하기", for: .normal)
+        $0.setTitleColor(.wwwColor(.WWWBlack).withAlphaComponent(0.7), for: .highlighted)
+        $0.titleLabel?.font = .www.body3
+        $0.setTitleColor(.wwwColor(.WWWBlack), for: .normal)
+        $0.semanticContentAttribute = .forceLeftToRight
+        $0.contentVerticalAlignment = .center
+        $0.contentHorizontalAlignment = .center
+        return $0
+    }(UIButton())
     
     public lazy var highlightView: UIView = {
         $0.backgroundColor = .wwwColor(.WWWGreen).withAlphaComponent(0.2)
@@ -112,6 +128,13 @@ extension CompletionViewcController {
             make.height.equalTo(277.59)
         }
         
+        self.view.addSubview(copyButton)
+        copyButton.snp.makeConstraints { make in
+            make.top.equalTo(imageView.snp.bottom).offset(35)
+            make.centerX.equalToSuperview()
+            make.width.equalTo(137)
+            make.height.equalTo(42)
+        }
         
         self.view.addSubview(nextButton)
         nextButton.snp.makeConstraints {
