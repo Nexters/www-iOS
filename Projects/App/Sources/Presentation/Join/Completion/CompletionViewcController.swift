@@ -38,12 +38,6 @@ final class CompletionViewcController: UIViewController {
         return $0
     }(UILabel())
     
-//    private lazy var imageView: UIImageView = {
-//        $0.image = UIImage(.completion)
-//        $0.contentMode = .scaleAspectFit
-//        return $0
-//    }(UIImageView())
-    
     private lazy var imageView: UIImageView = {
         $0.image = UIImage(.monster)
         $0.contentMode = .scaleAspectFit
@@ -195,7 +189,9 @@ extension CompletionViewcController {
         }
     }
     
+    
     private func setMotion() {
+        //TODO: - GUI 변경 및 모션디테일 수정
         motionGenerator.applyParallaxEffect(to: imageView, magnitue: -30)
         motionGenerator.applyParallaxEffect(to: donutView, magnitue: 30)
         motionGenerator.applyParallaxEffect(to: heartView, magnitue: -30)
