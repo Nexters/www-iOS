@@ -17,6 +17,29 @@ final class CompletionViewcController: UIViewController {
     private let disposeBag = DisposeBag()
     var viewModel: CompletionViewModel?
 
+    public lazy var subTitleLabel: UILabel = {
+        $0.text = "함께할 친구들을 초대해 보세요."
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+        $0.textColor = UIColor.wwwColor(.Gray500)
+        $0.font = .www.title9
+        return $0
+    }(UILabel())
+    
+    public lazy var titleLabel: UILabel = {
+        $0.text = "약속방 만들기가 완료되었어요!"
+        $0.textAlignment = .center
+        $0.numberOfLines = 0
+        $0.textColor = UIColor.wwwColor(.WWWBlack)
+        $0.font = .www.title2
+        return $0
+    }(UILabel())
+    
+    public lazy var highlightView: UIView = {
+        $0.backgroundColor = .wwwColor(.WWWGreen).withAlphaComponent(0.2)
+        return $0
+    }(UIView())
+    
     private lazy var nextButton: LargeButton = {
         $0.setTitle("약속방으로 가기", for: .normal)
         $0.setButtonState(true)
@@ -52,6 +75,26 @@ extension CompletionViewcController {
     private func setUI() {
         
         self.view.backgroundColor = .white
+        
+        self.view.addSubview(subTitleLabel)
+        subTitleLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(80)
+            make.centerX.equalToSuperview()
+        }
+        
+        self.view.addSubview(titleLabel)
+        titleLabel.snp.makeConstraints { make in
+            make.top.equalTo(subTitleLabel.snp.bottom).offset(8)
+            make.centerX.equalToSuperview()
+        }
+        
+        self.view.addSubview(highlightView)
+        highlightView.snp.makeConstraints { make in
+            make.bottom.equalTo(titleLabel.snp.bottom)
+            make.leading.equalTo(titleLabel.snp.leading)
+            make.width.equalTo(128)
+            make.height.equalTo(10)
+        }
 
         self.view.addSubview(nextButton)
         nextButton.snp.makeConstraints {
