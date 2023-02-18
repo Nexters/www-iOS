@@ -38,7 +38,7 @@ final class MainHomeDimView: UIView {
         let button = UIButton()
         button.backgroundColor = .wwwColor(.WWWBlack)
         button.clipsToBounds = true
-        button.setImage(UIImage(.delete), for: .normal)
+        button.setImage(UIImage(.delete_fill), for: .normal)
         button.layer.cornerRadius = 64/2
         return button
     }()

@@ -115,7 +115,7 @@ final class MainHomeViewController: UIViewController {
         let button = UIButton()
         button.backgroundColor = .wwwColor(.WWWBlack)
         button.clipsToBounds = true
-        button.setImage(UIImage(.add), for: .normal)
+        button.setImage(UIImage(.add_fill), for: .normal)
         button.layer.cornerRadius = 64/2
         return button
     }()
