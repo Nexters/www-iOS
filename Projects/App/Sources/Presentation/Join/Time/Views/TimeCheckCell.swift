@@ -17,25 +17,13 @@ enum CheckStatus {
 
 final class TimeCheckCell: UICollectionViewCell {
     
+    private var clicked = false
+    
     private let imageView: UIImageView = {
         $0.contentMode = .scaleAspectFit
         $0.image = UIImage(.time_default)
         return $0
     }(UIImageView())
-
-    override var isSelected: Bool {
-        didSet {
-            if isSelected {
-                UIView.animate(withDuration: 0.1) {
-                    self.imageView.image = UIImage(.time_selected)
-                }
-            } else {
-                UIView.animate(withDuration: 0.1) {
-                    self.imageView.image = UIImage(.time_default)
-                }
-            }
-        }
-    }
 
     override func layoutSubviews() {
         super.layoutSubviews()
@@ -51,6 +39,23 @@ final class TimeCheckCell: UICollectionViewCell {
         if status == .disabled {
             imageView.image = UIImage(.time_disabled)
             imageView.isUserInteractionEnabled = false
+        }
+    }
+    
+    func onSelected() {
+        clicked = !clicked
+        changeImage()
+    }
+    
+    private func changeImage(){
+        if clicked {
+            UIView.animate(withDuration: 0.1) {
+                self.imageView.image = UIImage(.time_selected)
+            }
+        } else {
+            UIView.animate(withDuration: 0.1) {
+                self.imageView.image = UIImage(.time_default)
+            }
         }
     }
 

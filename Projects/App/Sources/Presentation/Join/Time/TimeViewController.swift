@@ -274,7 +274,11 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        print("😉",indexPath.row)
+        let cell = collectionView.cellForItem(at: indexPath) as! TimeCheckCell
+        cell.onSelected()
+        // 아이템 담기, 빼기
+//        print("😉",indexPath.row)
+        
     }
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
