@@ -47,19 +47,19 @@ extension TimeStackView {
 
         morning.snp.makeConstraints { make in
             make.width.equalTo(59.horizontallyAdjusted)
-            make.height.equalTo(34.verticallyAdjusted)
+            make.height.equalTo(64.verticallyAdjusted)
         }
         lunch.snp.makeConstraints { make in
             make.width.equalTo(59.horizontallyAdjusted)
-            make.height.equalTo(34.verticallyAdjusted)
+            make.height.equalTo(64.verticallyAdjusted)
         }
         dinner.snp.makeConstraints { make in
             make.width.equalTo(59.horizontallyAdjusted)
-            make.height.equalTo(34.verticallyAdjusted)
+            make.height.equalTo(64.verticallyAdjusted)
         }
         night.snp.makeConstraints { make in
             make.width.equalTo(59.horizontallyAdjusted)
-            make.height.equalTo(34.verticallyAdjusted)
+            make.height.equalTo(64.verticallyAdjusted)
         }
     }
 }

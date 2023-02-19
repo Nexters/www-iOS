@@ -15,7 +15,7 @@ final class TimeViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-//    var viewModel: TimeViewModel?
+    //    var viewModel: TimeViewModel?
     
     private let progressView = ProgressView(current: 3, total: 4)
     
@@ -25,6 +25,21 @@ final class TimeViewController: UIViewController {
     private let dateView = DateStackView()
     
     private let timeView = TimeStackView()
+    
+    private let pickerView: UIScrollView = {
+        $0.backgroundColor = .lightGray
+        $0.showsHorizontalScrollIndicator = false
+        return $0
+    }(UIScrollView())
+    
+    private let pageControl: UIPageControl = {
+        $0.currentPage = 0
+        $0.isEnabled = false
+        $0.currentPageIndicatorTintColor = .wwwColor(.WWWGreen)
+        $0.pageIndicatorTintColor = .wwwColor(.Gray200)
+        $0.isUserInteractionEnabled = true
+        return $0
+    }(UIPageControl())
     
     private let line: UIView = {
         $0.backgroundColor = .wwwColor(.Gray150)
@@ -38,7 +53,7 @@ final class TimeViewController: UIViewController {
     
     // MARK: - LifeCycle
     init() {
-//        self.viewModel = viewModel
+        //        self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -49,6 +64,7 @@ final class TimeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        setImageSlider()
         setNavigationBar()
     }
     
@@ -63,6 +79,7 @@ extension TimeViewController {
     
     private func setUI() {
         self.view.backgroundColor = .white
+        //        pickerView.delegate = self
         
         self.view.addSubview(progressView)
         progressView.snp.makeConstraints {
@@ -96,7 +113,21 @@ extension TimeViewController {
             $0.top.equalTo(line.snp.bottom).offset(16.verticallyAdjusted)
             $0.leading.equalToSuperview().offset(20)
             $0.width.equalTo(59.horizontallyAdjusted)
-            $0.height.equalTo(276.verticallyAdjusted)
+            $0.height.equalTo(286.verticallyAdjusted)
+        }
+        
+        self.view.addSubview(pickerView)
+        pickerView.snp.makeConstraints {
+            $0.top.equalTo(line.snp.bottom).offset(16.verticallyAdjusted)
+            $0.leading.equalTo(timeView.snp.trailing).offset(10.horizontallyAdjusted)
+            $0.width.equalTo(266.horizontallyAdjusted)
+            $0.height.equalTo(286.verticallyAdjusted)
+        }
+        
+        self.view.addSubview(pageControl)
+        pageControl.snp.makeConstraints {
+            $0.top.equalTo(timeView.snp.bottom).offset(20.verticallyAdjusted)
+            $0.horizontalEdges.equalToSuperview()
         }
         
         self.view.addSubview(nextButton)
@@ -104,6 +135,7 @@ extension TimeViewController {
             $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-20)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
+        
     }
     
     /* Temp */
@@ -123,12 +155,68 @@ extension TimeViewController {
     
 }
 
+extension TimeViewController: UIScrollViewDelegate {
+    func setImageSlider() { // scrolliVew에 imageView 추가하는 함수
+        pickerView.delegate = self
+        pickerView.contentSize = CGSize(width: 266.horizontallyAdjusted,
+                                        height: 286.verticallyAdjusted)
+        pageControl.numberOfPages = 3
+        
+        for index in 0..<3 {
+            
+            let imageView = UIImageView()
+            imageView.image = UIImage(.delete)
+            imageView.contentMode = .scaleAspectFill
+            imageView.layer.cornerRadius = 5
+            imageView.clipsToBounds = true
+            
+            let xPosition = 266.horizontallyAdjusted * CGFloat(index)
+            
+            imageView.frame = CGRect(x: xPosition,
+                                     y: 0,
+                                     width: 266.horizontallyAdjusted,
+                                     height: 286.verticallyAdjusted)
+            
+            pickerView.contentSize.width = 266.horizontallyAdjusted * CGFloat(index+1)
+            pickerView.addSubview(imageView)
+        }
+    }
+
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if let pageOffset = ScrollPageController().pageOffset(
+            for: scrollView.contentOffset.x,
+            velocity: velocity.x,
+            in: pageOffsets(in: scrollView)
+        ) {
+            targetContentOffset.pointee.x = pageOffset
+        }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if let pageFraction = ScrollPageController().pageFraction(
+            for: scrollView.contentOffset.x,
+            in: pageOffsets(in: scrollView)
+        ) {
+            let pageControl: UIPageControl = pageControl
+            pageControl.currentPage = Int(round(pageFraction))
+        }
+    }
+
+    private func pageOffsets(in scrollView: UIScrollView) -> [CGFloat] {
+        return scrollView.subviews
+                         .compactMap { $0 as? UIImageView }
+                         .map { $0.frame.minX - scrollView.adjustedContentInset.left }
+    }
+    
+}
+    
 // MARK: - Binding
 private extension TimeViewController {
-
+    
 }
-
-
+    
+    
+    
 // MARK: - Preview
 
 #if canImport(SwiftUI) && DEBUG
@@ -140,4 +228,4 @@ struct TimeViewController_Preview: PreviewProvider {
     }
 }
 #endif
-
+    
