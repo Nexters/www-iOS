@@ -24,6 +24,11 @@ final class TimeViewController: UIViewController {
     
     private let dateView = DateStackView()
     
+    private let line: UIView = {
+        $0.backgroundColor = .wwwColor(.Gray150)
+        return $0
+    }(UIView())
+    
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
         return $0
@@ -75,6 +80,13 @@ extension TimeViewController {
         dateView.snp.makeConstraints {
             $0.top.equalTo(titleView.snp.bottom).offset(44.verticallyAdjusted)
             $0.trailing.equalToSuperview().offset(-20)
+        }
+        
+        self.view.addSubview(line)
+        line.snp.makeConstraints {
+            $0.leading.trailing.equalToSuperview()
+            $0.height.equalTo(1)
+            $0.top.equalTo(dateView.snp.bottom)
         }
         
         self.view.addSubview(nextButton)
