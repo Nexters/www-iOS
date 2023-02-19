@@ -18,7 +18,7 @@ final class CompletionViewcController: UIViewController {
     var viewModel: CompletionViewModel?
     
     private let hapticGenerator = UINotificationFeedbackGenerator()
-    private lazy var motionGenerator = WWWAnimationHelper()
+    private lazy var motionGenerator = WWWAnimationHelper.shared
 
     public lazy var subTitleLabel: UILabel = {
         $0.text = "함께할 친구들을 초대해 보세요."

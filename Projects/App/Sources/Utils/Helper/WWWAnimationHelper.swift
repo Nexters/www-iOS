@@ -9,6 +9,11 @@
 import UIKit
 
 final class WWWAnimationHelper {
+    
+    static let shared = WWWAnimationHelper()
+    
+    private init() { }
+    
     func applyParallaxEffect(to view: UIView, magnitue: Float = 50) {
         let horizontal = UIInterpolatingMotionEffect(keyPath: "center.x", type: .tiltAlongHorizontalAxis)
         horizontal.minimumRelativeValue = -magnitue
