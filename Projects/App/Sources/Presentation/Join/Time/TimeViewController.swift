@@ -128,6 +128,7 @@ extension TimeViewController {
         pageControl.snp.makeConstraints {
             $0.top.equalTo(timeView.snp.bottom).offset(20.verticallyAdjusted)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(8)
         }
         
         self.view.addSubview(nextButton)
