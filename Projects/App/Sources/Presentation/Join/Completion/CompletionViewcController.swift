@@ -18,7 +18,7 @@ final class CompletionViewcController: UIViewController {
     var viewModel: CompletionViewModel?
     
     private let hapticGenerator = UINotificationFeedbackGenerator()
-    private lazy var motionGenerator = WWWAnimationHelper.shared
+    private let motionGenerator = WWWAnimationHelper.shared
 
     public lazy var subTitleLabel: UILabel = {
         $0.text = "함께할 친구들을 초대해 보세요."
@@ -104,6 +104,7 @@ final class CompletionViewcController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+        setMotion()
         bindViewModel()
     }
     
@@ -189,13 +190,12 @@ extension CompletionViewcController {
         }
     }
     
-    
     private func setMotion() {
         //TODO: - GUI 변경 및 모션디테일 수정
-        motionGenerator.applyParallaxEffect(to: imageView, magnitue: -30)
-        motionGenerator.applyParallaxEffect(to: donutView, magnitue: 30)
-        motionGenerator.applyParallaxEffect(to: heartView, magnitue: -30)
-        motionGenerator.applyParallaxEffect(to: miniHeartView, magnitue: 30)
+        motionGenerator.applyParallaxEffect(to: imageView, magnitue: -50)
+        motionGenerator.applyParallaxEffect(to: donutView, magnitue: 100)
+        motionGenerator.applyParallaxEffect(to: heartView, magnitue: 20)
+        motionGenerator.applyParallaxEffect(to: miniHeartView, magnitue: -10)
     }
     
 }
