@@ -11,11 +11,17 @@ import SnapKit
 import RxCocoa
 import RxSwift
 
+enum TimeSection {
+    case meetingTime
+}
+
 final class TimeViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     //    var viewModel: TimeViewModel?
+    
+    private lazy var dataSource = configureDataSource()
     
     private let progressView = ProgressView(current: 3, total: 4)
     
@@ -23,6 +29,11 @@ final class TimeViewController: UIViewController {
                                            subTitle: "2월 21일 (화) - 3월 3일 (금)")
     
     private let dateView = DateStackView()
+    
+    private let line: UIView = {
+        $0.backgroundColor = .wwwColor(.Gray150)
+        return $0
+    }(UIView())
     
     private let timeView = TimeStackView()
     
@@ -41,10 +52,21 @@ final class TimeViewController: UIViewController {
         return $0
     }(UIPageControl())
     
-    private let line: UIView = {
-        $0.backgroundColor = .wwwColor(.Gray150)
-        return $0
-    }(UIView())
+    private lazy var chipCollectionView: UICollectionView = {
+        let flowLayout = UICollectionViewFlowLayout()
+        flowLayout.scrollDirection = .horizontal
+        flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
+        collectionView.register(DeleteChipCell.self, forCellWithReuseIdentifier: DeleteChipCell.identifier)
+        collectionView.layer.cornerRadius = 10.verticallyAdjusted
+        collectionView.layer.borderWidth = 1
+        collectionView.layer.borderColor = UIColor.wwwColor(.Gray100).cgColor
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.contentInset.top = ((56.verticallyAdjusted - 34)/2)
+        collectionView.contentInset.left = 14
+        collectionView.contentInset.right = 14
+        return collectionView
+    }()
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
@@ -66,6 +88,9 @@ final class TimeViewController: UIViewController {
         setUI()
         setImageSlider()
         setNavigationBar()
+        
+        let sample = ["25 (토) 낮","26 (일) 저녁", "27 (월) 저녁"]
+        applySnapshot(times: sample)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -131,6 +156,13 @@ extension TimeViewController {
             $0.height.equalTo(8)
         }
         
+        self.view.addSubview(chipCollectionView)
+        chipCollectionView.snp.makeConstraints {
+            $0.top.equalTo(pageControl.snp.bottom).offset(36.verticallyAdjusted)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(56.verticallyAdjusted)
+        }
+        
         self.view.addSubview(nextButton)
         nextButton.snp.makeConstraints {
             $0.bottom.equalTo(view.keyboardLayoutGuide.snp.top).offset(-20)
@@ -156,8 +188,14 @@ extension TimeViewController {
     
 }
 
+// MARK: - Binding
+private extension TimeViewController {
+    
+}
+ 
+// MARK: - ScrollView
 extension TimeViewController: UIScrollViewDelegate {
-    func setImageSlider() { // scrolliVew에 imageView 추가하는 함수
+    private func setImageSlider() {
         pickerView.delegate = self
         pickerView.contentSize = CGSize(width: 266.horizontallyAdjusted,
                                         height: 286.verticallyAdjusted)
@@ -211,11 +249,42 @@ extension TimeViewController: UIScrollViewDelegate {
     
 }
     
-// MARK: - Binding
+// MARK: - CollectionView
 private extension TimeViewController {
     
-}
+    func applySnapshot(times: [String]) {
+      var snapshot = NSDiffableDataSourceSnapshot<TimeSection, String>()
+      snapshot.appendSections([.meetingTime])
+      snapshot.appendItems(times, toSection: .meetingTime)
+      dataSource.apply(snapshot, animatingDifferences: true)
+    }
     
+    func configureDataSource() ->  UICollectionViewDiffableDataSource<TimeSection, String> {
+      let dataSource =  UICollectionViewDiffableDataSource<TimeSection, String>(
+        collectionView: chipCollectionView,
+        cellProvider: { (collectionView, indexPath, selectedTime: String) ->
+          UICollectionViewCell? in
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeleteChipCell.identifier, for: indexPath)
+                    as? DeleteChipCell else {
+                return UICollectionViewCell()
+            }
+            cell.configure(selectedTime)
+            return cell
+      })
+      return dataSource
+    }
+ 
+     func updateSnapshot(times: [String]) {
+        var snapshot = dataSource.snapshot()
+        let previousItems = snapshot.itemIdentifiers(inSection: .meetingTime)
+        snapshot.deleteItems(previousItems)
+        snapshot.appendItems(times, toSection: .meetingTime)
+        snapshot.appendItems(times, toSection: .meetingTime)
+        dataSource.apply(snapshot)
+    }
+    
+}
+
     
     
 // MARK: - Preview
