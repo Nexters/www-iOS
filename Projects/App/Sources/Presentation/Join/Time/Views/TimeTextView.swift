@@ -11,13 +11,6 @@ import SnapKit
 
 final class TimeTextView: UIView {
     
-    private var stackView: UIStackView = {
-        $0.axis = .vertical
-        $0.distribution = .equalSpacing
-        $0.spacing = 2.verticallyAdjusted
-        return $0
-    }(UIStackView())
-    
     private var titleLabel: UILabel = {
         $0.text = "아침🥚"
         $0.textAlignment = .left
@@ -50,21 +43,14 @@ final class TimeTextView: UIView {
 // MARK: - UI
 extension TimeTextView {
     private func setUI() {
-        self.addSubview(stackView)
-
-        stackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
-
-        self.stackView.addArrangedSubviews(titleLabel, subLabel)
-
+        self.addSubviews(titleLabel, subLabel)
+        
         titleLabel.snp.makeConstraints { make in
-            make.width.equalTo(59.horizontallyAdjusted)
-            make.height.equalTo(22.verticallyAdjusted)
+            make.top.leading.equalToSuperview()
         }
         subLabel.snp.makeConstraints { make in
-            make.width.equalTo(59.horizontallyAdjusted)
-            make.height.equalTo(22.verticallyAdjusted)
+            make.top.equalTo(titleLabel.snp.bottom).offset(2.verticallyAdjusted)
+            make.leading.equalToSuperview()
         }
 
         if DeviceManager.shared.isHomeButtonDevice() {
