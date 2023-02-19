@@ -11,14 +11,14 @@ import SnapKit
 
 final class DateStackView: UIView {
     
-    private var stackView: UIStackView = {
+    private lazy var stackView: UIStackView = {
         $0.axis = .horizontal
         $0.distribution = .equalSpacing
         $0.spacing = 10.horizontallyAdjusted
         return $0
     }(UIStackView())
     
-    private var dateLabel1: UILabel = {
+    private lazy var dateLabel1: UILabel = {
         $0.text = "25 (토)"
         $0.textAlignment = .center
         $0.textColor = UIColor.wwwColor(.WWWBlack)
@@ -26,7 +26,7 @@ final class DateStackView: UIView {
         return $0
     }(UILabel())
     
-    private var dateLabel2: UILabel = {
+    private lazy var dateLabel2: UILabel = {
         $0.text = "26 (일)"
         $0.textAlignment = .center
         $0.textColor = UIColor.wwwColor(.WWWBlack)
@@ -34,7 +34,7 @@ final class DateStackView: UIView {
         return $0
     }(UILabel())
     
-    private var dateLabel3: UILabel = {
+    private lazy var dateLabel3: UILabel = {
         $0.text = "27 (월)"
         $0.textAlignment = .center
         $0.textColor = UIColor.wwwColor(.WWWBlack)
@@ -42,7 +42,7 @@ final class DateStackView: UIView {
         return $0
     }(UILabel())
     
-    private var dateLabel4: UILabel = {
+    private lazy var dateLabel4: UILabel = {
         $0.text = "28 (화)"
         $0.textAlignment = .center
         $0.textColor = UIColor.wwwColor(.WWWBlack)
