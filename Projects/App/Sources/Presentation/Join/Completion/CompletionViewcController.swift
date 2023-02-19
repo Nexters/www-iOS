@@ -192,8 +192,8 @@ extension CompletionViewcController {
     
     private func setMotion() {
         //TODO: - GUI 변경 및 모션디테일 수정
-        motionGenerator.applyParallaxEffect(to: imageView, magnitue: -50)
-        motionGenerator.applyParallaxEffect(to: donutView, magnitue: 100)
+        motionGenerator.applyParallaxEffect(to: imageView, magnitue: -40)
+        motionGenerator.applyParallaxEffect(to: donutView, magnitue: 30)
         motionGenerator.applyParallaxEffect(to: heartView, magnitue: 20)
         motionGenerator.applyParallaxEffect(to: miniHeartView, magnitue: -10)
     }
