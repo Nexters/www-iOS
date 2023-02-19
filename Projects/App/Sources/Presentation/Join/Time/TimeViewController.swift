@@ -37,11 +37,24 @@ final class TimeViewController: UIViewController {
     
     private let timeView = TimeStackView()
     
-    private let pickerView: UIScrollView = {
-        $0.backgroundColor = .lightGray
-        $0.showsHorizontalScrollIndicator = false
-        return $0
-    }(UIScrollView())
+    private let pickerView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 8.horizontallyAdjusted
+        layout.minimumInteritemSpacing = 8.verticallyAdjusted
+        layout.itemSize = CGSize(width: 59.horizontallyAdjusted,
+                                 height: 64.verticallyAdjusted)
+        let collectionview = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionview.register(TimeCheckCell.self, forCellWithReuseIdentifier: "TimeCheckCell")
+        collectionview.showsHorizontalScrollIndicator = false
+        collectionview.isPagingEnabled = true
+        let xPosition = 266.horizontallyAdjusted
+        collectionview.frame = CGRect(x: xPosition,
+                                      y: 0,
+                                      width: 266.horizontallyAdjusted,
+                                      height: 286.verticallyAdjusted)
+        return collectionview
+    }()
     
     private let pageControl: UIPageControl = {
         $0.currentPage = 0
@@ -86,7 +99,7 @@ final class TimeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
-        setImageSlider()
+        setPicker(with: 2)
         setNavigationBar()
         
         let sample = ["25 (토) 낮","26 (일) 저녁", "27 (월) 저녁"]
@@ -194,62 +207,15 @@ private extension TimeViewController {
 }
  
 // MARK: - ScrollView
-extension TimeViewController: UIScrollViewDelegate {
-    private func setImageSlider() {
+extension TimeViewController {
+    private func setPicker(with pages: Int = 3) {
         pickerView.delegate = self
-        pickerView.contentSize = CGSize(width: 266.horizontallyAdjusted,
-                                        height: 286.verticallyAdjusted)
-        pageControl.numberOfPages = 3
-        
-        for index in 0..<3 {
-            
-            let imageView = UIImageView()
-            imageView.image = UIImage(.delete)
-            imageView.contentMode = .scaleAspectFill
-            imageView.layer.cornerRadius = 5
-            imageView.clipsToBounds = true
-            
-            let xPosition = 266.horizontallyAdjusted * CGFloat(index)
-            
-            imageView.frame = CGRect(x: xPosition,
-                                     y: 0,
-                                     width: 266.horizontallyAdjusted,
-                                     height: 286.verticallyAdjusted)
-            
-            pickerView.contentSize.width = 266.horizontallyAdjusted * CGFloat(index+1)
-            pickerView.addSubview(imageView)
-        }
+        pickerView.dataSource = self
+        pageControl.numberOfPages = pages
     }
-
-    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        if let pageOffset = ScrollPageController().pageOffset(
-            for: scrollView.contentOffset.x,
-            velocity: velocity.x,
-            in: pageOffsets(in: scrollView)
-        ) {
-            targetContentOffset.pointee.x = pageOffset
-        }
-    }
-    
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if let pageFraction = ScrollPageController().pageFraction(
-            for: scrollView.contentOffset.x,
-            in: pageOffsets(in: scrollView)
-        ) {
-            let pageControl: UIPageControl = pageControl
-            pageControl.currentPage = Int(round(pageFraction))
-        }
-    }
-
-    private func pageOffsets(in scrollView: UIScrollView) -> [CGFloat] {
-        return scrollView.subviews
-                         .compactMap { $0 as? UIImageView }
-                         .map { $0.frame.minX - scrollView.adjustedContentInset.left }
-    }
-    
 }
     
-// MARK: - CollectionView
+// MARK: - ChipCollectionView
 private extension TimeViewController {
     
     func applySnapshot(times: [String]) {
@@ -285,8 +251,68 @@ private extension TimeViewController {
     
 }
 
+// MARK: - PickerView
+
+extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 32
+    }
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TimeCheckCell", for: indexPath)
+                as? TimeCheckCell else {
+            return UICollectionViewCell()
+            
+        }
+//        cell.configure(with: categories[indexPath.row])
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        print("😉",indexPath.row)
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if let pageOffset = ScrollPageController().pageOffset(
+            for: scrollView.contentOffset.x,
+            velocity: velocity.x,
+            in: pageOffsets(in: scrollView)
+        ) {
+            targetContentOffset.pointee.x = pageOffset
+        }
+    }
+
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        if let pageOffset = ScrollPageController().pageOffset(
+            for: scrollView.contentOffset.x,
+            velocity: velocity.x,
+            in: pageOffsets(in: scrollView)
+        ) {
+            targetContentOffset.pointee.x = pageOffset
+        }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let pageWidth = 266.horizontallyAdjusted
+        let currentPage = Int(266.horizontallyAdjusted*2 / pageWidth)
+        pageControl.currentPage = currentPage
+    }
+
+    private func pageOffsets(in scrollView: UIScrollView) -> [CGFloat] {
+        return scrollView.subviews
+                         .compactMap { $0 as? UIImageView }
+                         .map { $0.frame.minX - scrollView.adjustedContentInset.left }
+    }
     
     
+    
+}
+
 // MARK: - Preview
 
 #if canImport(SwiftUI) && DEBUG
@@ -298,4 +324,3 @@ struct TimeViewController_Preview: PreviewProvider {
     }
 }
 #endif
-    

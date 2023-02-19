@@ -30,4 +30,9 @@ public enum WWWAssset: String {
     case heart_big
     case heart_small
     
+    
+    // time
+    case time_default
+    case time_disabled
+    case time_selected
 }
