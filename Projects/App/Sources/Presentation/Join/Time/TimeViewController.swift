@@ -22,6 +22,8 @@ final class TimeViewController: UIViewController {
     private let titleView = BasicTitleView(title: "가능한 시간대를 선택해주세요.",
                                            subTitle: "2월 21일 (화) - 3월 3일 (금)")
     
+    private let dateView = DateStackView()
+    
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
         return $0
@@ -67,6 +69,12 @@ extension TimeViewController {
             $0.top.equalTo(progressView.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
             $0.height.equalTo(100)
+        }
+        
+        self.view.addSubview(dateView)
+        dateView.snp.makeConstraints {
+            $0.top.equalTo(titleView.snp.bottom).offset(44.verticallyAdjusted)
+            $0.trailing.equalToSuperview().offset(-20)
         }
         
         self.view.addSubview(nextButton)
