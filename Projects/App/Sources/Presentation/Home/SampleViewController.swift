@@ -48,10 +48,10 @@ class SampleViewController: UIViewController {
     
     @objc func testButtonDidTap() {
  
-        let hostVM = PlaceViewModel(host: JoinHostUseCase())
+//        let hostVM = PlaceViewModel(host: JoinHostUseCase())
 //        let guestVM = PlaceViewModel(guest: JoinGuestUseCase())
         
-        self.navigationController?.pushViewController(PlaceViewController(viewModel: hostVM), animated: true)
+        self.navigationController?.pushViewController(TimeViewController(), animated: true)
     
     }
     
