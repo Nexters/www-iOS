@@ -27,6 +27,7 @@ final class MainHomeUseCase: MainHomeUseCaseProtocol {
     var endedMeetings = BehaviorSubject<[String]>(value: [])
     
     func fetchMainHomeMeeting() -> Single<MainHomeMeeting> {
-        meetingRepository.fetchMainHomeMeeting()
+//        meetingRepository.fetchMainHomeMeeting()
+        return Observable.just(MainHomeMeeting.mockData).asSingle()
     }
 }
