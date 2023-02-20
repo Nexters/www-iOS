@@ -24,6 +24,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.textColor = .wwwColor(.WWWBlack)
+        label.font = .www.title8
         label.textAlignment = .left
         return label
     }()
@@ -75,7 +76,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .www(size: 14, family: .Medium)
+        label.font = .www.body3
         label.textColor = .wwwColor(.Gray700)
         label.textAlignment = .left
         return label
@@ -89,7 +90,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     private let placeLabel: UILabel = {
         let label = UILabel()
-        label.font = .www(size: 14, family: .Medium)
+        label.font = .www.body3
         label.textColor = .wwwColor(.Gray700)
         label.textAlignment = .left
         return label
@@ -115,6 +116,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(20)
             $0.leading.equalToSuperview().inset(18)
+            $0.height.equalTo(22)
         }
         
         titleLabelBgView.snp.makeConstraints {
@@ -148,7 +150,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
         characterImgView.snp.makeConstraints {
             $0.top.equalTo(promiseView.snp.bottom).offset(20)
             $0.centerX.equalToSuperview()
-            $0.size.equalTo(300.horizontallyAdjusted)
+            $0.size.equalTo(250)
             $0.bottom.equalToSuperview().inset(20)
         }
         
@@ -178,13 +180,18 @@ final class MainHomePromiseCell: UICollectionViewCell {
         
     }
     
-    func setData(data: Int) {
-        statusLabel.text = "D-30"
+    func setData(_ data: MeetingMain) {
+//        statusLabel.text = "D-30"
+//        titleLabel.text = "제주도로 놀러가자아아"
+//        usersLabel.text = "3/4명"
+//        dateLabel.text = "23.02.13 아침"
+//        placeLabel.text = "강남역"
         
-        titleLabel.text = "제주도로 놀러가자아아"
-        usersLabel.text = "3/4명"
-        dateLabel.text = "23.02.13 아침"
-        placeLabel.text = "강남역"
+        statusLabel.text = data.meetingStatus.rawValue
+        titleLabel.text = data.meetingName
+        usersLabel.text = "\(data.votingUserCount)/\(data.joinedUserCount)"
+        dateLabel.text = data.confirmedDate
+        placeLabel.text = data.confirmedPlace
     }
     
     
