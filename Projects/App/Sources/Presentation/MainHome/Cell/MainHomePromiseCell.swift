@@ -42,7 +42,8 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     private let characterImgView: UIImageView = {
         let imgView = UIImageView()
-        imgView.image = UIImage(systemName: "heart")?.resized(to: .init(width: 200, height: 230))
+        imgView.image = UIImage(.monster)
+        imgView.contentMode = .scaleAspectFit
         return imgView
     }()
     
@@ -140,8 +141,16 @@ final class MainHomePromiseCell: UICollectionViewCell {
         placeLabel.snp.makeConstraints {
             $0.leading.equalTo(placeIcon.snp.trailing).offset(8)
             $0.top.equalTo(dateLabel.snp.bottom).offset(10)
+            $0.bottom.equalToSuperview().inset(30)
         }
         
+        addSubview(characterImgView)
+        characterImgView.snp.makeConstraints {
+            $0.top.equalTo(promiseView.snp.bottom).offset(20)
+            $0.centerX.equalToSuperview()
+            $0.size.equalTo(300.horizontallyAdjusted)
+            $0.bottom.equalToSuperview().inset(20)
+        }
         
         addSubview(statusLabel)
         statusLabel.snp.makeConstraints {
