@@ -239,6 +239,20 @@ extension MainHomeViewController {
             .drive(onNext: { [weak self] in
                 self?.dimView.isHidden = true
             }).disposed(by: bag)
+        
+        dimView.addPromiseButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                let vm = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
+                self?.navigationController?.pushViewController(RoomNameViewController(viewModel: vm), animated: true)
+            }).disposed(by: bag)
+        
+        dimView.enterWithCodeButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                let vm = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
+                self?.navigationController?.pushViewController(RoomCodeController(viewModel: vm), animated: true)
+            }).disposed(by: bag)
     }
     
     private func bindRx() {
