@@ -113,10 +113,7 @@ final class MainHomeViewController: UIViewController {
     
     private let floatingButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .wwwColor(.WWWBlack)
-        button.clipsToBounds = true
-        button.setImage(UIImage(.add_fill), for: .normal)
-        button.layer.cornerRadius = 64/2
+        button.setImage(UIImage(.floating_add), for: .normal)
         return button
     }()
     

@@ -36,10 +36,7 @@ final class MainHomeDimView: UIView {
     
     let floatingButton: UIButton = {
         let button = UIButton()
-        button.backgroundColor = .wwwColor(.WWWBlack)
-        button.clipsToBounds = true
-        button.setImage(UIImage(.delete_fill), for: .normal)
-        button.layer.cornerRadius = 64/2
+        button.setImage(UIImage(.floating_cancel), for: .normal)
         return button
     }()
     
