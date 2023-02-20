@@ -14,7 +14,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = CompletionViewcController(viewModel: CompletionViewModel(usecase: JoinHostUseCase()))
+        let sampleVC = SampleViewController(viewModel: SampleViewModel(joinUserUseCase: JoinUserUseCase(userRepository: UserDAO.init(network: RxMoyaProvider<UserAPI>()).makeUserRepository())))
+        window?.rootViewController = UINavigationController(rootViewController: sampleVC)
         window?.makeKeyAndVisible()
     }
 
