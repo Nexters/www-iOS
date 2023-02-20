@@ -302,9 +302,8 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let pageWidth = 266.horizontallyAdjusted
-        let currentPage = Int(266.horizontallyAdjusted*2 / pageWidth)
-        pageControl.currentPage = currentPage
+        let pageNumber = round(scrollView.contentOffset.x / scrollView.frame.size.width)
+        pageControl.currentPage = Int(pageNumber)
     }
 
     private func pageOffsets(in scrollView: UIScrollView) -> [CGFloat] {

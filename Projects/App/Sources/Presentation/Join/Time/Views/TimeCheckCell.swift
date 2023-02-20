@@ -47,6 +47,10 @@ final class TimeCheckCell: UICollectionViewCell {
         changeImage()
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+    }
+    
     private func changeImage(){
         if isClicked {
             UIView.animate(withDuration: 0.1) {
