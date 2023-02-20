@@ -17,7 +17,7 @@ enum CheckStatus {
 
 final class TimeCheckCell: UICollectionViewCell {
     
-    private var clicked = false
+    private var isClicked = false
     
     private let imageView: UIImageView = {
         $0.contentMode = .scaleAspectFit
@@ -43,12 +43,12 @@ final class TimeCheckCell: UICollectionViewCell {
     }
     
     func onSelected() {
-        clicked = !clicked
+        isClicked = !isClicked
         changeImage()
     }
     
     private func changeImage(){
-        if clicked {
+        if isClicked {
             UIView.animate(withDuration: 0.1) {
                 self.imageView.image = UIImage(.time_selected)
             }
