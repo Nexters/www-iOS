@@ -9,8 +9,11 @@
 import Foundation
 
 public enum WWWAssset: String {
+    
+    // WWW icon
     case chevron_left
     case link
+    case link_green
     case info
     case add
     case add_fill
@@ -19,4 +22,12 @@ public enum WWWAssset: String {
     case delete_green
     case plus_gray
     case plus_black
+    
+    // WWW Characters
+    case completion
+    case monster
+    case donut
+    case heart_big
+    case heart_small
+    
 }

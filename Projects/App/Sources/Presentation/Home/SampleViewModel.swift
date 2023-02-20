@@ -5,10 +5,9 @@
 //  Created by Chanhee Jeong on 2023/02/01.
 //
 
-import RxRelay
 import Foundation
-import RxCocoa
 import RxSwift
+import RxRelay
 
 
 final class SampleViewModel: BaseViewModel {
