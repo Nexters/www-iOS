@@ -20,5 +20,6 @@ let project = Project.app(name: projectName,
                             .external(name: "RxSwift"),
                             .external(name: "RxCocoa"),
                             .external(name: "RxMoya"),
-                            .external(name: "SnapKit")
+                            .external(name: "SnapKit"),
+                            .external(name: "DeviceKit")
                           ])
