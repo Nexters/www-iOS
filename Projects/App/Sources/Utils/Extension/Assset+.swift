@@ -43,4 +43,6 @@ public enum WWWAssset: String {
     case promiseFrame
     case union1
     case union2
+    case floating_add
+    case floating_cancel
 }
