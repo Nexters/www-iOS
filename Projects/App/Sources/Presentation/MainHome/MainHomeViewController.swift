@@ -17,7 +17,8 @@ final class MainHomeViewController: UIViewController {
     private let bag = DisposeBag()
     var viewModel: MainHomeViewModel?
     enum Section: CaseIterable {
-        case main
+        case proceeding
+        case ended
     }
     var isOneStepPaging = true
     var currentIndex: CGFloat = 0 {
@@ -25,6 +26,8 @@ final class MainHomeViewController: UIViewController {
             pageLabel.customAttributedString(text: "\(Int(currentIndex)+1)/5", highlightText: "\(Int(currentIndex)+1)", textFont: .www(size: 14)!, highlightTextFont: .www(size: 14)!, textColor: .wwwColor(.Gray450), highlightTextColor: .wwwColor(.WWWGreen))
         }
     }
+    
+    var fetchedMainHomeMeeting: MainHomeMeeting = .init(proceedingMeetings: [], endedMeetings: [])
     
     // MARK: - UI
     private let titleLabel: UIImageView = {
@@ -93,9 +96,9 @@ final class MainHomeViewController: UIViewController {
         return collectionView
     }()
     
-    private lazy var dataSource: UICollectionViewDiffableDataSource<Section, Int> = UICollectionViewDiffableDataSource<Section, Int>(collectionView: self.collectionView, cellProvider: { collectionView, indexPath, itemIdentifier in // TODO: entity로 수정
+    private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MeetingMain> = UICollectionViewDiffableDataSource<Section, MeetingMain>(collectionView: self.collectionView, cellProvider: { collectionView, indexPath, itemIdentifier in
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MainHomePromiseCell.identifier, for: indexPath) as?  MainHomePromiseCell else { return UICollectionViewCell() }
-        cell.setData(data: itemIdentifier)
+        cell.setData(itemIdentifier)
         return cell
     })
     
@@ -107,7 +110,6 @@ final class MainHomeViewController: UIViewController {
         label.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
         label.layer.borderWidth = 1
         label.customAttributedString(text: "\(Int(currentIndex)+1)/5", highlightText: "\(Int(currentIndex)+1)", textFont: .www(size: 14)!, highlightTextFont: .www(size: 14)!, textColor: .wwwColor(.Gray450), highlightTextColor: .wwwColor(.WWWGreen))
-
         return label
     }()
     
@@ -131,7 +133,6 @@ final class MainHomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
-        applyData()
         setAction()
         bindRx()
     }
@@ -196,11 +197,12 @@ extension MainHomeViewController {
         dimView.isHidden = true
     }
     
-    private func applyData() {
-        var snapshot = NSDiffableDataSourceSnapshot<Section,Int>()
-        snapshot.appendSections([.main])
-        snapshot.appendItems([1,2,3,4,5])
+    private func applyData(items: [MeetingMain], section: Section) {
+        var snapshot = NSDiffableDataSourceSnapshot<Section, MeetingMain>()
+        snapshot.appendSections([section])
+        snapshot.appendItems(items)
         self.dataSource.apply(snapshot, animatingDifferences: true)
+        self.collectionView.setContentOffset(.init(x: -collectionView.contentInset.left, y: .zero), animated: true)
     }
     
     private func setAction() {
@@ -210,6 +212,8 @@ extension MainHomeViewController {
                 // 진행중인 약속
                 self?.proceedingPromiseButton.isEnabled = false
                 self?.endedPromiseButton.isEnabled = true
+                let proceeding = self?.fetchedMainHomeMeeting.proceedingMeetings ?? []
+                self?.applyData(items: proceeding, section: .proceeding)
                 
             }).disposed(by: bag)
         
@@ -219,6 +223,9 @@ extension MainHomeViewController {
                 // 종료된 약속
                 self?.proceedingPromiseButton.isEnabled = true
                 self?.endedPromiseButton.isEnabled = false
+                
+                let ended = self?.fetchedMainHomeMeeting.endedMeetings ?? []
+                self?.applyData(items: ended, section: .ended)
             }).disposed(by: bag)
         
         floatingButton.rx.tap
@@ -239,8 +246,10 @@ extension MainHomeViewController {
         
         let output = viewModel?.transform(input: input, disposeBag: bag)
         
-        output?.mainHomeMeeting.subscribe(onSuccess: {
+        output?.mainHomeMeeting.subscribe(onSuccess: { [weak self] in
             print("mainHomeMeeting",$0)
+            self?.fetchedMainHomeMeeting = $0
+            self?.applyData(items: $0.proceedingMeetings, section: .proceeding)
         }).disposed(by: bag)
         
     }
