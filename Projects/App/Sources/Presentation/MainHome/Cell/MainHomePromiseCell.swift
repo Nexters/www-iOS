@@ -190,8 +190,21 @@ final class MainHomePromiseCell: UICollectionViewCell {
         statusLabel.text = data.meetingStatus.rawValue
         titleLabel.text = data.meetingName
         usersLabel.text = "\(data.votingUserCount)/\(data.joinedUserCount)"
-        dateLabel.text = data.confirmedDate
-        placeLabel.text = data.confirmedPlace
+        if let confirmedDate = data.confirmedDate, let confirmedTime = data.confirmedTime {
+            dateLabel.textColor = .wwwColor(.Gray700)
+            dateLabel.text = "\(confirmedDate) \(confirmedTime.toText())"
+        } else {
+            dateLabel.text = "미확정"
+            dateLabel.textColor = .wwwColor(.Gray250)
+        }
+        
+        if let confirmPlace = data.confirmedPlace {
+            placeLabel.textColor = .wwwColor(.Gray700)
+            placeLabel.text = confirmPlace
+        } else {
+            placeLabel.textColor = .wwwColor(.Gray250)
+            placeLabel.text = "미확정"
+        }
     }
     
     
