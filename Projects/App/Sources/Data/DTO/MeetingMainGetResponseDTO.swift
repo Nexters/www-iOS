@@ -16,30 +16,30 @@ struct MeetingMainGetResponseDTO: ModelType {
 
 extension MeetingMainGetResponseDTO {
     struct MeetingMainGetResDTOWrapper: ModelType {
-        let meetingMainIngGetResDtoList: [MeetingMainGetResDto]
-        let meetingMainEndGetResDtoList: [MeetingMainGetResDto]
+        let meetingIngList: [MeetingMainGetResDto]
+        let meetingEndList: [MeetingMainGetResDto]
     }
 }
 
 extension MeetingMainGetResponseDTO.MeetingMainGetResDTOWrapper {
     struct MeetingMainGetResDto: ModelType {
-        let conditionCount: Int
+        let confirmedDate: String?
+        let confirmedPlace: String?
+        let confirmedTime: PromiseTime?
         let hostName: String
         let joinedUserCount: Int
         let meetingId: Int
         let meetingName: String
         let meetingStatus: MeetingStatus
-        let promiseDate: String? // Date
-        let promisePlace: String?
-        let promiseTime: PromiseTime?
+        let minimumAlertMembers: Int
         let votingUserCount: Int
     }
 }
 
 extension MeetingMainGetResponseDTO.MeetingMainGetResDTOWrapper {
     func toDomain() -> MainHomeMeeting {
-        let proceedingMeetings =  self.meetingMainIngGetResDtoList.map { $0.toDomain() }
-        let endedMeetings = self.meetingMainEndGetResDtoList.map { $0.toDomain() }
+        let proceedingMeetings =  self.meetingIngList.map { $0.toDomain() }
+        let endedMeetings = self.meetingEndList.map { $0.toDomain() }
         
         return .init(proceedingMeetings: proceedingMeetings, endedMeetings: endedMeetings)
     }
@@ -47,7 +47,7 @@ extension MeetingMainGetResponseDTO.MeetingMainGetResDTOWrapper {
 
 
 extension MeetingMainGetResponseDTO.MeetingMainGetResDTOWrapper.MeetingMainGetResDto {
-    func toDomain() -> Meeting {
-        return Meeting(conditionCount: conditionCount, hostName: hostName, joinedUserCount: joinedUserCount, meetingId: meetingId, meetingName: meetingName, meetingStatus: meetingStatus, promiseDate: promiseDate, promisePlace: promisePlace, promiseTime: promiseTime, votingUserCount: votingUserCount)
+    func toDomain() -> MeetingMain {
+        return MeetingMain(confirmedDate: confirmedDate, confirmedPlace: confirmedPlace, confirmedTime: confirmedTime, hostName: hostName, joinedUserCount: joinedUserCount, meetingId: meetingId, meetingName: meetingName, meetingStatus: meetingStatus, minimumAlertMembers: minimumAlertMembers, votingUserCount: votingUserCount)
     }
 }
