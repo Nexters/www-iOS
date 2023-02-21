@@ -99,6 +99,7 @@ final class MainHomeViewController: UIViewController {
         collectionView.contentInset = UIEdgeInsets(top: 0, left: insetX, bottom: 0, right: insetX)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.decelerationRate = UIScrollView.DecelerationRate.fast
+        collectionView.showsHorizontalScrollIndicator = false
         
         return collectionView
     }()
