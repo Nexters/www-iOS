@@ -11,26 +11,32 @@ import UIKit
 final class MainHomeDimView: UIView {
     
     let addPromiseButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .wwwColor(.WWWBlack)
-        button.clipsToBounds = true
-        button.layer.cornerRadius = 46/2
-        button.setTitleColor(.wwwColor(.WWWWhite), for: .normal)
-        button.setTitle("새로운 약속 생성하기", for: .normal)
-        button.titleLabel?.font = .www(size: 14, family: .Bold)
-        button.contentEdgeInsets = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
+        let button = UIButton(type: .system)
+        var config = UIButton.Configuration.filled()
+        var attrStr = AttributedString("새로운 약속 생성하기")
+        attrStr.font = .www.body2
+        attrStr.foregroundColor = .wwwColor(.WWWWhite)
+        config.attributedTitle = attrStr
+        config.baseBackgroundColor = .wwwColor(.WWWBlack)
+        config.titleAlignment = .center
+        config.cornerStyle = .capsule
+        config.contentInsets = .init(top: 14, leading: 14, bottom: 14, trailing: 14)
+        button.configuration = config
         return button
     }()
     
     let enterWithCodeButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .wwwColor(.WWWWhite)
-        button.clipsToBounds = true
-        button.layer.cornerRadius = 46/2
-        button.setTitleColor(.wwwColor(.WWWBlack), for: .normal)
-        button.setTitle("초대코드로 입장하기", for: .normal)
-        button.titleLabel?.font = .www(size: 14, family: .Bold)
-        button.contentEdgeInsets = UIEdgeInsets(top: 14, left: 14, bottom: 14, right: 14)
+        let button = UIButton(type: .system)
+        var config = UIButton.Configuration.filled()
+        var attrStr = AttributedString("초대코드로 입장하기")
+        attrStr.font = .www.body2
+        attrStr.foregroundColor = .wwwColor(.WWWBlack)
+        config.attributedTitle = attrStr
+        config.baseBackgroundColor = .wwwColor(.WWWWhite)
+        config.titleAlignment = .center
+        config.cornerStyle = .capsule
+        config.contentInsets = .init(top: 14, leading: 14, bottom: 14, trailing: 14)
+        button.configuration = config
         return button
     }()
     
