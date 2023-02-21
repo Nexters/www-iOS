@@ -7,7 +7,6 @@
 
 import Foundation
 import Moya
-import RxSwift
 
 extension UserAPI {
     struct Plugins {
