@@ -23,7 +23,14 @@ final class MainHomeViewController: UIViewController {
     var isOneStepPaging = true
     var currentIndex: CGFloat = 0 {
         didSet {
-            pageLabel.customAttributedString(text: "\(Int(currentIndex)+1)/5", highlightText: "\(Int(currentIndex)+1)", textFont: .www(size: 14)!, highlightTextFont: .www(size: 14)!, textColor: .wwwColor(.Gray450), highlightTextColor: .wwwColor(.WWWGreen))
+            pageLabel.customAttributedString(
+                text: "\(Int(currentIndex)+1)/5",
+                highlightText: "\(Int(currentIndex)+1)",
+                textFont: .www(size: 14)!,
+                highlightTextFont: .www(size: 14)!,
+                textColor: .wwwColor(.Gray450),
+                highlightTextColor: .wwwColor(.WWWGreen)
+            )
         }
     }
     
@@ -96,11 +103,16 @@ final class MainHomeViewController: UIViewController {
         return collectionView
     }()
     
-    private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MeetingMain> = UICollectionViewDiffableDataSource<Section, MeetingMain>(collectionView: self.collectionView, cellProvider: { collectionView, indexPath, itemIdentifier in
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MainHomePromiseCell.identifier, for: indexPath) as?  MainHomePromiseCell else { return UICollectionViewCell() }
-        cell.setData(itemIdentifier)
-        return cell
-    })
+    private lazy var dataSource: UICollectionViewDiffableDataSource<Section, MeetingMain>
+    = UICollectionViewDiffableDataSource<Section, MeetingMain>(
+        collectionView: self.collectionView,
+        cellProvider: { collectionView, indexPath, itemIdentifier in
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: MainHomePromiseCell.identifier,
+                for: indexPath) as?  MainHomePromiseCell else { return UICollectionViewCell() }
+            cell.setData(itemIdentifier)
+            return cell
+        })
     
     lazy var pageLabel: PaddingLabel = {
         let label = PaddingLabel(padding: .init(top: 2, left: 14, bottom: 2, right: 14))
@@ -109,7 +121,14 @@ final class MainHomeViewController: UIViewController {
         label.layer.cornerRadius = 26/2
         label.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
         label.layer.borderWidth = 1
-        label.customAttributedString(text: "\(Int(currentIndex)+1)/5", highlightText: "\(Int(currentIndex)+1)", textFont: .www(size: 14)!, highlightTextFont: .www(size: 14)!, textColor: .wwwColor(.Gray450), highlightTextColor: .wwwColor(.WWWGreen))
+        label.customAttributedString(
+            text: "\(Int(currentIndex)+1)/5",
+            highlightText: "\(Int(currentIndex)+1)",
+            textFont: .www(size: 14)!,
+            highlightTextFont: .www(size: 14)!,
+            textColor: .wwwColor(.Gray450),
+            highlightTextColor: .wwwColor(.WWWGreen)
+        )
         return label
     }()
     
