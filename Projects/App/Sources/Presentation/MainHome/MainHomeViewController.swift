@@ -34,7 +34,7 @@ final class MainHomeViewController: UIViewController {
         }
     }
     
-    var fetchedMainHomeMeeting: MainHomeMeeting = .init(proceedingMeetings: [], endedMeetings: [])
+    private var fetchedMainHomeMeeting: MainHomeMeeting = .init(proceedingMeetings: [], endedMeetings: [])
     
     // MARK: - UI
     private let titleLabel: UIImageView = {
