@@ -50,5 +50,5 @@ extension MeetingAPI: TargetType {
 }
 
 struct MeetingAPIManager {
-    static let provider = RxMoyaProvider<MeetingAPI>()
+    static let provider: RxMoyaProvider<MeetingAPI> = MeetingAPI.provider
 }
