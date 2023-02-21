@@ -51,5 +51,5 @@ extension UserAPI: TargetType {
 }
 
 struct UserAPIManager {
-    static let provider = RxMoyaProvider<UserAPI>()
+    static let provider: RxMoyaProvider<UserAPI> = UserAPI.provider
 }
