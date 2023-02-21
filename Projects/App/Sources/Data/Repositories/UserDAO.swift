@@ -16,7 +16,7 @@ final class UserDAO: UserRepository {
         self.network = network
     }
     
-    func joinUser(deviceId: String, fcmToken: String, userName: String) -> RxSwift.Single<CommonResponse> {
+    func joinUser(deviceId: String, fcmToken: String, userName: String) -> Single<CommonResponse> {
         
         return network.request(.join(param: LoginRequestDTO(deviceId: deviceId, fcmToken: fcmToken, userName: userName)))
             .map(LoginResponseDTO.self)

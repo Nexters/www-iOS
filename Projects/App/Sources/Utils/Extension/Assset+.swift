@@ -35,4 +35,14 @@ public enum WWWAssset: String {
     case time_default
     case time_disabled
     case time_selected
+    
+    // MainHome
+    case users
+    case calendar
+    case place
+    case promiseFrame
+    case union1
+    case union2
+    case floating_add
+    case floating_cancel
 }
