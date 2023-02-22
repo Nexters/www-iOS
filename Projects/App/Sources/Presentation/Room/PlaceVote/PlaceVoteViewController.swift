@@ -86,6 +86,27 @@ extension PlaceVoteViewController {
     
 }
 
+// MARK: - UITableViewDelegate
+extension PlaceVoteViewController: UITableViewDelegate{
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60.0
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 11.0
+    }
+
+    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        return 40.0 + 1.0
+    }
+
+}
+
 // MARK: - UITableViewDataSource
 extension PlaceVoteViewController: UITableViewDataSource {
     
@@ -110,32 +131,49 @@ extension PlaceVoteViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        
+        let line = UIView()
+        line.backgroundColor = UIColor.wwwColor(.Gray150)
+        
+        let peopleNumLabel: UILabel = {
+            $0.numberOfLines = 0
+            $0.textColor = UIColor.wwwColor(.Gray350)
+            $0.font = UIFont.www.body6
+            $0.text = "N명 참여중"
+            return $0
+        }(UILabel())
+        
+        let icon: UIImageView = { // TODO: 아이콘으로 교체 
+            let imageIcon = UIImage(systemName: "chevron.right")?.withTintColor(.wwwColor(.Gray350), renderingMode: .alwaysOriginal)
+            $0.image = imageIcon
+            $0.contentMode = .scaleAspectFit
+            return $0
+        }(UIImageView())
+        
         let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "MyFooterView") ?? UITableViewHeaderFooterView()
         footerView.contentView.backgroundColor = .white
         footerView.contentView.layer.cornerRadius = 10
         footerView.contentView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+        
+        footerView.contentView.addSubviews(line, peopleNumLabel, icon)
+        line.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview()
+            make.height.equalTo(1)
+            make.width.equalToSuperview()
+        }
+        
+        peopleNumLabel.snp.makeConstraints { make in
+            make.top.equalTo(line.snp.bottom).offset(10)
+            make.leading.equalToSuperview().offset(20)
+        }
+        
+        icon.snp.makeConstraints { make in
+            make.leading.equalTo(peopleNumLabel.snp.trailing).offset(2)
+            make.centerY.equalTo(peopleNumLabel.snp.centerY)
+            make.width.height.equalTo(14)
+        }
+        
         return footerView
-    }
-
-}
-
-// MARK: - UITableViewDelegate
-extension PlaceVoteViewController: UITableViewDelegate{
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60.0
-    }
-
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-        return 11.0
-    }
-
-    func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 40.0
     }
 
 }
