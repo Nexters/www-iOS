@@ -45,4 +45,5 @@ public enum WWWAssset: String {
     case union2
     case floating_add
     case floating_cancel
+    case votingBox
 }
