@@ -14,8 +14,13 @@ final class PlaceVoteCell: UITableViewCell {
     
     static let id = "PlaceVoteCell"
     
-    private let gradientLayer = CAGradientLayer()
-    private let containerView = UIView()
+    private let containerView: UIView = {
+        $0.layer.cornerRadius = 15
+        $0.backgroundColor = .wwwColor(.Gray100)
+        return $0
+    }(UIView())
+    
+    private let colorView = UIView()
     private let nameLabel = UILabel()
     
     // MARK: - Initializers
@@ -24,6 +29,7 @@ final class PlaceVoteCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
         setupViews()
+        makeGradient(isSelected: true)
     }
     
     required init?(coder: NSCoder) {
@@ -39,28 +45,36 @@ final class PlaceVoteCell: UITableViewCell {
             make.height.equalTo(48)
         }
         
+        containerView.addSubview(colorView)
+        
+        colorView.snp.makeConstraints { make in
+            make.leading.top.equalToSuperview()
+            make.width.equalTo(200)
+            make.height.equalTo(48)
+        }
+        
         containerView.addSubview(nameLabel)
         containerView.snp.makeConstraints { make in
             make.leading.equalToSuperview()
             make.centerY.equalToSuperview()
         }
         
-        gradientLayer.colors = [
-            UIColor(red: 0.255, green: 0.887, blue: 0.621, alpha: 1).cgColor,
-            UIColor(red: 0.409, green: 0.892, blue: 0.805, alpha: 1).cgColor
-        ]
-        gradientLayer.locations = [0, 0.84]
-        gradientLayer.startPoint = CGPoint(x: 0.25, y: 0.5)
-        gradientLayer.endPoint = CGPoint(x: 0.75, y: 0.5)
-        gradientLayer.transform = CATransform3DMakeAffineTransform(CGAffineTransform(a: 0, b: 1, c: -1, d: 0, tx: 1, ty: 0))
-        containerView.layer.insertSublayer(gradientLayer, at: 0)
-        containerView.layer.cornerRadius = 15
-        containerView.layer.borderWidth = 1
-        containerView.layer.borderColor = UIColor(red: 0.294, green: 0.89, blue: 0.667, alpha: 1).cgColor
     }
     
     func configure(with text: String) {
         textLabel?.text = text
+    }
+    
+    
+    private func makeGradient(isSelected: Bool) {
+        self.layoutIfNeeded()
+        colorView.layer.cornerRadius = 15
+        colorView.layer.masksToBounds = true
+        colorView.addGradientLayer(colors: [UIColor.wwwColor(.WWWMint).withAlphaComponent(isSelected ? 1.0 : 0.2).cgColor,
+                                            UIColor.wwwColor(.WWWGreen).withAlphaComponent(isSelected ? 1.0 : 0.2).cgColor],
+                                   locations: nil,
+                                   startPoint: CGPoint(x: 0, y: 0.5),
+                                   endPoint: CGPoint(x: 1, y: 0.5))
     }
     
 }

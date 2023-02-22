@@ -53,6 +53,7 @@ extension PlaceVoteViewController {
         tableView.showsVerticalScrollIndicator = false
         tableView.register(PlaceVoteCell.self, forCellReuseIdentifier: PlaceVoteCell.id)
         tableView.backgroundColor = .clear
+        tableView.separatorStyle = .none
         tableView.layer.applyFigmaShadow(color: .black, opacity: 0.05, x: 0, y: 0, blur: 20, spread: 0)
     }
     
