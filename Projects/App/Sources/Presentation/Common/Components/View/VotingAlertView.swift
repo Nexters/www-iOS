@@ -8,6 +8,11 @@
 
 import UIKit
 
+enum VotingAlertType {
+    case startVoting
+    case endVoting
+}
+
 final class VotingAlertView: UIView {
     
     private let bgView: UIView = {
@@ -23,7 +28,8 @@ final class VotingAlertView: UIView {
     
     private let votingImgView: UIImageView = {
         let imgView = UIImageView()
-        imgView.image = UIImage(.votingBox)?.resized(to: .init(width: 300.horizontallyAdjusted, height: 190.verticallyAdjusted))
+        imgView.image = UIImage(.votingBox)
+        imgView.contentMode = .scaleAspectFit
         return imgView
     }()
     private let titleLabel: UILabel = {
@@ -97,6 +103,7 @@ final class VotingAlertView: UIView {
         votingImgView.snp.makeConstraints {
             $0.centerY.equalTo(contentView.snp.top)
             $0.centerX.equalToSuperview()
+            $0.height.equalTo(190)
         }
         
         contentView.addSubviews(titleLabel, descriptionLabel, btnStackView)
@@ -108,11 +115,13 @@ final class VotingAlertView: UIView {
         descriptionLabel.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(4)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(44)
         }
         
         btnStackView.snp.makeConstraints {
+            $0.top.equalTo(descriptionLabel.snp.bottom).offset(25)
             $0.leading.trailing.bottom.equalToSuperview()
-            $0.height.equalTo(64.verticallyAdjusted)
+            $0.height.equalTo(64)
         }
         
         btnStackView.addArrangedSubviews(cancelBtn, confirmBtn)
@@ -140,9 +149,4 @@ final class VotingAlertView: UIView {
         }
     }
     
-}
-
-enum VotingAlertType {
-    case startVoting
-    case endVoting
 }
