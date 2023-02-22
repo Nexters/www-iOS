@@ -140,7 +140,13 @@ extension PlaceVoteCell {
             make.height.equalTo(48)
         }
         
-        setProgress(progress: progress)
+        let width = (self.containerView.bounds.width) * progress // TODO: 계산이상하게 안맞음
+        containerView.addSubview(colorView)
+        colorView.snp.makeConstraints { make in
+            make.leading.top.equalToSuperview()
+            make.width.equalTo(width)
+            make.height.equalTo(48)
+        }
         
         containerView.addSubview(countLabel)
         countLabel.snp.makeConstraints { make in
@@ -159,7 +165,7 @@ extension PlaceVoteCell {
             }
         } else {
             UIView.animate(withDuration: 0.1) {
-                self.setStatus(type: .doneNotSelected)
+                self.setStatus(type: .doneNotSelected) 
             }
         }
     }
@@ -213,15 +219,15 @@ extension PlaceVoteCell {
         self.layoutIfNeeded()
     }
     
-    private func setProgress(progress: CGFloat) {
-        let width = self.contentView.bounds.width - 10 * progress
-        containerView.addSubview(colorView)
-        colorView.snp.makeConstraints { make in
-            make.leading.top.equalToSuperview()
-            make.width.equalTo(width)
-            make.height.equalTo(48)
-        }
-        self.layoutIfNeeded()
-    }
-    
+//    private func setProgress(progress: CGFloat) {
+//        let width = self.contentView.bounds.width - 10 * progress
+//        containerView.addSubview(colorView)
+//        colorView.snp.makeConstraints { make in
+//            make.leading.top.equalToSuperview()
+//            make.width.equalTo(width)
+//            make.height.equalTo(48)
+//        }
+//        self.layoutIfNeeded()
+//    }
+//
 }
