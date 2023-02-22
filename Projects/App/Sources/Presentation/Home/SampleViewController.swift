@@ -52,7 +52,7 @@ class SampleViewController: UIViewController {
 //        let hostVM = PlaceViewModel(host: JoinHostUseCase())
 //        let guestVM = PlaceViewModel(guest: JoinGuestUseCase())
         
-        self.navigationController?.pushViewController(TimeViewController(), animated: true)
+        self.navigationController?.pushViewController(PlaceVoteViewController(), animated: true)
     
     }
     
