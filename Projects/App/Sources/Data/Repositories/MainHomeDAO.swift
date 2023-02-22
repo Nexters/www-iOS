@@ -20,7 +20,6 @@ final class MainHomeDAO: MeetingRepository {
         
         return network.request(.getMeetings)
             .map(MeetingMainGetResponseDTO.self)
-            .do { print("MeetingMainGetResponseDTO", $0) }
             .map{ $0.result }
             .map{ $0.toDomain() }
             .asSingle()

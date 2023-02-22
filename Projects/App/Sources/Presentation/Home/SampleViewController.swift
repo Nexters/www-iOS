@@ -33,6 +33,7 @@ class SampleViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
+//        bindRx()
     }
 
     private func setUI() {
@@ -62,11 +63,11 @@ class SampleViewController: UIViewController {
 //        let viewModel = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
 //        self.navigationController?.pushViewController(RoomCodeController(viewModel: viewModel), animated: true)
         
-//        output?.loginResult.subscribe {
-//            print("loginResult is", $0)
-//            UserDefaultKeyCase().setUserToken($0.result)
-//
-//        }.disposed(by: bag)
+        output?.loginResult.subscribe {
+            print("loginResult is", $0)
+            UserDefaultKeyCase().setUserToken($0.result)
+
+        }.disposed(by: bag)
     }
 }
 

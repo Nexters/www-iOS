@@ -1,14 +1,15 @@
 //
-//  UserAPI+Request.swift
-//  www
+//  MeetingAPI+Request.swift
+//  App
 //
-//  Created by kokojong on 2023/02/05.
+//  Created by kokojong on 2023/02/22.
+//  Copyright © 2023 com.promise8. All rights reserved.
 //
 
 import Foundation
 import Moya
 
-extension UserAPI {
+extension MeetingAPI {
     struct Plugins {
         var plugins: [PluginType]
         
@@ -19,7 +20,7 @@ extension UserAPI {
         func callAsFunction() -> [PluginType] { self.plugins }
     }
     
-    static var provider: RxMoyaProvider<UserAPI> {
+    static var provider: RxMoyaProvider<MeetingAPI> {
         let plugins = Plugins(plugins: [LoggerPlugin()])
         
         let configuration = URLSessionConfiguration.default
@@ -27,7 +28,7 @@ extension UserAPI {
         configuration.urlCredentialStorage = nil
         let session = Session(configuration: configuration)
         
-        return RxMoyaProvider<UserAPI>(
+        return RxMoyaProvider<MeetingAPI>(
             endpointClosure: { target in
                 MoyaProvider.defaultEndpointMapping(for: target)
             },

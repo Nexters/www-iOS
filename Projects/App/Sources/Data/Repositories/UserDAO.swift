@@ -31,7 +31,7 @@ final class UserDAO: UserRepository {
     
     // MARK: - Repositories
     func makeUserRepository() -> UserRepository {
-        return UserDAO(network: RxMoyaProvider<UserAPI>())
+        return UserDAO(network: UserAPIManager.provider)
     }
 
 }
