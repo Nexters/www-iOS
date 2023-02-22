@@ -118,12 +118,12 @@ extension PlaceVoteViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
                 as? PlaceVoteCell else { return UITableViewCell() }
         cell.configure(with: "\(indexPath.row)번째 아이템")
+        cell.selectionStyle = .none
         return cell
     }
     
-    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "MyHeaderView") ?? UITableViewHeaderFooterView()
+        let headerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "header") ?? UITableViewHeaderFooterView()
         headerView.contentView.backgroundColor = .white
         headerView.contentView.layer.cornerRadius = 10
         headerView.contentView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
@@ -150,7 +150,7 @@ extension PlaceVoteViewController: UITableViewDataSource {
             return $0
         }(UIImageView())
         
-        let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "MyFooterView") ?? UITableViewHeaderFooterView()
+        let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "footer") ?? UITableViewHeaderFooterView()
         footerView.contentView.backgroundColor = .white
         footerView.contentView.layer.cornerRadius = 10
         footerView.contentView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
