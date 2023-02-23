@@ -23,7 +23,7 @@ final class PlaceVoteCell: UITableViewCell {
     
     static let id = "PlaceVoteCell"
     
-    private var isSlected = false
+    private var isClicked = false
     
     private let containerView: UIView = {
         $0.layer.cornerRadius = 15
@@ -89,7 +89,7 @@ extension PlaceVoteCell {
     }
     
     func onSelected() {
-        isSlected = !isSlected
+        isClicked = !isClicked
         manageSelection()
         self.layoutIfNeeded()
     }
@@ -165,7 +165,7 @@ extension PlaceVoteCell {
             }
         } else {
             UIView.animate(withDuration: 0.1) {
-                self.setStatus(type: .doneNotSelected) 
+                self.setStatus(type: .doneNotSelected)
             }
         }
     }
