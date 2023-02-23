@@ -18,6 +18,7 @@ import UIKit
 enum WWWColor: String {
     case WWWGreen
     case WWWRed
+    case WWWMint // Gradient
     
     case WWWBlack
     case WWWWhite
