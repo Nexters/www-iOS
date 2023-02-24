@@ -12,26 +12,20 @@ import RxRelay
 final class SettingViewModel: BaseViewModel {
     
     struct Input {
-        let viewDidLoad: Observable<Void>
-        let togglePushAlarm: Observable<Void>
+        let togglePushAlarm: Observable<Bool>
     }
     
     struct Output {
-        let isPushAlarmOn: BehaviorRelay<Bool> = BehaviorRelay(value: false)
+        let isPushAlarmOn: PublishRelay<Bool> = PublishRelay<Bool>()
     }
     
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
         
-        input.viewDidLoad.subscribe(onNext: {
-            output.isPushAlarmOn.accept(UserDefaultKeyCase().getIsPushAlarmOn())
-        }).disposed(by: disposeBag)
-        
-        input.togglePushAlarm.subscribe(onNext: {
-            let isPushAlarmOn = !UserDefaultKeyCase().getIsPushAlarmOn()
-            UserDefaultKeyCase().setIsPushAlarmOn(isPushAlarmOn)
+        input.togglePushAlarm.subscribe(onNext: { isOn in
+            UserDefaultKeyCase().setIsPushAlarmOn(isOn)
             output.isPushAlarmOn
-                .accept(isPushAlarmOn)
+                .accept(isOn)
         }).disposed(by: disposeBag)
         
         return output

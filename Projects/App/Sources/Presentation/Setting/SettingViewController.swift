@@ -46,6 +46,7 @@ final class SettingViewController: UIViewController {
     private let pushAlarmSwitch: UISwitch = {
         let toggleSwitch = UISwitch()
         toggleSwitch.onTintColor = .wwwColor(.WWWGreen)
+        toggleSwitch.isOn = UserDefaultKeyCase().getIsPushAlarmOn()
         return toggleSwitch
     }()
     
@@ -212,15 +213,12 @@ final class SettingViewController: UIViewController {
     }
     
     private func bindViewModel() {
-        let input = SettingViewModel.Input(
-            viewDidLoad: Observable.just(()),
-            togglePushAlarm: Observable.just(())
-        )
+        let input = SettingViewModel.Input(togglePushAlarm: pushAlarmSwitch.rx.isOn.asObservable())
         
         let output = viewModel?.transform(input: input, disposeBag: bag)
         
-        output?.isPushAlarmOn.subscribe(onNext: { [weak self] isPushAlarmOn in
-            
+        output?.isPushAlarmOn.subscribe(onNext: { [weak self] isOn in
+            self?.pushAlarmSwitch.isOn = isOn
         }).disposed(by: bag)
     }
     
