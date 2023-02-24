@@ -242,8 +242,8 @@ extension MainHomeViewController {
         settingButton.rx.tap
             .asDriver()
             .drive(onNext: { [weak self] in
-                let vm = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
-                self?.navigationController?.pushViewController(RoomCodeController(viewModel: vm), animated: true)
+                let vm = SettingViewModel()
+                self?.navigationController?.pushViewController(SettingViewController(viewModel: vm), animated: true)
             }).disposed(by: bag)
         
         proceedingPromiseButton.rx.tap
