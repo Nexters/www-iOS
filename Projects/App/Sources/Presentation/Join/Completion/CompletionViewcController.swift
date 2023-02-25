@@ -114,7 +114,7 @@ final class CompletionViewcController: UIViewController {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        super.viewWillDisappear(animated)
         self.navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
