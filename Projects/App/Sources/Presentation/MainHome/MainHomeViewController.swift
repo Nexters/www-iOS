@@ -44,6 +44,12 @@ final class MainHomeViewController: UIViewController {
         return label
     }()
     
+    private let settingButton: UIButton = {
+        let btn = UIButton()
+        btn.setImage(UIImage(.settings), for: .normal)
+        return btn
+    }()
+    
     private let promiseButtonTabStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
@@ -170,6 +176,13 @@ extension MainHomeViewController {
             $0.height.equalTo(26)
         }
         
+        self.view.addSubview(settingButton)
+        settingButton.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.trailing.equalToSuperview().inset(20)
+            $0.size.equalTo(26)
+        }
+        
         self.view.addSubview(promiseButtonTabStackView)
         promiseButtonTabStackView.snp.makeConstraints {
             $0.top.equalTo(titleLabel.snp.bottom).offset(26)
@@ -226,6 +239,13 @@ extension MainHomeViewController {
     }
     
     private func setAction() {
+        settingButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                let vm = SettingViewModel()
+                self?.navigationController?.pushViewController(SettingViewController(viewModel: vm), animated: true)
+            }).disposed(by: bag)
+        
         proceedingPromiseButton.rx.tap
             .asDriver()
             .drive(onNext: { [weak self] in

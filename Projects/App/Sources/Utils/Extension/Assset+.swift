@@ -46,8 +46,9 @@ public enum WWWAssset: String {
     case floating_add
     case floating_cancel
     case votingBox
+    case settings
     
-    // profile
+   // profile
     case profileImg
     case profileBadge
 }
