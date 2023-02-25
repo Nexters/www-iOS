@@ -16,6 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window = UIWindow(windowScene: windowScene)
 //        let sampleVC = SampleViewController(viewModel: SampleViewModel(joinUserUseCase: JoinUserUseCase(userRepository: UserDAO.init(network: RxMoyaProvider<UserAPI>()).makeUserRepository())))
         let sampleVC = MainHomeViewController(viewModel: MainHomeViewModel(mainHomeUseCase: .init(meetingRepository: MainHomeDAO.init(network: MeetingAPIManager.provider))))
+//        let sampleVC = CalendarViewController(viewModel: CalendarViewModel())
         window?.rootViewController = UINavigationController(rootViewController: sampleVC)
         window?.makeKeyAndVisible()
     }

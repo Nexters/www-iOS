@@ -18,6 +18,16 @@ struct UserDefaultKeyCase {
     func setUserToken(_ token: String) {
         UserDefaults.standard.set(token, forKey: userToken)
     }
+    
+    private let isPushAlarmOn = "isPushAlarmOn"
+    
+    func getIsPushAlarmOn() -> Bool {
+        UserDefaults.standard.bool(forKey: isPushAlarmOn)
+    }
+    
+    func setIsPushAlarmOn(_ isPushAlarm: Bool) {
+        UserDefaults.standard.set(isPushAlarm, forKey: isPushAlarmOn)
+    }
 }
 
 
