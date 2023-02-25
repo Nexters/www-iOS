@@ -22,6 +22,7 @@ final class MinUserViewModel: BaseViewModel {
     private let usecase: JoinHostUseCase
     
     struct Input {
+        let viewDidLoad: Observable<Void>
         let plusButtonDidTap: Observable<Void>
         let minusButtonDidTap: Observable<Void>
         let stepperTextDidChange: Observable<String?>
@@ -30,6 +31,7 @@ final class MinUserViewModel: BaseViewModel {
     }
     
     struct Output {
+        var naviTitleText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<MinUserPager>()
         var plusValue = PublishRelay<Void>()
@@ -75,6 +77,12 @@ final class MinUserViewModel: BaseViewModel {
         self.usecase.minUser
             .subscribe(onNext: { minUser in
                 output.nextButtonMakeEnable.accept(minUser>1)
+            })
+            .disposed(by: disposeBag)
+        
+        input.viewDidLoad
+            .subscribe(onNext: { [weak self] in
+                output.naviTitleText.accept(try! (self?.usecase.roomName)!.value())
             })
             .disposed(by: disposeBag)
         

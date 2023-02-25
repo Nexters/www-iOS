@@ -41,8 +41,13 @@ final class TimeViewModel: BaseViewModel {
 
     // MARK: - Transform
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
-        self.handleInput(input, disposeBag: disposeBag)
-        return makeOutput(with:  input, disposeBag: disposeBag)
+        if usecaseGuest != nil {  // Guest
+            self.handleInputGuest(input, disposeBag: disposeBag)
+            return makeOutputGuest(with: input, disposeBag: disposeBag)
+        } else {  // Host
+            self.handleInputHost(input, disposeBag: disposeBag)
+            return makeOutputHost(with: input, disposeBag: disposeBag)
+        }
     }
     
     func getHostUsecase() -> JoinHostUseCase {
@@ -52,12 +57,52 @@ final class TimeViewModel: BaseViewModel {
     func getGeustUsecase() -> JoinGuestUseCase {
         return self.usecaseGuest!
     }
+}
+
+// MARK: - HOST
+extension TimeViewModel {
     
-    private func handleInput(_ input: Input, disposeBag: DisposeBag) {
+    private func handleInputHost(_ input: Input, disposeBag: DisposeBag) {
 
     }
     
-    private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
+    private func makeOutputHost(with input: Input, disposeBag: DisposeBag) -> Output {
+        let output = Output()
+
+        input.viewDidLoad
+            .subscribe(onNext: { [weak self] in
+                output.naviTitleText.accept(try! (self?.usecaseHost!.roomName)!.value())
+            })
+            .disposed(by: disposeBag)
+        
+        input.backButtonDidTap
+            .subscribe(onNext: {
+                output.navigatePage.accept(.back)
+            })
+            .disposed(by: disposeBag)
+        
+        input.nextButtonDidTap
+            .subscribe(onNext: {
+                print("연결")
+                output.navigatePage.accept(.place)
+            })
+            .disposed(by: disposeBag)
+        return output
+    }
+    
+}
+
+
+// MARK: - Guest
+extension TimeViewModel {
+    
+    private func handleInputGuest(_ input: Input, disposeBag: DisposeBag) {
+        
+    }
+    
+    
+    
+    private func makeOutputGuest(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
 
         input.viewDidLoad
@@ -81,4 +126,6 @@ final class TimeViewModel: BaseViewModel {
         
         return output
     }
+    
+        
 }

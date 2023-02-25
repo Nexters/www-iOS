@@ -232,9 +232,11 @@ private extension CompletionViewcController {
     func bindPager(output: CompletionViewModel.Output?){
         output?.navigatePage
             .asDriver(onErrorJustReturn: .error)
-            .drive(onNext: { page in
+            .drive(onNext: { [weak self] page in
                 switch page {
-                case .roomMain: print("룸메인으로")
+                case .roomMain:
+                    self?.navigationController?.popToRootViewController(animated: true)
+                    print("룸메인으로")
                 case .error: break
                 }
             })

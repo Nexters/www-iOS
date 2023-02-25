@@ -88,7 +88,6 @@ final class TimeViewController: UIViewController {
         return $0
     }(LargeButton(state: false))
     
-    // Navigation Items
     private let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: UserNameViewController.self, action: nil)
     
     private let progressLabel = UILabel()
@@ -226,11 +225,10 @@ private extension TimeViewController {
             .drive(onNext: { [weak self] title in
                 switch self?.userMode {
                 case .host:
-                    print(title)
-                    self?.progressView.setProgress(current: 2, total: 6)
+                    self?.progressView.setProgress(current: 5, total: 6)
                     self?.setNavigationBar(title: title, step: "5/6")
                 case .guest:
-                    self?.progressView.setProgress(current: 2, total: 4)
+                    self?.progressView.setProgress(current: 3, total: 4)
                     self?.setNavigationBar(title: title, step: "3/4")
                 case .none:
                     break
