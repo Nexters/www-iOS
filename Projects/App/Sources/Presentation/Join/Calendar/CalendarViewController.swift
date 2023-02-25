@@ -15,7 +15,7 @@ final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: CalendarViewModel?
+    private let viewModel: CalendarViewModel
     private var selectedStartDay: Day? = nil
     private var selectedEndDay: Day? = nil
     private var defaultDate = Date()
@@ -28,6 +28,7 @@ final class CalendarViewController: UIViewController {
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
+        $0.setButtonState(true) // TODO: 화면 전환 연결용 -> 삭제
         return $0
     }(LargeButton(state: false))
     
@@ -49,6 +50,7 @@ final class CalendarViewController: UIViewController {
         configUI()
         setNavigationBar(title: "캘린더")
         bindRx()
+        setAction()
     }
     
     private func setUI() {
@@ -95,10 +97,10 @@ final class CalendarViewController: UIViewController {
             if self.selectedStartDay == nil {
                 self.selectedStartDay = day
                 self.selectedEndDay = day
-                print("startDay", self.selectedStartDay)
+//                print("startDay", self.selectedStartDay)
             } else {
                 self.selectedEndDay = day
-                print("endDay", self.selectedEndDay)
+//                print("endDay", self.selectedEndDay)
             }
             
             let newContent = self.makeContent()
@@ -123,7 +125,18 @@ final class CalendarViewController: UIViewController {
         navigationItem.titleView = titleLabel
     }
     
-    @objc func backButtonDidTap() {}
+    @objc func backButtonDidTap() { // TODO: 임시
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    private func setAction() {
+        nextButton.rx.tap
+            .asDriver()
+            .drive(onNext: { [weak self] in
+                let viewmodel = TimeViewModel(joinAdminUseCase: self!.viewModel.getUseCase())
+                self?.navigationController?.pushViewController(TimeViewController(viewmodel: viewmodel, userMode: .host), animated: true)
+            }).disposed(by: disposeBag)
+    }
     
     private func bindRx() {
         
@@ -203,7 +216,7 @@ import SwiftUI
 
 struct CalendarViewController_Preview: PreviewProvider {
     static var previews: some View {
-        let viewModel = CalendarViewModel()
+        let viewModel = CalendarViewModel(usecase: JoinHostUseCase())
         CalendarViewController(viewModel: viewModel).toPreview()
     }
 }

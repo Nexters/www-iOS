@@ -15,8 +15,8 @@ final class UserNameViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: UserNameViewModel?
-    var userMode: UserType
+    private let viewModel: UserNameViewModel?
+    private let userMode: UserType
     
     private let progressView = ProgressView(current: 0, total: 0)
     
@@ -167,11 +167,13 @@ private extension UserNameViewController {
                 switch page {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
-                case .calendar:
-                    print("calendar로 넘어갑니다")
+                case .minUser:
+                    let viewmodel = MinUserViewModel(joinAdminUseCase: self?.viewModel?.getHostUseCase() ?? JoinHostUseCase())
+                    self?.navigationController?.pushViewController(MinUserViewController(viewModel: viewmodel), animated: true)
                 case .timeslot:
-                    print("timeslot로 넘어갑니다")
-                    
+                    // TODO: - 게스트로 전환
+                    let viewmodel = TimeViewModel(joinAdminUseCase: self?.viewModel?.getHostUseCase() ?? JoinHostUseCase())
+                    self?.navigationController?.pushViewController(TimeViewController(viewmodel: viewmodel, userMode: .guest), animated: true)
                 case .error: break
                 }
             })

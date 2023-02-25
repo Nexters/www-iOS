@@ -59,6 +59,10 @@ final class PlaceViewModel: BaseViewModel {
             return makeOutputHost(with: input, disposeBag: disposeBag)
         }
     }
+    
+    func getHostUsecase() -> JoinHostUseCase {
+        return self.hostUsecase!
+    }
 }
 
 // MARK: - HOST

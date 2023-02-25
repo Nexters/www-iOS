@@ -15,7 +15,7 @@ final class CompletionViewcController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: CompletionViewModel?
+    private let viewModel: CompletionViewModel
     
     private let hapticGenerator = UINotificationFeedbackGenerator()
     private let motionGenerator = WWWAnimationHelper.shared
@@ -106,6 +106,10 @@ final class CompletionViewcController: UIViewController {
         setUI()
         setMotion()
         bindViewModel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) { super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -212,9 +216,9 @@ private extension CompletionViewcController {
                 self.nextButton.rx.tap.asObservable()
         )
         
-        let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
-        output?.copiedRoomInfo
+        output.copiedRoomInfo
             .asDriver()
             .drive(onNext: { [weak self] text in
                 self?.hapticGenerator.notificationOccurred(.success)

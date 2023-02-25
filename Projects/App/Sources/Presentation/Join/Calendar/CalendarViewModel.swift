@@ -12,7 +12,7 @@ import RxSwift
 
 final class CalendarViewModel: BaseViewModel {
    
-//    private let usecase:
+    private let usecase: JoinHostUseCase
     
     enum CalendarPager {
         case back
@@ -29,6 +29,14 @@ final class CalendarViewModel: BaseViewModel {
     struct Output {
         let startDate = BehaviorRelay<String>(value: "")
         let navigatePage = PublishRelay<CalendarPager>()
+    }
+    
+    init(usecase: JoinHostUseCase) {
+        self.usecase = usecase
+    }
+    
+    func getUseCase() -> JoinHostUseCase {
+        return self.usecase
     }
     
     func transform(input: Input, disposeBag: DisposeBag) -> Output {

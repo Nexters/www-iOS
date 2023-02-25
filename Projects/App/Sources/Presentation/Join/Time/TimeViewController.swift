@@ -19,7 +19,8 @@ final class TimeViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    //    var viewModel: TimeViewModel?
+    private let viewModel: TimeViewModel
+    private let userMode: UserType
     
     private lazy var dataSource = configureDataSource()
     
@@ -83,12 +84,14 @@ final class TimeViewController: UIViewController {
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
+        $0.setButtonState(true) // TODO: 화면연결 임시
         return $0
     }(LargeButton(state: false))
     
     // MARK: - LifeCycle
-    init() {
-        //        self.viewModel = viewModel
+    init(viewmodel: TimeViewModel, userMode: UserType) {
+        self.viewModel = viewmodel
+        self.userMode = userMode
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -101,6 +104,7 @@ final class TimeViewController: UIViewController {
         setUI()
         setPicker(with: 2)
         setNavigationBar()
+        bindViewModel()
         
         let sample = ["25 (토) 낮","26 (일) 저녁", "27 (월) 저녁"]
         applySnapshot(times: sample)
@@ -114,7 +118,6 @@ final class TimeViewController: UIViewController {
 // MARK: - Function
 
 extension TimeViewController {
-    
     private func setUI() {
         self.view.backgroundColor = .white
         //        pickerView.delegate = self
@@ -189,7 +192,7 @@ extension TimeViewController {
         let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
         backButton.tintColor = .black
         let progressLabel = UILabel()
-        progressLabel.text = "3/4"
+        progressLabel.text = "5/6"
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
@@ -203,7 +206,36 @@ extension TimeViewController {
 
 // MARK: - Binding
 private extension TimeViewController {
+    func bindViewModel() {
+        let input = TimeViewModel.Input(
+            nextButtonDidTap:
+                self.nextButton.rx.tap.asObservable(),
+            backButtonDidTap:
+                self.navigationItem.leftBarButtonItem!.rx.tap.asObservable()
+        )
+        
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
+        
+        self.bindPager(output: output)
+        
+    }
     
+    func bindPager(output: TimeViewModel.Output?){
+        output?.navigatePage
+            .asDriver(onErrorJustReturn: .error)
+            .drive(onNext: { [weak self] page in
+                switch page {
+                case .back:
+                    self?.navigationController?.popViewController(animated: true)
+                case .place:
+                    let viewmodel = PlaceViewModel(host: self!.viewModel.getUseCase())
+                    self?.navigationController?.pushViewController(PlaceViewController(viewModel: viewmodel), animated: true)
+                case .error: break
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+
 }
  
 // MARK: - ScrollView
@@ -323,7 +355,7 @@ import SwiftUI
 
 struct TimeViewController_Preview: PreviewProvider {
     static var previews: some View {
-        TimeViewController().toPreview()
+        TimeViewController(viewmodel: TimeViewModel(joinAdminUseCase: JoinHostUseCase()), userMode: .host).toPreview()
     }
 }
 #endif

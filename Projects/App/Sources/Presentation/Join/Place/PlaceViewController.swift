@@ -207,8 +207,7 @@ private extension PlaceViewController {
         output.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
-                self?.nextButton.setTitle(isEnabled ? "다음" : "스킵할래요",
-                                          for: .normal)
+                self?.nextButton.setTitle(isEnabled ? "다음" : "스킵할래요", for: .normal)
             })
             .disposed(by: disposeBag)
         
@@ -241,7 +240,8 @@ private extension PlaceViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .completion:
-                    print("완료페이지로 이동")
+                    let viewmodel = CompletionViewModel(usecase: self!.viewModel.getHostUsecase())
+                    self?.navigationController?.pushViewController(CompletionViewcController(viewModel: viewmodel), animated: true)
                 case .roomMain:
                     print("방메인으로 이동")
                 case .error: break

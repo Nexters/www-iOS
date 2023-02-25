@@ -15,7 +15,7 @@ final class MinUserViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: MinUserViewModel?
+    private let viewModel: MinUserViewModel
     
     private let progressView = ProgressView(current: 3, total: 6)
     
@@ -120,25 +120,25 @@ private extension MinUserViewController {
                 self.navigationItem.leftBarButtonItem!.rx.tap.asObservable()
         )
         
-        let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
         
-        output?.plusValue
+        output.plusValue
             .asDriver(onErrorJustReturn: ())
             .drive(onNext: { [weak self] isEnabled in
                 self?.stepperView.plusValue()
             })
             .disposed(by: disposeBag)
         
-        output?.minusValue
+        output.minusValue
             .asDriver(onErrorJustReturn: ())
             .drive(onNext: { [weak self] isEnabled in
                 self?.stepperView.minusValue()
             })
             .disposed(by: disposeBag)
         
-        output?.nextButtonMakeEnable
+        output.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
                 self?.nextButton.setButtonState(isEnabled)
@@ -155,7 +155,8 @@ private extension MinUserViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .calendar:
-                    print("달력뷰로!")
+                    let viewmodel = CalendarViewModel(usecase: self!.viewModel.getUseCase())
+                    self?.navigationController?.pushViewController(CalendarViewController(viewModel: viewmodel), animated: true)
                 case .error: break
                 }
             })
