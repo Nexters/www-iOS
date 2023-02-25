@@ -242,7 +242,7 @@ private extension CompletionViewcController {
                 switch page {
                 case .roomMain:
                     self?.navigationController?.popToRootViewController(animated: true)
-                    print("룸메인으로")
+                    // TODO: 룸메인으로 이동
                 case .error: break
                 }
             })

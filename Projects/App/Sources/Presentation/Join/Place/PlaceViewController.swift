@@ -275,7 +275,8 @@ private extension PlaceViewController {
                 case .roomMain:
                     self?.view.endEditing(true)
                     self?.textFieldView.textField.resignFirstResponder()
-                    print("방메인으로 이동")
+                    self?.navigationController?.popToRootViewController(animated: true)
+                    // TODO: - 홈메인으로 이동
                 case .error: break
                 }
             })
