@@ -68,6 +68,7 @@ extension RoomNameViewController {
         progressView.snp.makeConstraints {
             $0.top.equalTo(view.safeAreaLayoutGuide)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(2)
         }
         
         self.view.addSubview(titleView)
