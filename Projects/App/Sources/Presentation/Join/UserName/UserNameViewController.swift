@@ -51,6 +51,7 @@ final class UserNameViewController: UIViewController {
         super.viewWillAppear(animated)
         textFieldView.textField.becomeFirstResponder()
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
@@ -135,7 +136,6 @@ private extension UserNameViewController {
             .drive(onNext: { [weak self] title in
                 switch self?.userMode {
                 case .host:
-                    print(title)
                     self?.progressView.setProgress(current: 2, total: 6)
                     self?.setNavigationBar(title: title, step: "2/6")
                 case .guest:
@@ -168,10 +168,13 @@ private extension UserNameViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .minUser:
+                    self?.view.endEditing(true)
+                    self?.textFieldView.textField.resignFirstResponder()
                     let viewmodel = MinUserViewModel(joinAdminUseCase: self?.viewModel?.getHostUseCase() ?? JoinHostUseCase())
                     self?.navigationController?.pushViewController(MinUserViewController(viewModel: viewmodel), animated: true)
                 case .timeslot:
-                    // TODO: - 게스트로 전환
+                    self?.view.endEditing(true)
+                    self?.textFieldView.textField.resignFirstResponder()
                     let viewmodel = TimeViewModel(joinGuestUseCase: self?.viewModel?.getGuestUseCase())
                     self?.navigationController?.pushViewController(TimeViewController(viewmodel: viewmodel, userMode: .guest), animated: true)
                 case .error: break

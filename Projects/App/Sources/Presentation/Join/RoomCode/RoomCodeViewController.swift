@@ -137,7 +137,7 @@ private extension RoomCodeController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .nickName:
-                    // VM에서 코드 검증 단계
+                    self?.view.endEditing(true)
                     self?.textFieldView.textField.resignFirstResponder()
                     let viewModel = UserNameViewModel(joinGuestUseCase: self!.viewModel.getUseCase())
                     self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .guest), animated: true)

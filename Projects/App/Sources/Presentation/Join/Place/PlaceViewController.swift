@@ -88,12 +88,16 @@ final class PlaceViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        textFieldView.textField.becomeFirstResponder()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationBar()
         self.bindViewModel()
         self.setUI()
-        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -264,9 +268,13 @@ private extension PlaceViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .completion:
+                    self?.view.endEditing(true)
+                    self?.textFieldView.textField.resignFirstResponder()
                     let viewmodel = CompletionViewModel(usecase: self!.viewModel.getHostUsecase())
                     self?.navigationController?.pushViewController(CompletionViewcController(viewModel: viewmodel), animated: true)
                 case .roomMain:
+                    self?.view.endEditing(true)
+                    self?.textFieldView.textField.resignFirstResponder()
                     print("방메인으로 이동")
                 case .error: break
                 }
