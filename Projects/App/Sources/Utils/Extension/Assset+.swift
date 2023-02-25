@@ -29,6 +29,8 @@ public enum WWWAssset: String {
     case donut
     case heart_big
     case heart_small
+    case bubble
+    case suitcase
     
     
     // time
