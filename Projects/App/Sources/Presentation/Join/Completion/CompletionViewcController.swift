@@ -219,7 +219,7 @@ private extension CompletionViewcController {
         let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
         output.copiedRoomInfo
-            .asDriver()
+            .asDriver(onErrorJustReturn: "")
             .drive(onNext: { [weak self] text in
                 self?.hapticGenerator.notificationOccurred(.success)
             })

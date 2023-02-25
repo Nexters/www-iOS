@@ -36,6 +36,7 @@ final class PlaceViewModel: BaseViewModel {
     }
     
     struct Output {
+        var naviTitleText = BehaviorRelay<String>(value: "")
         var flushTextField = PublishRelay<Void>()
         var plusButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var initPlaces = BehaviorRelay<[WrappedPlace]>(value: [])
@@ -97,6 +98,7 @@ extension PlaceViewModel {
             .subscribe(onNext: { [weak self] in
                 self?.places = self?.hostUsecase!.getServerPlaceList() ?? []
                 output.initPlaces.accept(self?.places ?? [])
+                output.naviTitleText.accept(try! (self?.hostUsecase!.roomName)!.value())
             })
             .disposed(by: disposeBag)
         
@@ -194,6 +196,7 @@ extension PlaceViewModel {
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
                 self?.places = self?.guestUsecase!.getServerPlaceList() ?? []
+                output.naviTitleText.accept((self?.guestUsecase!.roomName)!)
                 output.initPlaces.accept(self?.places ?? [])
             })
             .disposed(by: disposeBag)

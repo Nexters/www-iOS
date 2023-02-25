@@ -172,7 +172,7 @@ private extension UserNameViewController {
                     self?.navigationController?.pushViewController(MinUserViewController(viewModel: viewmodel), animated: true)
                 case .timeslot:
                     // TODO: - 게스트로 전환
-                    let viewmodel = TimeViewModel(joinAdminUseCase: self?.viewModel?.getHostUseCase() ?? JoinHostUseCase())
+                    let viewmodel = TimeViewModel(joinGuestUseCase: self?.viewModel?.getGuestUseCase())
                     self?.navigationController?.pushViewController(TimeViewController(viewmodel: viewmodel, userMode: .guest), animated: true)
                 case .error: break
                 }

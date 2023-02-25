@@ -24,6 +24,7 @@ final class PlaceViewController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     private let viewModel: PlaceViewModel
+    private let userMode: UserType
     private var fetchedPlace: [WrappedPlace] = []
     
     private lazy var dataSource = makeDataSource()
@@ -70,9 +71,16 @@ final class PlaceViewController: UIViewController {
         return collectionView
     }()
     
+    // Navigation Items
+    private let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: UserNameViewController.self, action: #selector(backButtonDidTap))
+    
+    private let progressLabel = UILabel()
+    
+    
     // MARK: - LifeCycle
-    init(viewModel: PlaceViewModel) {
+    init(viewModel: PlaceViewModel, userMode: UserType) {
         self.viewModel = viewModel
+        self.userMode = userMode
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -148,17 +156,16 @@ extension PlaceViewController {
     }
     
     /* Temp */
-    private func setNavigationBar(title: String = "") {
-        let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
+    private func setNavigationBar(title: String = "", step: String = "") {
         backButton.tintColor = .black
-        let progressLabel = UILabel()
-        progressLabel.text = "6/6"
+        progressLabel.text = step
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
         navigationItem.rightBarButtonItem = progressItem
         navigationItem.title = title
     }
+    
     
     @objc func backButtonDidTap() {}
 }
@@ -200,6 +207,23 @@ private extension PlaceViewController {
                     self?.textFieldView.enablePlusButton()
                 } else {
                     self?.textFieldView.disablePlusButton()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        output.naviTitleText
+            .asDriver()
+            .drive(onNext: { [weak self] title in
+                switch self?.userMode {
+                case .host:
+                    print(title)
+                    self?.progressView.setProgress(current: 6, total: 6)
+                    self?.setNavigationBar(title: title, step: "6/6")
+                case .guest:
+                    self?.progressView.setProgress(current: 4, total: 4)
+                    self?.setNavigationBar(title: title, step: "4/4")
+                case .none:
+                    break
                 }
             })
             .disposed(by: disposeBag)
@@ -309,7 +333,7 @@ import SwiftUI
 struct PlaceViewController_Preview: PreviewProvider {
     static var previews: some View {
         let viewModel = PlaceViewModel(guest: JoinGuestUseCase())
-        PlaceViewController(viewModel: viewModel).toPreview()
+        PlaceViewController(viewModel: viewModel, userMode: .guest).toPreview()
     }
 }
 #endif

@@ -19,20 +19,24 @@ enum TimePager {
 final class TimeViewModel: BaseViewModel {
     
     // MARK: - Properties
-    private let usecase: JoinHostUseCase
+    private let usecaseHost: JoinHostUseCase?
+    private let usecaseGuest: JoinGuestUseCase?
     
     struct Input {
+        let viewDidLoad: Observable<Void>
         let nextButtonDidTap: Observable<Void>
         let backButtonDidTap: Observable<Void>
     }
     
     struct Output {
+        var naviTitleText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<TimePager>()
     }
     
-    init(joinAdminUseCase: JoinHostUseCase) {
-        self.usecase = joinAdminUseCase
+    init(joinGuestUseCase: JoinGuestUseCase? = nil, joinHostUseCase: JoinHostUseCase? = nil) {
+        self.usecaseGuest = joinGuestUseCase
+        self.usecaseHost = joinHostUseCase
     }
 
     // MARK: - Transform
@@ -41,8 +45,12 @@ final class TimeViewModel: BaseViewModel {
         return makeOutput(with:  input, disposeBag: disposeBag)
     }
     
-    func getUseCase() -> JoinHostUseCase {
-        return self.usecase
+    func getHostUsecase() -> JoinHostUseCase {
+        return self.usecaseHost!
+    }
+    
+    func getGeustUsecase() -> JoinGuestUseCase {
+        return self.usecaseGuest!
     }
     
     private func handleInput(_ input: Input, disposeBag: DisposeBag) {
@@ -52,6 +60,12 @@ final class TimeViewModel: BaseViewModel {
     private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
 
+        input.viewDidLoad
+            .subscribe(onNext: { [weak self] in
+                output.naviTitleText.accept((self?.usecaseGuest!.roomName)!)
+            })
+            .disposed(by: disposeBag)
+        
         input.backButtonDidTap
             .subscribe(onNext: {
                 output.navigatePage.accept(.back)

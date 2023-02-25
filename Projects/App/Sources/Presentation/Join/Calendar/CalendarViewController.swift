@@ -133,7 +133,7 @@ final class CalendarViewController: UIViewController {
         nextButton.rx.tap
             .asDriver()
             .drive(onNext: { [weak self] in
-                let viewmodel = TimeViewModel(joinAdminUseCase: self!.viewModel.getUseCase())
+                let viewmodel = TimeViewModel(joinHostUseCase: self!.viewModel.getUseCase())
                 self?.navigationController?.pushViewController(TimeViewController(viewmodel: viewmodel, userMode: .host), animated: true)
             }).disposed(by: disposeBag)
     }
@@ -212,12 +212,12 @@ extension CalendarViewController {
 // MARK: - Preview
 
 #if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct CalendarViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        let viewModel = CalendarViewModel(usecase: JoinHostUseCase())
-        CalendarViewController(viewModel: viewModel).toPreview()
-    }
-}
+//import SwiftUI
+//
+//struct CalendarViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewModel = CalendarViewModel(usecaseHost: JoinHostUseCase())
+//        CalendarViewController(viewModel: viewModel).toPreview()
+//    }
+//}
 #endif

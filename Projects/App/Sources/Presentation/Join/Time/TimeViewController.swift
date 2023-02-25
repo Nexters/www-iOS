@@ -88,6 +88,11 @@ final class TimeViewController: UIViewController {
         return $0
     }(LargeButton(state: false))
     
+    // Navigation Items
+    private let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: UserNameViewController.self, action: nil)
+    
+    private let progressLabel = UILabel()
+    
     // MARK: - LifeCycle
     init(viewmodel: TimeViewModel, userMode: UserType) {
         self.viewModel = viewmodel
@@ -188,11 +193,9 @@ extension TimeViewController {
     }
     
     /* Temp */
-    private func setNavigationBar(title: String = "") {
-        let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
+    private func setNavigationBar(title: String = "", step: String = "") {
         backButton.tintColor = .black
-        let progressLabel = UILabel()
-        progressLabel.text = "5/6"
+        progressLabel.text = step
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
@@ -200,23 +203,40 @@ extension TimeViewController {
         navigationItem.title = title
     }
     
-    @objc func backButtonDidTap() {}
-    
 }
 
 // MARK: - Binding
 private extension TimeViewController {
     func bindViewModel() {
         let input = TimeViewModel.Input(
+            viewDidLoad:
+                Observable.just(()).asObservable(),
             nextButtonDidTap:
                 self.nextButton.rx.tap.asObservable(),
             backButtonDidTap:
-                self.navigationItem.leftBarButtonItem!.rx.tap.asObservable()
+                self.backButton.rx.tap.asObservable()
         )
         
         let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
+        
+        output.naviTitleText
+            .asDriver()
+            .drive(onNext: { [weak self] title in
+                switch self?.userMode {
+                case .host:
+                    print(title)
+                    self?.progressView.setProgress(current: 2, total: 6)
+                    self?.setNavigationBar(title: title, step: "5/6")
+                case .guest:
+                    self?.progressView.setProgress(current: 2, total: 4)
+                    self?.setNavigationBar(title: title, step: "3/4")
+                case .none:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
         
     }
     
@@ -228,8 +248,14 @@ private extension TimeViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .place:
-                    let viewmodel = PlaceViewModel(host: self!.viewModel.getUseCase())
-                    self?.navigationController?.pushViewController(PlaceViewController(viewModel: viewmodel), animated: true)
+                    if self?.userMode == .guest {
+                        let viewmodel = PlaceViewModel(guest: self!.viewModel.getGeustUsecase())
+                        self?.navigationController?.pushViewController(PlaceViewController(viewModel: viewmodel, userMode: .guest), animated: true)
+                    } else {
+                        let viewmodel = PlaceViewModel(host: self!.viewModel.getHostUsecase())
+                        self?.navigationController?.pushViewController(PlaceViewController(viewModel: viewmodel, userMode: .host), animated: true)
+                    }
+
                 case .error: break
                 }
             })
@@ -350,12 +376,13 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
 
 // MARK: - Preview
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct TimeViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        TimeViewController(viewmodel: TimeViewModel(joinAdminUseCase: JoinHostUseCase()), userMode: .host).toPreview()
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct TimeViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewmodel = TimeViewModel(joinGuestUseCase: JoinGuestUseCase(), joinHostUseCase: nil)
+//      TimeViewController(viewmodel: viewmodel, userMode: .guest)).toPreview()
+//    }
+//}
+//#endif
