@@ -15,8 +15,8 @@ final class UserNameViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: UserNameViewModel?
-    var userMode: UserType
+    private let viewModel: UserNameViewModel?
+    private let userMode: UserType
     
     private let progressView = ProgressView(current: 0, total: 0)
     
@@ -51,6 +51,7 @@ final class UserNameViewController: UIViewController {
         super.viewWillAppear(animated)
         textFieldView.textField.becomeFirstResponder()
     }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
@@ -135,7 +136,6 @@ private extension UserNameViewController {
             .drive(onNext: { [weak self] title in
                 switch self?.userMode {
                 case .host:
-                    print(title)
                     self?.progressView.setProgress(current: 2, total: 6)
                     self?.setNavigationBar(title: title, step: "2/6")
                 case .guest:
@@ -167,11 +167,16 @@ private extension UserNameViewController {
                 switch page {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
-                case .calendar:
-                    print("calendar로 넘어갑니다")
+                case .minUser:
+                    self?.view.endEditing(true)
+                    self?.textFieldView.textField.resignFirstResponder()
+                    let viewmodel = MinUserViewModel(joinAdminUseCase: self?.viewModel?.getHostUseCase() ?? JoinHostUseCase())
+                    self?.navigationController?.pushViewController(MinUserViewController(viewModel: viewmodel), animated: true)
                 case .timeslot:
-                    print("timeslot로 넘어갑니다")
-                    
+                    self?.view.endEditing(true)
+                    self?.textFieldView.textField.resignFirstResponder()
+                    let viewmodel = TimeViewModel(joinGuestUseCase: self?.viewModel?.getGuestUseCase())
+                    self?.navigationController?.pushViewController(TimeViewController(viewmodel: viewmodel, userMode: .guest), animated: true)
                 case .error: break
                 }
             })

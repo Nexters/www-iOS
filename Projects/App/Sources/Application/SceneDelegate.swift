@@ -14,10 +14,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-//        let sampleVC = SampleViewController(viewModel: SampleViewModel(joinUserUseCase: JoinUserUseCase(userRepository: UserDAO.init(network: RxMoyaProvider<UserAPI>()).makeUserRepository())))
-        let sampleVC = MainHomeViewController(viewModel: MainHomeViewModel(mainHomeUseCase: .init(meetingRepository: MainHomeDAO.init(network: MeetingAPIManager.provider))))
-//        let sampleVC = CalendarViewController(viewModel: CalendarViewModel())
-        window?.rootViewController = UINavigationController(rootViewController: sampleVC)
+        let mainHomeVC = MainHomeViewController(viewModel: MainHomeViewModel(mainHomeUseCase: .init(meetingRepository: MainHomeDAO.init(network: MeetingAPIManager.provider))))
+        window?.rootViewController = UINavigationController(rootViewController: mainHomeVC)
         window?.makeKeyAndVisible()
     }
 

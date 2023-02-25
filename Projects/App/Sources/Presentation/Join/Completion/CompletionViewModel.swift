@@ -28,7 +28,7 @@ final class CompletionViewModel: BaseViewModel {
     
     struct Output {
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
-        var copiedRoomInfo = BehaviorRelay<String>(value: "")
+        var copiedRoomInfo = PublishRelay<String>()
         var navigatePage = PublishRelay<CompletionPager>()
     }
     

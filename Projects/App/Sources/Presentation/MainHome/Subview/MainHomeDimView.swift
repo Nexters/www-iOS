@@ -61,6 +61,7 @@ final class MainHomeDimView: UIView {
         self.addSubview(addPromiseButton)
         addPromiseButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(20)
+            $0.width.equalTo(150.horizontallyAdjusted)
             $0.height.equalTo(46)
         }
         
@@ -68,6 +69,7 @@ final class MainHomeDimView: UIView {
         enterWithCodeButton.snp.makeConstraints {
             $0.top.equalTo(addPromiseButton.snp.bottom).offset(14)
             $0.trailing.equalToSuperview().inset(20)
+            $0.width.equalTo(150.horizontallyAdjusted)
             $0.height.equalTo(46)
         }
         

@@ -11,7 +11,7 @@ import RxSwift
 
 enum UserNamePager {
     case back
-    case calendar
+    case minUser
     case timeslot
     case error
 }
@@ -52,6 +52,15 @@ final class UserNameViewModel: BaseViewModel {
             return makeOutputHost(with: input, disposeBag: disposeBag)
         }
     }
+    
+    func getGuestUseCase() -> JoinGuestUseCase? {
+        return self.usecaseGuest
+    }
+    
+    func getHostUseCase() -> JoinHostUseCase? {
+        return self.usecaseHost
+    }
+    
 }
 
 // MARK: - Guest
@@ -131,7 +140,7 @@ extension UserNameViewModel {
         
         input.nextButtonDidTap
             .subscribe(onNext: {
-                output.navigatePage.accept(.calendar)
+                output.navigatePage.accept(.minUser)
             })
             .disposed(by: disposeBag)
         

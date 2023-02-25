@@ -24,6 +24,7 @@ final class PlaceViewController: UIViewController {
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     private let viewModel: PlaceViewModel
+    private let userMode: UserType
     private var fetchedPlace: [WrappedPlace] = []
     
     private lazy var dataSource = makeDataSource()
@@ -70,9 +71,16 @@ final class PlaceViewController: UIViewController {
         return collectionView
     }()
     
+    // Navigation Items
+    private let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: UserNameViewController.self, action: #selector(backButtonDidTap))
+    
+    private let progressLabel = UILabel()
+    
+    
     // MARK: - LifeCycle
-    init(viewModel: PlaceViewModel) {
+    init(viewModel: PlaceViewModel, userMode: UserType) {
         self.viewModel = viewModel
+        self.userMode = userMode
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -80,12 +88,16 @@ final class PlaceViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        textFieldView.textField.becomeFirstResponder()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationBar()
         self.bindViewModel()
         self.setUI()
-        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -148,17 +160,16 @@ extension PlaceViewController {
     }
     
     /* Temp */
-    private func setNavigationBar(title: String = "") {
-        let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
+    private func setNavigationBar(title: String = "", step: String = "") {
         backButton.tintColor = .black
-        let progressLabel = UILabel()
-        progressLabel.text = "6/6"
+        progressLabel.text = step
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
         navigationItem.rightBarButtonItem = progressItem
         navigationItem.title = title
     }
+    
     
     @objc func backButtonDidTap() {}
 }
@@ -204,11 +215,27 @@ private extension PlaceViewController {
             })
             .disposed(by: disposeBag)
         
+        output.naviTitleText
+            .asDriver()
+            .drive(onNext: { [weak self] title in
+                switch self?.userMode {
+                case .host:
+                    print(title)
+                    self?.progressView.setProgress(current: 6, total: 6)
+                    self?.setNavigationBar(title: title, step: "6/6")
+                case .guest:
+                    self?.progressView.setProgress(current: 4, total: 4)
+                    self?.setNavigationBar(title: title, step: "4/4")
+                case .none:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        
         output.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
-                self?.nextButton.setTitle(isEnabled ? "다음" : "스킵할래요",
-                                          for: .normal)
+                self?.nextButton.setTitle(isEnabled ? "다음" : "스킵할래요", for: .normal)
             })
             .disposed(by: disposeBag)
         
@@ -241,9 +268,15 @@ private extension PlaceViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .completion:
-                    print("완료페이지로 이동")
+                    self?.view.endEditing(true)
+                    self?.textFieldView.textField.resignFirstResponder()
+                    let viewmodel = CompletionViewModel(usecase: self!.viewModel.getHostUsecase())
+                    self?.navigationController?.pushViewController(CompletionViewcController(viewModel: viewmodel), animated: true)
                 case .roomMain:
-                    print("방메인으로 이동")
+                    self?.view.endEditing(true)
+                    self?.textFieldView.textField.resignFirstResponder()
+                    self?.navigationController?.popToRootViewController(animated: true)
+                    // TODO: - 홈메인으로 이동
                 case .error: break
                 }
             })
@@ -309,7 +342,7 @@ import SwiftUI
 struct PlaceViewController_Preview: PreviewProvider {
     static var previews: some View {
         let viewModel = PlaceViewModel(guest: JoinGuestUseCase())
-        PlaceViewController(viewModel: viewModel).toPreview()
+        PlaceViewController(viewModel: viewModel, userMode: .guest).toPreview()
     }
 }
 #endif

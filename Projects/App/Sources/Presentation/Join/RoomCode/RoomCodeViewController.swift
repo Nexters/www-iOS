@@ -15,7 +15,7 @@ final class RoomCodeController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: RoomCodeViewModel?
+    private let viewModel: RoomCodeViewModel
     
     private let progressView = ProgressView(current: 1, total: 4)
     
@@ -112,11 +112,11 @@ private extension RoomCodeController {
                 self.navigationItem.leftBarButtonItem!.rx.tap.asObservable()
         )
         
-        let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
         
-        output?.nextButtonMakeEnable
+        output.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
                 if isEnabled == true {
@@ -137,9 +137,9 @@ private extension RoomCodeController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .nickName:
-                    // VM에서 코드 검증 단계
+                    self?.view.endEditing(true)
                     self?.textFieldView.textField.resignFirstResponder()
-                    let viewModel = UserNameViewModel(joinGuestUseCase: self?.viewModel?.getUseCase())
+                    let viewModel = UserNameViewModel(joinGuestUseCase: self!.viewModel.getUseCase())
                     self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .guest), animated: true)
                 case .error: break
                 }

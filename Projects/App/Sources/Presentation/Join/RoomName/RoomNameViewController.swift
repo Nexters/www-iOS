@@ -15,7 +15,7 @@ final class RoomNameViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: RoomNameViewModel?
+    private let viewModel: RoomNameViewModel
     
     private let progressView = ProgressView(current: 1, total: 6)
     
@@ -112,11 +112,11 @@ private extension RoomNameViewController {
                 self.navigationItem.leftBarButtonItem!.rx.tap.asObservable()
         )
         
-        let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
         
-        output?.nextButtonMakeEnable
+        output.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
                 self?.nextButton.setButtonState(isEnabled)
@@ -133,8 +133,9 @@ private extension RoomNameViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .nickName:
+                    self?.view.endEditing(true)
                     self?.textFieldView.textField.resignFirstResponder()
-                    let viewModel = UserNameViewModel(joinHostUseCase: self?.viewModel?.getUseCase())
+                    let viewModel = UserNameViewModel(joinHostUseCase: self!.viewModel.getUseCase())
                     self?.navigationController?.pushViewController(UserNameViewController(viewModel: viewModel, userMode: .host), animated: true)
                 case .error: break
                 }

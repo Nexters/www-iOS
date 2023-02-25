@@ -233,7 +233,9 @@ final class SettingViewController: UIViewController {
         navigationItem.titleView = titleLabel
     }
     
-    @objc func backButtonDidTap() {}
+    @objc func backButtonDidTap() {
+        self.navigationController?.popViewController(animated: true)
+    }
 }
 
 // MARK: - Preview

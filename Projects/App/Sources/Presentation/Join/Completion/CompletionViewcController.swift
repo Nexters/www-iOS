@@ -15,7 +15,7 @@ final class CompletionViewcController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: CompletionViewModel?
+    private let viewModel: CompletionViewModel
     
     private let hapticGenerator = UINotificationFeedbackGenerator()
     private let motionGenerator = WWWAnimationHelper.shared
@@ -106,6 +106,16 @@ final class CompletionViewcController: UIViewController {
         setUI()
         setMotion()
         bindViewModel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -212,10 +222,10 @@ private extension CompletionViewcController {
                 self.nextButton.rx.tap.asObservable()
         )
         
-        let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
-        output?.copiedRoomInfo
-            .asDriver()
+        output.copiedRoomInfo
+            .asDriver(onErrorJustReturn: "")
             .drive(onNext: { [weak self] text in
                 self?.hapticGenerator.notificationOccurred(.success)
             })
@@ -228,9 +238,11 @@ private extension CompletionViewcController {
     func bindPager(output: CompletionViewModel.Output?){
         output?.navigatePage
             .asDriver(onErrorJustReturn: .error)
-            .drive(onNext: { page in
+            .drive(onNext: { [weak self] page in
                 switch page {
-                case .roomMain: print("룸메인으로")
+                case .roomMain:
+                    self?.navigationController?.popToRootViewController(animated: true)
+                    // TODO: 룸메인으로 이동
                 case .error: break
                 }
             })

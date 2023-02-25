@@ -19,7 +19,8 @@ final class TimeViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    //    var viewModel: TimeViewModel?
+    private let viewModel: TimeViewModel
+    private let userMode: UserType
     
     private lazy var dataSource = configureDataSource()
     
@@ -83,12 +84,18 @@ final class TimeViewController: UIViewController {
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
+        $0.setButtonState(true) // TODO: 화면연결 임시
         return $0
     }(LargeButton(state: false))
     
+    private let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: UserNameViewController.self, action: nil)
+    
+    private let progressLabel = UILabel()
+    
     // MARK: - LifeCycle
-    init() {
-        //        self.viewModel = viewModel
+    init(viewmodel: TimeViewModel, userMode: UserType) {
+        self.viewModel = viewmodel
+        self.userMode = userMode
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -101,6 +108,7 @@ final class TimeViewController: UIViewController {
         setUI()
         setPicker(with: 2)
         setNavigationBar()
+        bindViewModel()
         
         let sample = ["25 (토) 낮","26 (일) 저녁", "27 (월) 저녁"]
         applySnapshot(times: sample)
@@ -114,7 +122,6 @@ final class TimeViewController: UIViewController {
 // MARK: - Function
 
 extension TimeViewController {
-    
     private func setUI() {
         self.view.backgroundColor = .white
         //        pickerView.delegate = self
@@ -185,11 +192,9 @@ extension TimeViewController {
     }
     
     /* Temp */
-    private func setNavigationBar(title: String = "") {
-        let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
+    private func setNavigationBar(title: String = "", step: String = "") {
         backButton.tintColor = .black
-        let progressLabel = UILabel()
-        progressLabel.text = "3/4"
+        progressLabel.text = step
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
@@ -197,13 +202,64 @@ extension TimeViewController {
         navigationItem.title = title
     }
     
-    @objc func backButtonDidTap() {}
-    
 }
 
 // MARK: - Binding
 private extension TimeViewController {
+    func bindViewModel() {
+        let input = TimeViewModel.Input(
+            viewDidLoad:
+                Observable.just(()).asObservable(),
+            nextButtonDidTap:
+                self.nextButton.rx.tap.asObservable(),
+            backButtonDidTap:
+                self.backButton.rx.tap.asObservable()
+        )
+        
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
+        
+        self.bindPager(output: output)
+        
+        output.naviTitleText
+            .asDriver()
+            .drive(onNext: { [weak self] title in
+                switch self?.userMode {
+                case .host:
+                    self?.progressView.setProgress(current: 5, total: 6)
+                    self?.setNavigationBar(title: title, step: "5/6")
+                case .guest:
+                    self?.progressView.setProgress(current: 3, total: 4)
+                    self?.setNavigationBar(title: title, step: "3/4")
+                case .none:
+                    break
+                }
+            })
+            .disposed(by: disposeBag)
+        
+    }
     
+    func bindPager(output: TimeViewModel.Output?){
+        output?.navigatePage
+            .asDriver(onErrorJustReturn: .error)
+            .drive(onNext: { [weak self] page in
+                switch page {
+                case .back:
+                    self?.navigationController?.popViewController(animated: true)
+                case .place:
+                    if self?.userMode == .guest {
+                        let viewmodel = PlaceViewModel(guest: self!.viewModel.getGeustUsecase())
+                        self?.navigationController?.pushViewController(PlaceViewController(viewModel: viewmodel, userMode: .guest), animated: true)
+                    } else {
+                        let viewmodel = PlaceViewModel(host: self!.viewModel.getHostUsecase())
+                        self?.navigationController?.pushViewController(PlaceViewController(viewModel: viewmodel, userMode: .host), animated: true)
+                    }
+
+                case .error: break
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+
 }
  
 // MARK: - ScrollView
@@ -318,12 +374,13 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
 
 // MARK: - Preview
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct TimeViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        TimeViewController().toPreview()
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct TimeViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewmodel = TimeViewModel(joinGuestUseCase: JoinGuestUseCase(), joinHostUseCase: nil)
+//      TimeViewController(viewmodel: viewmodel, userMode: .guest)).toPreview()
+//    }
+//}
+//#endif

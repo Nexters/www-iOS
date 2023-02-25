@@ -15,7 +15,7 @@ final class MinUserViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
-    var viewModel: MinUserViewModel?
+    private let viewModel: MinUserViewModel
     
     private let progressView = ProgressView(current: 3, total: 6)
     
@@ -28,6 +28,10 @@ final class MinUserViewController: UIViewController {
         $0.setTitle("다음", for: .normal)
         return $0
     }(LargeButton(state: false))
+    
+    private let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: UserNameViewController.self, action: nil)
+    
+    private let progressLabel = UILabel()
     
     // MARK: - LifeCycle
     init(viewModel: MinUserViewModel) {
@@ -88,11 +92,9 @@ extension MinUserViewController {
     }
     
     /* Temp */
-    private func setNavigationBar(title: String = "") {
-        let backButton: UIBarButtonItem = UIBarButtonItem(image: UIImage(.chevron_left), style: .plain, target: self, action: #selector(backButtonDidTap))
+    private func setNavigationBar(title: String = "", step: String = "") {
         backButton.tintColor = .black
-        let progressLabel = UILabel()
-        progressLabel.text = "3/6"
+        progressLabel.text = step
         progressLabel.font = UIFont.www.body3
         let progressItem: UIBarButtonItem = UIBarButtonItem(customView: progressLabel)
         navigationItem.leftBarButtonItem = backButton
@@ -108,6 +110,8 @@ extension MinUserViewController {
 private extension MinUserViewController {
     func bindViewModel() {
         let input = MinUserViewModel.Input(
+            viewDidLoad:
+                Observable.just(()).asObservable(),
             plusButtonDidTap:
                 self.stepperView.plusButton.rx.tap.asObservable(),
             minusButtonDidTap:
@@ -120,25 +124,33 @@ private extension MinUserViewController {
                 self.navigationItem.leftBarButtonItem!.rx.tap.asObservable()
         )
         
-        let output = self.viewModel?.transform(input: input, disposeBag: self.disposeBag)
+        let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
         
-        output?.plusValue
+        output.naviTitleText
+            .asDriver()
+            .drive(onNext: { [weak self] title in
+                self?.progressView.setProgress(current: 3, total: 6)
+                self?.setNavigationBar(title: title, step: "3/6")
+            })
+            .disposed(by: disposeBag)
+        
+        output.plusValue
             .asDriver(onErrorJustReturn: ())
             .drive(onNext: { [weak self] isEnabled in
                 self?.stepperView.plusValue()
             })
             .disposed(by: disposeBag)
         
-        output?.minusValue
+        output.minusValue
             .asDriver(onErrorJustReturn: ())
             .drive(onNext: { [weak self] isEnabled in
                 self?.stepperView.minusValue()
             })
             .disposed(by: disposeBag)
         
-        output?.nextButtonMakeEnable
+        output.nextButtonMakeEnable
             .asDriver(onErrorJustReturn: false)
             .drive(onNext: { [weak self] isEnabled in
                 self?.nextButton.setButtonState(isEnabled)
@@ -155,7 +167,8 @@ private extension MinUserViewController {
                 case .back:
                     self?.navigationController?.popViewController(animated: true)
                 case .calendar:
-                    print("달력뷰로!")
+                    let viewmodel = CalendarViewModel(usecase: self!.viewModel.getUseCase())
+                    self?.navigationController?.pushViewController(CalendarViewController(viewModel: viewmodel), animated: true)
                 case .error: break
                 }
             })
