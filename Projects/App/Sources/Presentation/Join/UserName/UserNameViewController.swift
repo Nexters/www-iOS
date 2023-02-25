@@ -22,6 +22,12 @@ final class UserNameViewController: UIViewController {
     
     private let titleView = BasicTitleView(title: "약속방에서 사용하실\n닉네임을 알려주세요.")
     
+    private lazy var titleImgView: UIImageView = {
+        $0.image = UIImage(.suitcase)
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
+    
     private lazy var textFieldView = BasicTextFieldView(placeholder: "닉네임 입력")
     
     private lazy var nextButton: LargeButton = {
@@ -82,6 +88,15 @@ extension UserNameViewController {
         titleView.snp.makeConstraints {
             $0.top.equalTo(progressView.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(110)
+        }
+        
+        self.view.addSubview(titleImgView)
+        titleImgView.snp.makeConstraints {
+            $0.top.equalTo(progressView.snp.bottom).offset(28)
+            $0.trailing.equalToSuperview().inset(20)
+            $0.width.equalTo(92.horizontallyAdjusted)
+            $0.height.equalTo(77.verticallyAdjusted)
         }
         
         self.view.addSubview(textFieldView)

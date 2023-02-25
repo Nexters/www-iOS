@@ -19,7 +19,13 @@ final class RoomCodeController: UIViewController {
     
     private let progressView = ProgressView(current: 1, total: 4)
     
-    private let titleView = BasicTitleView(title: "친구에게 받은\n참여 코드를 입력해주세요.")
+    private let titleView = BasicTitleView(title: "친구에게 받은\n참여 코드를 입력하세요.")
+    
+    private lazy var titleImgView: UIImageView = {
+        $0.image = UIImage(.bubble)
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
     
     private lazy var textFieldView = BasicTextFieldView(placeholder: "참여 코드 입력")
     
@@ -68,6 +74,15 @@ extension RoomCodeController {
         titleView.snp.makeConstraints {
             $0.top.equalTo(progressView.snp.bottom)
             $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(110)
+        }
+        
+        self.view.addSubview(titleImgView)
+        titleImgView.snp.makeConstraints {
+            $0.top.equalTo(progressView.snp.bottom).offset(28)
+            $0.trailing.equalToSuperview().inset(20)
+            $0.width.equalTo(92.horizontallyAdjusted)
+            $0.height.equalTo(77.verticallyAdjusted)
         }
         
         self.view.addSubview(textFieldView)
