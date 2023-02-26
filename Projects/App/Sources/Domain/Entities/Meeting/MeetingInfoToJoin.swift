@@ -12,5 +12,7 @@ struct MeetingInfoToJoin {
     let id: Int
     let meetingCode: String
     let meetingName: String
-    let placelist: [String]
+    let startDate: String
+    let endDate: String
+    let placelist: [WrappedPlace]
 }

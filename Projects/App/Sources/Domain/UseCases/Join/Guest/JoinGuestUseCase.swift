@@ -11,11 +11,13 @@ import RxSwift
 
 
 protocol JoinGuestUseCaseProtocol {
-    var roomCode: BehaviorSubject<String> { get }
     var roomName: String { get }
+    var placeList: [WrappedPlace]{ get }
+    var startDate: Date? { get }
+    var endDate: Date? { get }
     var userName: BehaviorSubject<String> { get }
-    var placeList: PublishSubject<[WrappedPlace]> { get }
-    var myPlaceList: PublishSubject<[WrappedPlace]> { get }
+    var roomCode: BehaviorSubject<String> { get }
+    var myPlaceList: [WrappedPlace]{ get }
     var selectedTimes: [SelectedTime] { get set }
 }
 
@@ -24,14 +26,14 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     private let meetingJoinRepository: MeetingJoinRepository
     
     // MARK: - Properties
+    var roomName: String = ""
+    var startDate: Date? = nil
+    var endDate: Date? = nil
+    var placeList: [WrappedPlace] = []
     var roomCode = BehaviorSubject<String>(value: "")
-    var roomName: String = "방이름"
     var userName = BehaviorSubject<String>(value: "")
-    var placeList = PublishSubject<[WrappedPlace]>()
-    var myPlaceList = PublishSubject<[WrappedPlace]>()
+    var myPlaceList: [WrappedPlace] = []
     var myTimeList = PublishSubject<[SelectedTime]>()
-    let startDate = "2023-03-06".strToDate()
-    let endDate = "2023-03-15".strToDate()
     internal var selectedTimes: [SelectedTime] = []
     
     private let disposeBag = DisposeBag()
@@ -42,12 +44,11 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     }
     
     func getServerPlaceList() -> [WrappedPlace] {
-        return Place.mockServerData
-            .map { WrappedPlace(isFromLocal: false, place: $0) }
+        return placeList
     }
     
     func addMyPlaces(_ places: [WrappedPlace]) {
-        self.placeList.onNext(places)
+        self.myPlaceList += places
     }
     
     func addSelectedTimes(_ times: [SelectedTime]) {
@@ -65,10 +66,15 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
             }
 
             self?.meetingJoinRepository.fetchMeetingStatusWithCode(with: roomCode)
-                .subscribe(onNext: { result in
+                .subscribe(onNext: { [weak self] result in
                     switch result {
                     case .success:
                         observer.onNext(.success(true))
+                        let entity = try! result.get()
+                        self?.roomName = entity.meetingName
+                        self?.placeList += entity.placelist
+                        self?.startDate = entity.startDate.strToDate()
+                        self?.endDate = entity.endDate.strToDate()
                     case .failure(let error):
                         observer.onNext(.failure(error))
                     }

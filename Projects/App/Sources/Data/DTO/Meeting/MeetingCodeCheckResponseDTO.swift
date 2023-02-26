@@ -125,18 +125,21 @@ extension MeetingCodeCheckResponseDTO {
 extension MeetingCodeCheckResponseDTO {
 
     func toDomain() -> MeetingInfoToJoin {
-        guard let result = result else { return MeetingInfoToJoin(id: -1, meetingCode: "", meetingName: "", placelist: []) }
+        guard let result = result else { return MeetingInfoToJoin(id: -1, meetingCode: "", meetingName: "", startDate: "", endDate:"", placelist: []) }
         
-        var placenames: [String] = []
+        var places: [WrappedPlace] = []
         for promisePlace in result.userPromisePlaceList {
-                placenames.append(promisePlace.promisePlace)
+            let place = WrappedPlace(isFromLocal: false,
+                                     place: Place(title: promisePlace.promisePlace))
+            places.append(place)
         }
         
         return MeetingInfoToJoin(id: result.meetingID,
                                  meetingCode: result.meetingCode,
                                  meetingName: result.meetingName,
-                                 placelist: placenames)
+                                 startDate: result.startDate,
+                                 endDate:result.endDate,
+                                 placelist: places)
     }
-    
     
 }
