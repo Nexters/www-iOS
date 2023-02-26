@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct SelectedTime: Hashable {
+struct SelectedTime: Hashable, Codable {
     let promiseDate: String
     let promiseTime: PromiseTime
 }
