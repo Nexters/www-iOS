@@ -40,6 +40,7 @@ final class TimeViewModel: BaseViewModel {
         var navigatePage = PublishRelay<TimePager>()
         var updateSelected = BehaviorRelay<[String]>(value: [])
         var initSelected = BehaviorRelay<[String]>(value: [])
+        var diselectTimeCell = PublishRelay<Int>()
     }
     
     init(joinGuestUseCase: JoinGuestUseCase? = nil, joinHostUseCase: JoinHostUseCase? = nil) {
@@ -78,6 +79,22 @@ final class TimeViewModel: BaseViewModel {
             return promiseList
         }
     }
+    
+    
+    private func getIndex(time: SelectedTime, promiselist: [PromiseDateViewData]) -> Int? {
+        for (index, element) in promiselist.enumerated() {
+            if element.date?.formatted("yyyy-MM-dd") == time.promiseDate {
+                switch time.promiseTime {
+                case .morning: return 4 * index
+                case .lunch: return 4 * index + 1
+                case .dinner: return 4 * index + 2
+                case .night: return 4 * index + 3
+                }
+            }
+        }
+        return nil
+    }
+
     
     private func makePromiseDateViewData(start: Date, end: Date) -> [PromiseDateViewData]{
         let dates = datesBetween(start: start, end: end)
@@ -125,21 +142,6 @@ final class TimeViewModel: BaseViewModel {
 extension TimeViewModel {
     
     private func handleInputHost(_ input: Input, disposeBag: DisposeBag) {
-        input.selectedCellDidTap
-            .subscribe(onNext: { [weak self] in
-                var timelist: [SelectedTime] = []
-                self?.selectedTimes
-                    .asDriver()
-                    .drive { times in
-                        timelist += times
-                    }
-                    .disposed(by: disposeBag)
-                if timelist.count > 0 {
-                    timelist.remove(at: $0)
-                    self?.selectedTimes.accept(timelist)
-                }
-            })
-            .disposed(by: disposeBag)
         
         input.timeCellDidTap
             .subscribe(onNext: { [weak self] cellNo in
@@ -208,21 +210,6 @@ extension TimeViewModel {
 extension TimeViewModel {
     
     private func handleInputGuest(_ input: Input, disposeBag: DisposeBag) {
-        input.selectedCellDidTap
-            .subscribe(onNext: { [weak self] in
-                var timelist: [SelectedTime] = []
-                self?.selectedTimes
-                    .asDriver()
-                    .drive { times in
-                        timelist += times
-                    }
-                    .disposed(by: disposeBag)
-                if timelist.count > 0 {
-                    timelist.remove(at: $0)
-                    self?.selectedTimes.accept(timelist)
-                }
-            })
-            .disposed(by: disposeBag)
         
         input.timeCellDidTap
             .subscribe(onNext: { [weak self] cellNo in
@@ -240,14 +227,12 @@ extension TimeViewModel {
                 let selected = SelectedTime(promiseDate: (self?.promiseList[date].date?.formatted("yyyy-MM-dd"))! ,
                              promiseTime: (self?.promiseTimes[time])!
                 )
-                
                 if timeList.contains(selected) {
                     let idx = timeList.firstIndex(of: selected)
                     timeList.remove(at: idx! )
                 } else {
                     timeList.insert(contentsOf: [selected], at: 0)
                 }
-                
                 self?.selectedTimes.accept(timeList)
             })
             .disposed(by: disposeBag)
@@ -257,6 +242,32 @@ extension TimeViewModel {
     private func makeOutputGuest(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
 
+        /*
+        input.selectedCellDidTap
+            .subscribe(onNext: { [weak self] in
+                var timelist: [SelectedTime] = []
+                self?.selectedTimes
+                    .asDriver()
+                    .drive { times in
+                        timelist += times
+                    }
+                    .disposed(by: disposeBag)
+
+                let timeToRemove = timelist[$0]
+                let idx = self?.getIndex(time: timeToRemove,
+                                         promiselist: self?.promiseList ?? [])
+
+                output.diselectTimeCell.accept(idx!)
+
+                if timelist.count > 0 {
+                    timelist.remove(at: $0)
+                    self?.selectedTimes.accept(timelist)
+                }
+
+            })
+            .disposed(by: disposeBag)
+        */
+        
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
                 output.initSelected.accept([])

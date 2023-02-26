@@ -84,7 +84,7 @@ final class TimeViewController: UIViewController {
         flowLayout.scrollDirection = .horizontal
         flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        collectionView.register(DeleteChipCell.self, forCellWithReuseIdentifier: DeleteChipCell.identifier)
+        collectionView.register(BasicChipCell.self, forCellWithReuseIdentifier: BasicChipCell.identifier)
         collectionView.layer.cornerRadius = 10.verticallyAdjusted
         collectionView.layer.borderWidth = 1
         collectionView.layer.borderColor = UIColor.wwwColor(.Gray100).cgColor
@@ -276,6 +276,25 @@ private extension TimeViewController {
                 self?.updateSnapshot(times: times)
             }
             .disposed(by: disposeBag)
+        
+//        output.diselectTimeCell
+//            .asDriver(onErrorJustReturn: -1)
+//            .drive { [weak self] indexPath in
+//                let cell = collectionView.cellForItem(at: indexPath) as! TimeCheckCell
+//                let dateCol = indexPath.row / 4
+//                let timeRow = indexPath.row % 4
+//
+//                let data = promiseList[dateCol].status[timeRow]
+//                if data == .selected {
+//                    promiseList[dateCol].status[timeRow] = .notSelected
+//                } else if data == .notSelected{
+//                    promiseList[dateCol].status[timeRow] = .selected
+//                } else {
+//                    promiseList[dateCol].status[timeRow] = .disabled
+//                }
+//                cell.changeImage(with: promiseList[dateCol].status[timeRow])
+//            }
+//            .disposed(by: disposeBag)
 
     }
 
@@ -335,8 +354,8 @@ private extension TimeViewController {
         collectionView: chipCollectionView,
         cellProvider: { (collectionView, indexPath, selectedTime: String) ->
           UICollectionViewCell? in
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeleteChipCell.identifier, for: indexPath)
-                    as? DeleteChipCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BasicChipCell.identifier, for: indexPath)
+                    as? BasicChipCell else {
                 return UICollectionViewCell()
             }
             cell.configure(selectedTime)
