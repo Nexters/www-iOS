@@ -241,8 +241,13 @@ extension TimeViewModel {
                              promiseTime: (self?.promiseTimes[time])!
                 )
                 
-                guard timeList.contains(selected) != true else { return }
-                timeList.insert(contentsOf: [selected], at: 0)
+                if timeList.contains(selected) {
+                    let idx = timeList.firstIndex(of: selected)
+                    timeList.remove(at: idx! )
+                } else {
+                    timeList.insert(contentsOf: [selected], at: 0)
+                }
+                
                 self?.selectedTimes.accept(timeList)
             })
             .disposed(by: disposeBag)

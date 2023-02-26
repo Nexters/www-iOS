@@ -304,7 +304,6 @@ private extension TimeViewController {
 
 }
  
-// MARK: - ScrollView
 extension TimeViewController {
     private func setPageControl() {
         var pages = 0
