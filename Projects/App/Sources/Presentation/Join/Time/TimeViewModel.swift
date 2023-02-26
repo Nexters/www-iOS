@@ -17,19 +17,6 @@ enum TimePager {
 }
 
 
-var promiseDateMock = [
-    PromiseDateViewData(date: Date(), dateLabel: "25(토)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: Date(), dateLabel: "26(일)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: Date(), dateLabel: "27(월)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: Date(), dateLabel: "28(화)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: Date(), dateLabel: "01(수)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled])
-]
-
-
 final class TimeViewModel: BaseViewModel {
     
     // MARK: - Properties
@@ -43,7 +30,6 @@ final class TimeViewModel: BaseViewModel {
     }
     
     struct Output {
-        var promiseList = PublishRelay<[PromiseDateViewData]>()
         var naviTitleText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<TimePager>()
@@ -139,11 +125,6 @@ extension TimeViewModel {
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
                 output.naviTitleText.accept(try! (self?.usecaseHost!.roomName)!.value())
-                
-                let list = self?.makePromiseDateViewData(start: (self?.usecaseHost!.startDate)!,
-                                                   end: (self?.usecaseHost!.endDate)!)
-//                output.promiseList.accept(list!)
-                output.promiseList.accept(promiseDateMock)
             })
             .disposed(by: disposeBag)
         
@@ -178,10 +159,6 @@ extension TimeViewModel {
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
                 output.naviTitleText.accept((self?.usecaseGuest!.roomName)!)
-                
-                let list = self?.makePromiseDateViewData(start: (self?.usecaseGuest!.startDate)!,
-                                                   end: (self?.usecaseGuest!.endDate)!)
-                output.promiseList.accept(promiseDateMock)
             })
             .disposed(by: disposeBag)
         
