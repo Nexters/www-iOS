@@ -17,9 +17,10 @@ enum CheckStatus {
 
 final class TimeCheckCell: UICollectionViewCell {
     
-    private var isClicked = false
+    var isClicked = false
+    var status: CheckStatus = .notSelected
     
-    private let imageView: UIImageView = {
+    let imageView: UIImageView = {
         $0.contentMode = .scaleAspectFit
         $0.image = UIImage(.time_default)
         return $0
@@ -32,35 +33,40 @@ final class TimeCheckCell: UICollectionViewCell {
         imageView.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
-        
-    }
-    
-    func configure(status: CheckStatus) {
-        if status == .disabled {
-            imageView.image = UIImage(.time_disabled)
-            imageView.isUserInteractionEnabled = false
-        }
-    }
-    
-    func onSelected() {
-        isClicked = !isClicked
-        changeImage()
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        self.imageView.removeFromSuperview()    
+        imageView.image = nil
     }
     
-    private func changeImage(){
-        if isClicked {
-            UIView.animate(withDuration: 0.1) {
-                self.imageView.image = UIImage(.time_selected)
-            }
-        } else {
-            UIView.animate(withDuration: 0.1) {
-                self.imageView.image = UIImage(.time_default)
-            }
+    
+    func configure(status: CheckStatus) {
+        self.status = status
+        switch status {
+        case .notSelected:
+            imageView.image = UIImage(.time_default)
+        case .selected:
+            imageView.image = UIImage(.time_selected)
+        case .disabled:
+            imageView.image = UIImage(.time_disabled)
         }
+    }
+    
+     func changeImage(with status: CheckStatus){
+         switch status {
+         case .notSelected:
+             UIView.animate(withDuration: 0.1) {
+                 self.imageView.image = UIImage(.time_default)
+             }
+         case .selected:
+             UIView.animate(withDuration: 0.1) {
+                 self.imageView.image = UIImage(.time_selected)
+             }
+         case .disabled:
+             break
+         }
     }
 
 }
