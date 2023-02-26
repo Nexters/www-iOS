@@ -9,14 +9,14 @@
 import Foundation
 
 // MARK: - Welcome
-struct MeetingCodeCheckRequest: Codable {
+struct MeetingCodeCheckResponseDTO: Codable {
     let code: Int
     let message: String
-    let result: Result
+    var result: Result?
 }
 
 
-extension MeetingCodeCheckRequest {
+extension MeetingCodeCheckResponseDTO {
     // MARK: - Result
     struct Result: Codable {
         let meetingID: Int
@@ -37,12 +37,24 @@ extension MeetingCodeCheckRequest {
         let userPromiseDateTimeList: [UserPromiseDateTimeList]
         let userPromisePlaceList: [UserPromisePlaceList]
         let meetingStatus: String
-        let userVoteList: [UserVoteList]
+        var userVoteList: [Vote]
         
         enum CodingKeys: String, CodingKey {
             case meetingID = "meetingId"
             case meetingName, minimumAlertMembers, hostName, currentUserName, isHost, joinedUserCount, votingUserCount, meetingCode, shortLink, confirmedDate, confirmedTime, confirmedPlace, isJoined, startDate, endDate, joinedUserInfoList, userPromiseDateTimeList, userPromisePlaceList, meetingStatus, userVoteList
         }
+        
+    }
+    
+    struct VoteList: Codable {
+        let location: String
+        let users: [String]
+        
+        enum CodingKeys: String, CodingKey {
+            case location
+            case users = "userVoteList"
+        }
+        
     }
     
     // MARK: - UserInfoList
@@ -69,21 +81,44 @@ extension MeetingCodeCheckRequest {
     
     // MARK: - UserVoteList
     
-    struct UserVoteList: Codable {
-        var userVoteList: [VoteDTO]
+    struct Vote: Codable {
+          let location: String
+          let users: [String]
+
+          init(from decoder: Decoder) throws {
+              let container = try decoder.container(keyedBy: DynamicKey.self)
+              guard let key = container.allKeys.first?.stringValue else {
+                  throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "No keys in JSON object"))
+              }
+              location = key
+              users = try container.decode([String].self, forKey: DynamicKey(keyValue: key))
+          }
+
+          func encode(to encoder: Encoder) throws {
+              var container = encoder.container(keyedBy: DynamicKey.self)
+              try container.encode(users, forKey: DynamicKey(keyValue: location))
+          }
+      }
+    
+    struct DynamicKey: CodingKey {
+        let stringValue: String
+        let intValue: Int?
+
+        init(stringValue: String) {
+            self.stringValue = stringValue
+            self.intValue = nil
+        }
+
+        init(intValue: Int) {
+            self.stringValue = "\(intValue)"
+            self.intValue = intValue
+        }
+
+        init(keyValue: String) {
+            self.stringValue = keyValue
+            self.intValue = nil
+        }
     }
 
-    struct VoteDTO: Codable {
-        var location: [String: [String]]
-        
-        enum CodingKeys: String, CodingKey {
-            case location
-        }
-        
-        init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: CodingKeys.self)
-            self.location = try container.decode([String: [String]].self, forKey: .location)
-        }
-    }
-        
 }
+
