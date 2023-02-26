@@ -27,10 +27,10 @@ var promiseDate = [
     PromiseDateViewData(date: Date(), dateLabel: "27(월)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
     PromiseDateViewData(date: Date(), dateLabel: "28(화)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
     PromiseDateViewData(date: Date(), dateLabel: "01(수)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: nil, dateLabel: "", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "", status: [.disabled, .disabled, .disabled, .disabled])
+    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
+    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
+    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
+    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled])
 ]
 
 
@@ -42,8 +42,7 @@ final class TimeViewController: UIViewController {
     private let userMode: UserType
     private let promiseTimes: [PromiseTime] = [.morning, .lunch, .dinner, .night]
     
-//    private let promiseDate: [String] = ["25(토)", "26(일)", "27(월)", "28(화)", "01(수)", "", "", ""]
-    
+    private var selecteLabel: [String] = []
     
     private lazy var dataSource = configureDataSource()
     
@@ -134,8 +133,7 @@ final class TimeViewController: UIViewController {
         setNavigationBar()
         bindViewModel()
         
-        let sample = ["25 (토) 낮","26 (일) 저녁", "27 (월) 저녁"]
-        applySnapshot(times: sample)
+        applySnapshot(times: [])
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -231,6 +229,7 @@ extension TimeViewController {
 // MARK: - Binding
 private extension TimeViewController {
     func bindViewModel() {
+
         let input = TimeViewModel.Input(
             viewDidLoad:
                 Observable.just(()).asObservable(),
@@ -367,13 +366,25 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
         
         if data == .selected {
             promiseDate[dateCol].status[timeRow] = .notSelected
+            
+            let index = selecteLabel.firstIndex(of: "\(promiseDate[dateCol].dateLabel) \(promiseTimes[timeRow].rawValue)")
+            selecteLabel.remove(at: index! )
+
+            self.updateSnapshot(times: selecteLabel)
+            
         } else if data == .notSelected{
+
+            
+            selecteLabel.append("\(promiseDate[dateCol].dateLabel) \(promiseTimes[timeRow].rawValue)")
+            self.updateSnapshot(times: selecteLabel)
+            
             promiseDate[dateCol].status[timeRow] = .selected
         } else {
             promiseDate[dateCol].status[timeRow] = .disabled
         }
 
         cell.changeImage(with: promiseDate[dateCol].status[timeRow])
+        
     }
     
     
@@ -401,6 +412,7 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let pageNumber = round(scrollView.contentOffset.x / scrollView.frame.size.width)
         pageControl.currentPage = Int(pageNumber)
+        updateDateView(page: Int(pageNumber))
     }
 
     private func pageOffsets(in scrollView: UIScrollView) -> [CGFloat] {
@@ -409,7 +421,14 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
                          .map { $0.frame.minX - scrollView.adjustedContentInset.left }
     }
     
-    
+    func updateDateView(page: Int) {
+        let start = 4 * page
+        var arr: [String] = []
+        for i in start...start+3 {
+            arr.append(promiseDate[i].dateLabel)
+        }
+        self.dateView.configure(with: arr)
+    }
     
 }
 

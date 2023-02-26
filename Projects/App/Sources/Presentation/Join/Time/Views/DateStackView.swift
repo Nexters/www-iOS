@@ -60,6 +60,13 @@ final class DateStackView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func configure(with dates : [String]) {
+        dateLabel1.text = dates[0]
+        dateLabel2.text = dates[1]
+        dateLabel3.text = dates[2]
+        dateLabel4.text = dates[3]
+    }
+    
     
 }
 // MARK: - UI

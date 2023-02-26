@@ -97,9 +97,8 @@ extension TimeViewModel {
 extension TimeViewModel {
     
     private func handleInputGuest(_ input: Input, disposeBag: DisposeBag) {
-        
+
     }
-    
     
     
     private func makeOutputGuest(with input: Input, disposeBag: DisposeBag) -> Output {

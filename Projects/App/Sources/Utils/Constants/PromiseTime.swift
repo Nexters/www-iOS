@@ -9,8 +9,8 @@
 import Foundation
 
 enum promiseTime: String {
-    case morning = "MORNING"
-    case lunch = "LUNCH"
-    case dinner = "DINNER"
-    case night = "NIGHT"
+    case morning = "아침"
+    case lunch = "낮"
+    case dinner = "저녁"
+    case night = "밤"
 }
