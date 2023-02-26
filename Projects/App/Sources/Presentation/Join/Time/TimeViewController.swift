@@ -98,7 +98,6 @@ final class TimeViewController: UIViewController {
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
-        $0.setButtonState(true) // TODO: 화면연결 임시
         return $0
     }(LargeButton(state: false))
     
@@ -284,8 +283,13 @@ private extension TimeViewController {
             }
             .disposed(by: disposeBag)
 
+        output.nextButtonMakeEnable
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] isEnabled in
+                self?.nextButton.setButtonState(isEnabled)
+            })
+            .disposed(by: disposeBag)
     }
-
     
     func bindPager(output: TimeViewModel.Output?){
         output?.navigatePage

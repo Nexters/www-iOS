@@ -170,9 +170,13 @@ extension TimeViewModel {
     
     private func makeOutputHost(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
-
+        
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
+                let start = self?.usecaseHost?.startDate?.formatted("MM월 dd일 (E)")
+                let end = self?.usecaseHost?.endDate?.formatted("MM월 dd일 (E)")
+                output.fetchSubTitleText.accept("\(start!) - \(end!)")
+                output.initSelected.accept([])
                 output.naviTitleText.accept(try! (self?.usecaseHost!.roomName)!.value())
             })
             .disposed(by: disposeBag)
