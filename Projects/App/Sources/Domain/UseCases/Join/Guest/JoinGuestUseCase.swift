@@ -11,6 +11,7 @@ import RxSwift
 
 
 protocol JoinGuestUseCaseProtocol {
+    var id: Int { get }
     var roomName: String { get }
     var placeList: [WrappedPlace]{ get }
     var startDate: Date? { get }
@@ -26,10 +27,11 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     private let meetingJoinRepository: MeetingJoinRepository
     
     // MARK: - Properties
-    var roomName: String = ""
-    var startDate: Date? = nil
-    var endDate: Date? = nil
-    var placeList: [WrappedPlace] = []
+    internal var id: Int = -1
+    internal var roomName: String = ""
+    internal var startDate: Date? = nil
+    internal var endDate: Date? = nil
+    internal var placeList: [WrappedPlace] = []
     var roomCode = BehaviorSubject<String>(value: "")
     var userName = BehaviorSubject<String>(value: "")
     var myPlaceList: [WrappedPlace] = []
@@ -71,6 +73,7 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
                     case .success:
                         observer.onNext(.success(true))
                         let entity = try! result.get()
+                        self?.id = entity.id
                         self?.roomName = entity.meetingName
                         self?.placeList += entity.placelist
                         self?.startDate = entity.startDate.strToDate()
