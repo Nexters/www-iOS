@@ -36,6 +36,7 @@ final class TimeViewModel: BaseViewModel {
     
     struct Output {
         var naviTitleText = BehaviorRelay<String>(value: "")
+        var fetchSubTitleText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<TimePager>()
         var updateSelected = BehaviorRelay<[String]>(value: [])
@@ -270,6 +271,9 @@ extension TimeViewModel {
         
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
+                let start = self?.usecaseGuest?.startDate?.formatted("MM월 dd일 (E)")
+                let end = self?.usecaseGuest?.endDate?.formatted("MM월 dd일 (E)")
+                output.fetchSubTitleText.accept("\(start!) - \(end!)")
                 output.initSelected.accept([])
                 output.naviTitleText.accept((self?.usecaseGuest!.roomName)!)
             })

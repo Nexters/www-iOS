@@ -277,24 +277,12 @@ private extension TimeViewController {
             }
             .disposed(by: disposeBag)
         
-//        output.diselectTimeCell
-//            .asDriver(onErrorJustReturn: -1)
-//            .drive { [weak self] indexPath in
-//                let cell = collectionView.cellForItem(at: indexPath) as! TimeCheckCell
-//                let dateCol = indexPath.row / 4
-//                let timeRow = indexPath.row % 4
-//
-//                let data = promiseList[dateCol].status[timeRow]
-//                if data == .selected {
-//                    promiseList[dateCol].status[timeRow] = .notSelected
-//                } else if data == .notSelected{
-//                    promiseList[dateCol].status[timeRow] = .selected
-//                } else {
-//                    promiseList[dateCol].status[timeRow] = .disabled
-//                }
-//                cell.changeImage(with: promiseList[dateCol].status[timeRow])
-//            }
-//            .disposed(by: disposeBag)
+        output.fetchSubTitleText
+            .asDriver(onErrorJustReturn: "")
+            .drive { [weak self] text in
+                self?.titleView.subtitleLabel.text = text
+            }
+            .disposed(by: disposeBag)
 
     }
 
