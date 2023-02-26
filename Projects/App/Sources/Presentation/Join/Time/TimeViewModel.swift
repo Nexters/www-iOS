@@ -16,6 +16,20 @@ enum TimePager {
     case error
 }
 
+
+var promiseDateMock = [
+    PromiseDateViewData(date: Date(), dateLabel: "25(토)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
+    PromiseDateViewData(date: Date(), dateLabel: "26(일)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
+    PromiseDateViewData(date: Date(), dateLabel: "27(월)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
+    PromiseDateViewData(date: Date(), dateLabel: "28(화)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
+    PromiseDateViewData(date: Date(), dateLabel: "01(수)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
+    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
+    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
+    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
+    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled])
+]
+
+
 final class TimeViewModel: BaseViewModel {
     
     // MARK: - Properties
@@ -57,6 +71,48 @@ final class TimeViewModel: BaseViewModel {
     func getGeustUsecase() -> JoinGuestUseCase {
         return self.usecaseGuest!
     }
+    
+    func makePromiseDateViewData(start: Date, end: Date) -> [PromiseDateViewData]{
+        let dates = datesBetween(start: start, end: end)
+        let count = dates.count
+        var promiseDateViewData = createArrayWithCount(count)
+        for i in 0..<count {
+            let date = dates[i]
+            promiseDateViewData[i] = PromiseDateViewData(date: date,
+                                                         dateLabel: date.formatted("dd(E)"),
+                                                         status: [.notSelected, .notSelected, .notSelected, .notSelected])
+        }
+        return promiseDateViewData
+    }
+    
+    private func datesBetween(start: Date, end: Date) -> [Date] {
+        var dates: [Date] = []
+        var currentDate = start
+        while currentDate <= end {
+            dates.append(currentDate)
+            currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate)!
+        }
+        print("🌐",dates)
+        return dates
+    }
+    
+    private func createArrayWithCount(_ count: Int) -> [PromiseDateViewData] {
+        let empty = PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled])
+        switch count {
+        case 1...4:
+            return Array(repeating: empty, count: 4)
+        case 5...8:
+            return Array(repeating: empty, count: 8)
+        case 9...12:
+            return Array(repeating: empty, count: 12)
+        case 13...14:
+            return Array(repeating: empty, count: 16)
+        default:
+            return []
+        }
+    }
+
+
 }
 
 // MARK: - HOST

@@ -21,19 +21,6 @@ struct PromiseDateViewData {
     var status: [CheckStatus]
 }
 
-var promiseDate = [
-    PromiseDateViewData(date: Date(), dateLabel: "25(토)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: Date(), dateLabel: "26(일)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: Date(), dateLabel: "27(월)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: Date(), dateLabel: "28(화)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: Date(), dateLabel: "01(수)", status: [.notSelected, .notSelected, .notSelected, .notSelected]),
-    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled]),
-    PromiseDateViewData(date: nil, dateLabel: "-", status: [.disabled, .disabled, .disabled, .disabled])
-]
-
-
 final class TimeViewController: UIViewController {
     
     // MARK: - Properties
@@ -41,6 +28,8 @@ final class TimeViewController: UIViewController {
     private let viewModel: TimeViewModel
     private let userMode: UserType
     private let promiseTimes: [PromiseTime] = [.morning, .lunch, .dinner, .night]
+    
+    private var promiseDate: [PromiseDateViewData] = []
     
     private var selecteLabel: [String] = []
     
@@ -129,9 +118,11 @@ final class TimeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
-        setPicker(with: 2)
+        setPicker(with: 4)
         setNavigationBar()
         bindViewModel()
+
+        promiseDate = viewModel.makePromiseDateViewData(start: JoinHostUseCase().startDate!, end: JoinHostUseCase().endDate! )
         
         applySnapshot(times: [])
     }
@@ -223,7 +214,7 @@ extension TimeViewController {
         navigationItem.rightBarButtonItem = progressItem
         navigationItem.title = title
     }
-    
+
 }
 
 // MARK: - Binding
@@ -287,7 +278,7 @@ private extension TimeViewController {
  
 // MARK: - ScrollView
 extension TimeViewController {
-    private func setPicker(with pages: Int = 3) {
+    private func setPicker(with pages: Int) {
         pickerView.delegate = self
         pickerView.dataSource = self
         pageControl.numberOfPages = pages
@@ -366,16 +357,14 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
         
         if data == .selected {
             promiseDate[dateCol].status[timeRow] = .notSelected
-            
-            let index = selecteLabel.firstIndex(of: "\(promiseDate[dateCol].dateLabel) \(promiseTimes[timeRow].rawValue)")
+            let index = selecteLabel.firstIndex(of: "\(promiseDate[dateCol].dateLabel) \(promiseTimes[timeRow].toText())")
             selecteLabel.remove(at: index! )
 
             self.updateSnapshot(times: selecteLabel)
             
         } else if data == .notSelected{
 
-            
-            selecteLabel.append("\(promiseDate[dateCol].dateLabel) \(promiseTimes[timeRow].rawValue)")
+            selecteLabel.append("\(promiseDate[dateCol].dateLabel) \(promiseTimes[timeRow].toText())")
             self.updateSnapshot(times: selecteLabel)
             
             promiseDate[dateCol].status[timeRow] = .selected

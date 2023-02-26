@@ -23,6 +23,9 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     var userName = BehaviorSubject<String>(value: "")
     var minUser = BehaviorSubject<Int>(value: 1)
     var placeList = PublishSubject<[WrappedPlace]>()
+    let startDate = "2023-03-06".strToDate()
+    let endDate = "2023-03-15".strToDate()
+//    formatted("dd(E)")
     
     // MARK: - Methods
     init() {}
@@ -50,4 +53,18 @@ private extension JoinHostUseCase {
     
 
     
+}
+
+
+extension String {
+    func toDate() -> Date? { 
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+        if let date = dateFormatter.date(from: self) {
+            return date
+        } else {
+            return nil
+        }
+    }
 }
