@@ -1,5 +1,5 @@
 //
-//  PromiseDateTime.swift
+//  SelectedTimes.swift
 //  App
 //
 //  Created by Chanhee Jeong on 2023/02/25.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct promiseDateTime: Hashable {
+struct SelectedTime: Hashable {
     let promiseDate: String
     let promiseTime: PromiseTime
 }

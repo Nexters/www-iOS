@@ -26,6 +26,7 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     var userName = BehaviorSubject<String>(value: "")
     var placeList = PublishSubject<[WrappedPlace]>()
     var myPlaceList = PublishSubject<[WrappedPlace]>()
+    var myTimeList = PublishSubject<[SelectedTime]>()
     let startDate = "2023-03-06".strToDate()
     let endDate = "2023-03-15".strToDate()
     

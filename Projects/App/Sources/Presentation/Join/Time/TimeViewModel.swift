@@ -22,9 +22,14 @@ final class TimeViewModel: BaseViewModel {
     // MARK: - Properties
     private let usecaseHost: JoinHostUseCase?
     private let usecaseGuest: JoinGuestUseCase?
+    private var promiseList: [PromiseDateViewData] = []
+    private var selectedTimes = BehaviorRelay<[SelectedTime]>(value: [])
+    private let promiseTimes: [PromiseTime] = [.morning, .lunch, .dinner, .night]
     
     struct Input {
         let viewDidLoad: Observable<Void>
+        let timeCellDidTap: Observable<Int>
+        let selectedCellDidTap: Observable<Int>
         let nextButtonDidTap: Observable<Void>
         let backButtonDidTap: Observable<Void>
     }
@@ -33,6 +38,8 @@ final class TimeViewModel: BaseViewModel {
         var naviTitleText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<TimePager>()
+        var updateSelected = BehaviorRelay<[String]>(value: [])
+        var initSelected = BehaviorRelay<[String]>(value: [])
     }
     
     init(joinGuestUseCase: JoinGuestUseCase? = nil, joinHostUseCase: JoinHostUseCase? = nil) {
@@ -62,11 +69,13 @@ final class TimeViewModel: BaseViewModel {
     func makePromiseList(mode: UserType) -> [PromiseDateViewData] {
         switch mode {
         case .guest:
-            return makePromiseDateViewData(start: (usecaseGuest?.startDate)! ,
-                                           end: (usecaseGuest?.endDate)!)
+            promiseList = makePromiseDateViewData(start: (usecaseGuest?.startDate)! ,
+                                                  end: (usecaseGuest?.endDate)!)
+            return promiseList
         case .host:
-            return makePromiseDateViewData(start: (usecaseHost?.startDate)! ,
-                                           end: (usecaseHost?.endDate)!)
+            promiseList = makePromiseDateViewData(start: (usecaseHost?.startDate)! ,
+                                                  end: (usecaseHost?.endDate)!)
+            return promiseList
         }
     }
     
@@ -116,7 +125,44 @@ final class TimeViewModel: BaseViewModel {
 extension TimeViewModel {
     
     private func handleInputHost(_ input: Input, disposeBag: DisposeBag) {
-
+        input.selectedCellDidTap
+            .subscribe(onNext: { [weak self] in
+                var timelist: [SelectedTime] = []
+                self?.selectedTimes
+                    .asDriver()
+                    .drive { times in
+                        timelist += times
+                    }
+                    .disposed(by: disposeBag)
+                if timelist.count > 0 {
+                    timelist.remove(at: $0)
+                    self?.selectedTimes.accept(timelist)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        input.timeCellDidTap
+            .subscribe(onNext: { [weak self] cellNo in
+                let date = cellNo / 4
+                let time = cellNo % 4
+                        
+                var timeList: [SelectedTime] = []
+                self?.selectedTimes
+                    .asDriver()
+                    .drive { times in
+                        timeList += times
+                    }
+                    .disposed(by: disposeBag)
+                
+                let selected = SelectedTime(promiseDate: (self?.promiseList[date].date?.formatted("yyyy-MM-dd"))! ,
+                             promiseTime: (self?.promiseTimes[time])!
+                )
+                
+                guard timeList.contains(selected) != true else { return }
+                timeList.insert(contentsOf: [selected], at: 0)
+                self?.selectedTimes.accept(timeList)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func makeOutputHost(with input: Input, disposeBag: DisposeBag) -> Output {
@@ -139,6 +185,19 @@ extension TimeViewModel {
                 output.navigatePage.accept(.place)
             })
             .disposed(by: disposeBag)
+        
+        self.selectedTimes
+            .subscribe(onNext: { selecteTimes in
+                var timeSelections = [String]()
+                
+                for time in selecteTimes {
+                    timeSelections.append("\(time.promiseDate.toDate()!.formatted("dd(E)")) \(time.promiseTime.toText())")
+                }
+                output.updateSelected.accept(timeSelections)
+                output.nextButtonMakeEnable.accept(selecteTimes.count > 0)
+            })
+            .disposed(by: disposeBag)
+        
         return output
     }
     
@@ -149,7 +208,44 @@ extension TimeViewModel {
 extension TimeViewModel {
     
     private func handleInputGuest(_ input: Input, disposeBag: DisposeBag) {
-
+        input.selectedCellDidTap
+            .subscribe(onNext: { [weak self] in
+                var timelist: [SelectedTime] = []
+                self?.selectedTimes
+                    .asDriver()
+                    .drive { times in
+                        timelist += times
+                    }
+                    .disposed(by: disposeBag)
+                if timelist.count > 0 {
+                    timelist.remove(at: $0)
+                    self?.selectedTimes.accept(timelist)
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        input.timeCellDidTap
+            .subscribe(onNext: { [weak self] cellNo in
+                let date = cellNo / 4
+                let time = cellNo % 4
+                        
+                var timeList: [SelectedTime] = []
+                self?.selectedTimes
+                    .asDriver()
+                    .drive { times in
+                        timeList += times
+                    }
+                    .disposed(by: disposeBag)
+                
+                let selected = SelectedTime(promiseDate: (self?.promiseList[date].date?.formatted("yyyy-MM-dd"))! ,
+                             promiseTime: (self?.promiseTimes[time])!
+                )
+                
+                guard timeList.contains(selected) != true else { return }
+                timeList.insert(contentsOf: [selected], at: 0)
+                self?.selectedTimes.accept(timeList)
+            })
+            .disposed(by: disposeBag)
     }
     
     
@@ -158,6 +254,7 @@ extension TimeViewModel {
 
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
+                output.initSelected.accept([])
                 output.naviTitleText.accept((self?.usecaseGuest!.roomName)!)
             })
             .disposed(by: disposeBag)
@@ -171,6 +268,18 @@ extension TimeViewModel {
         input.nextButtonDidTap
             .subscribe(onNext: {
                 output.navigatePage.accept(.place)
+            })
+            .disposed(by: disposeBag)
+        
+        self.selectedTimes
+            .subscribe(onNext: { selecteTimes in
+                var timeSelections = [String]()
+                
+                for time in selecteTimes {
+                    timeSelections.append("\(time.promiseDate.toDate()!.formatted("dd(E)")) \(time.promiseTime.toText())")
+                }
+                output.updateSelected.accept(timeSelections)
+                output.nextButtonMakeEnable.accept(selecteTimes.count > 0)
             })
             .disposed(by: disposeBag)
         

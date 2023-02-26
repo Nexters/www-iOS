@@ -33,6 +33,8 @@ final class TimeViewController: UIViewController {
     
     private var selecteLabel: [String] = []
     
+    private let cellSelection = PublishRelay<Int>()
+    
     private lazy var dataSource = configureDataSource()
     
     private let progressView = ProgressView(current: 3, total: 4)
@@ -121,12 +123,15 @@ final class TimeViewController: UIViewController {
         setNavigationBar()
         bindViewModel()
         
+
+        
         promiseList = viewModel.makePromiseList(mode: userMode)
         pickerView.delegate = self
         pickerView.dataSource = self
         
-        setPageControl()
         applySnapshot(times: [])
+       
+        setPageControl()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -223,11 +228,14 @@ extension TimeViewController {
 // MARK: - Binding
 private extension TimeViewController {
     func bindViewModel() {
-
         
         let input = TimeViewModel.Input(
             viewDidLoad:
                 Observable.just(()).asObservable(),
+            timeCellDidTap:
+                cellSelection.asObservable(),
+            selectedCellDidTap:
+                self.chipCollectionView.rx.itemSelected.map{$0.row},
             nextButtonDidTap:
                 self.nextButton.rx.tap.asObservable(),
             backButtonDidTap:
@@ -254,7 +262,23 @@ private extension TimeViewController {
             })
             .disposed(by: disposeBag)
         
+        
+        output.initSelected
+            .asDriver(onErrorJustReturn: [])
+            .drive { [weak self] times in
+                self?.applySnapshot(times: times)
+            }
+            .disposed(by: disposeBag)
+        
+        output.updateSelected
+            .asDriver(onErrorJustReturn: [])
+            .drive { [weak self] times in
+                self?.updateSnapshot(times: times)
+            }
+            .disposed(by: disposeBag)
+
     }
+
     
     func bindPager(output: TimeViewModel.Output?){
         output?.navigatePage
@@ -293,6 +317,7 @@ extension TimeViewController {
         default: break
         }
         pageControl.numberOfPages = pages
+        updateDateView(page: 0)
     }
 }
     
@@ -360,33 +385,19 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as! TimeCheckCell
-        
         let dateCol = indexPath.row / 4
         let timeRow = indexPath.row % 4
-        
+        cellSelection.accept(indexPath.row)
         let data = promiseList[dateCol].status[timeRow]
-        
         if data == .selected {
             promiseList[dateCol].status[timeRow] = .notSelected
-            let index = selecteLabel.firstIndex(of: "\(promiseList[dateCol].dateLabel) \(promiseTimes[timeRow].toText())")
-            selecteLabel.remove(at: index! )
-
-            self.updateSnapshot(times: selecteLabel)
-            
         } else if data == .notSelected{
-
-            selecteLabel.append("\(promiseList[dateCol].dateLabel) \(promiseTimes[timeRow].toText())")
-            self.updateSnapshot(times: selecteLabel)
-            
             promiseList[dateCol].status[timeRow] = .selected
         } else {
             promiseList[dateCol].status[timeRow] = .disabled
         }
-
         cell.changeImage(with: promiseList[dateCol].status[timeRow])
-        
     }
-    
     
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
