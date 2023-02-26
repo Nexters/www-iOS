@@ -13,6 +13,7 @@ import RxSwift
 
 enum MeetingAPI {
     case getMeetings
+    case checkMeetingCode(code: String)
 }
 
 extension MeetingAPI: TargetType {
@@ -24,12 +25,16 @@ extension MeetingAPI: TargetType {
         switch self {
         case .getMeetings:
             return "meetings"
+        case .checkMeetingCode(let code):
+            return "meetings/code/\(code)"
         }
     }
     
     var method: Moya.Method {
         switch self {
         case .getMeetings:
+            return .get
+        case .checkMeetingCode:
             return .get
         }
     }
@@ -38,6 +43,8 @@ extension MeetingAPI: TargetType {
         switch self {
         case .getMeetings:
             return .requestPlain
+        case .checkMeetingCode:
+            return .requestPlain
         }
     }
     
@@ -45,6 +52,9 @@ extension MeetingAPI: TargetType {
         switch self {
         case .getMeetings:
             return ["Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
+        case .checkMeetingCode:
+            return ["Content-Type": "application/json",
+                    "Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
         }
     }
 }
