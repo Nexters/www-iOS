@@ -29,7 +29,7 @@ final class TimeViewController: UIViewController {
     private let userMode: UserType
     private let promiseTimes: [PromiseTime] = [.morning, .lunch, .dinner, .night]
     
-    private var promiseDate: [PromiseDateViewData] = []
+    private var promiseList: [PromiseDateViewData] = []
     
     private var selecteLabel: [String] = []
     
@@ -118,18 +118,21 @@ final class TimeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
-        setPicker(with: 4)
         setNavigationBar()
         bindViewModel()
-
-        promiseDate = viewModel.makePromiseDateViewData(start: JoinHostUseCase().startDate!, end: JoinHostUseCase().endDate! )
         
+        promiseList = viewModel.makePromiseList(mode: userMode)
+        pickerView.delegate = self
+        pickerView.dataSource = self
+        
+        setPageControl()
         applySnapshot(times: [])
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
+
 }
 
 // MARK: - Function
@@ -221,6 +224,7 @@ extension TimeViewController {
 private extension TimeViewController {
     func bindViewModel() {
 
+        
         let input = TimeViewModel.Input(
             viewDidLoad:
                 Observable.just(()).asObservable(),
@@ -233,7 +237,7 @@ private extension TimeViewController {
         let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
-        
+
         output.naviTitleText
             .asDriver()
             .drive(onNext: { [weak self] title in
@@ -278,9 +282,16 @@ private extension TimeViewController {
  
 // MARK: - ScrollView
 extension TimeViewController {
-    private func setPicker(with pages: Int) {
-        pickerView.delegate = self
-        pickerView.dataSource = self
+    private func setPageControl() {
+        var pages = 0
+        let numberOfItems = pickerView.numberOfItems(inSection: 0)
+        switch numberOfItems {
+        case 1...16: pages = 1
+        case 17...32: pages = 2
+        case 9...48: pages = 3
+        case 49...60: pages = 4
+        default: break
+        }
         pageControl.numberOfPages = pages
     }
 }
@@ -329,7 +340,7 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return promiseDate.count * 4
+        return promiseList.count * 4
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -340,7 +351,7 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
         let dateCol = indexPath.row / 4
         let timeRow = indexPath.row % 4
         
-        let data = promiseDate[dateCol].status[timeRow]
+        let data = promiseList[dateCol].status[timeRow]
         
         cell.configure(status: data)
 
@@ -353,26 +364,26 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
         let dateCol = indexPath.row / 4
         let timeRow = indexPath.row % 4
         
-        let data = promiseDate[dateCol].status[timeRow]
+        let data = promiseList[dateCol].status[timeRow]
         
         if data == .selected {
-            promiseDate[dateCol].status[timeRow] = .notSelected
-            let index = selecteLabel.firstIndex(of: "\(promiseDate[dateCol].dateLabel) \(promiseTimes[timeRow].toText())")
+            promiseList[dateCol].status[timeRow] = .notSelected
+            let index = selecteLabel.firstIndex(of: "\(promiseList[dateCol].dateLabel) \(promiseTimes[timeRow].toText())")
             selecteLabel.remove(at: index! )
 
             self.updateSnapshot(times: selecteLabel)
             
         } else if data == .notSelected{
 
-            selecteLabel.append("\(promiseDate[dateCol].dateLabel) \(promiseTimes[timeRow].toText())")
+            selecteLabel.append("\(promiseList[dateCol].dateLabel) \(promiseTimes[timeRow].toText())")
             self.updateSnapshot(times: selecteLabel)
             
-            promiseDate[dateCol].status[timeRow] = .selected
+            promiseList[dateCol].status[timeRow] = .selected
         } else {
-            promiseDate[dateCol].status[timeRow] = .disabled
+            promiseList[dateCol].status[timeRow] = .disabled
         }
 
-        cell.changeImage(with: promiseDate[dateCol].status[timeRow])
+        cell.changeImage(with: promiseList[dateCol].status[timeRow])
         
     }
     
@@ -414,7 +425,7 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
         let start = 4 * page
         var arr: [String] = []
         for i in start...start+3 {
-            arr.append(promiseDate[i].dateLabel)
+            arr.append(promiseList[i].dateLabel)
         }
         self.dateView.configure(with: arr)
     }

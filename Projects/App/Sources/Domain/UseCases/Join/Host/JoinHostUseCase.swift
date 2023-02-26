@@ -25,7 +25,6 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     var placeList = PublishSubject<[WrappedPlace]>()
     let startDate = "2023-03-06".strToDate()
     let endDate = "2023-03-15".strToDate()
-//    formatted("dd(E)")
     
     // MARK: - Methods
     init() {}

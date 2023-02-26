@@ -43,6 +43,7 @@ final class TimeViewModel: BaseViewModel {
     }
     
     struct Output {
+        var promiseList = PublishRelay<[PromiseDateViewData]>()
         var naviTitleText = BehaviorRelay<String>(value: "")
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
         var navigatePage = PublishRelay<TimePager>()
@@ -72,7 +73,18 @@ final class TimeViewModel: BaseViewModel {
         return self.usecaseGuest!
     }
     
-    func makePromiseDateViewData(start: Date, end: Date) -> [PromiseDateViewData]{
+    func makePromiseList(mode: UserType) -> [PromiseDateViewData] {
+        switch mode {
+        case .guest:
+            return makePromiseDateViewData(start: (usecaseGuest?.startDate)! ,
+                                           end: (usecaseGuest?.endDate)!)
+        case .host:
+            return makePromiseDateViewData(start: (usecaseHost?.startDate)! ,
+                                           end: (usecaseHost?.endDate)!)
+        }
+    }
+    
+    private func makePromiseDateViewData(start: Date, end: Date) -> [PromiseDateViewData]{
         let dates = datesBetween(start: start, end: end)
         let count = dates.count
         var promiseDateViewData = createArrayWithCount(count)
@@ -92,7 +104,6 @@ final class TimeViewModel: BaseViewModel {
             dates.append(currentDate)
             currentDate = Calendar.current.date(byAdding: .day, value: 1, to: currentDate)!
         }
-        print("🌐",dates)
         return dates
     }
     
@@ -128,6 +139,11 @@ extension TimeViewModel {
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
                 output.naviTitleText.accept(try! (self?.usecaseHost!.roomName)!.value())
+                
+                let list = self?.makePromiseDateViewData(start: (self?.usecaseHost!.startDate)!,
+                                                   end: (self?.usecaseHost!.endDate)!)
+//                output.promiseList.accept(list!)
+                output.promiseList.accept(promiseDateMock)
             })
             .disposed(by: disposeBag)
         
@@ -139,7 +155,6 @@ extension TimeViewModel {
         
         input.nextButtonDidTap
             .subscribe(onNext: {
-                print("연결")
                 output.navigatePage.accept(.place)
             })
             .disposed(by: disposeBag)
@@ -163,6 +178,10 @@ extension TimeViewModel {
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
                 output.naviTitleText.accept((self?.usecaseGuest!.roomName)!)
+                
+                let list = self?.makePromiseDateViewData(start: (self?.usecaseGuest!.startDate)!,
+                                                   end: (self?.usecaseGuest!.endDate)!)
+                output.promiseList.accept(promiseDateMock)
             })
             .disposed(by: disposeBag)
         
@@ -174,7 +193,6 @@ extension TimeViewModel {
         
         input.nextButtonDidTap
             .subscribe(onNext: {
-                print("연결")
                 output.navigatePage.accept(.place)
             })
             .disposed(by: disposeBag)
