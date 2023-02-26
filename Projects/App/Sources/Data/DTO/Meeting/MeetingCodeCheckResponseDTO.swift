@@ -122,3 +122,11 @@ extension MeetingCodeCheckResponseDTO {
 
 }
 
+extension MeetingCodeCheckResponseDTO {
+
+//    func toDomain() -> [String:String] {
+//        [""]
+//    }
+//    
+    
+}

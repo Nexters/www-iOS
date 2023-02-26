@@ -54,7 +54,8 @@ extension MeetingAPI: TargetType {
             return ["Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
         case .checkMeetingCode:
             return ["Content-Type": "application/json",
-                    "Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
+                    "Authorization": "Bearer " + "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjc2ODAzNzQyLCJleHAiOjkyMjMzNzIwMzY4NTQ3NzV9.I_uOzywGtMG0bxX5Yot13103RPHeDfXILhGoDthaBcaMcl26WN7OXp0Hg3u_ksLpZpZtIIt828kj5u7Tgc523Q"]
+            
         }
     }
 }

@@ -21,6 +21,8 @@ protocol JoinGuestUseCaseProtocol {
 
 final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     
+    private let meetingJoinRepository: MeetingJoinRepository
+    
     // MARK: - Properties
     var roomCode = BehaviorSubject<String>(value: "")
     var roomName: String = "방이름"
@@ -32,8 +34,12 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     let endDate = "2023-03-15".strToDate()
     internal var selectedTimes: [SelectedTime] = []
     
+    private let disposeBag = DisposeBag()
+    
     // MARK: - Methods
-    init() {}
+    init(meetingJoinRepository: MeetingJoinRepository) {
+        self.meetingJoinRepository = meetingJoinRepository
+    }
     
     func getServerPlaceList() -> [WrappedPlace] {
         return Place.mockServerData
@@ -48,11 +54,57 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
         self.selectedTimes = times
     }
 
+    func checkMeetingRoomAvailable() -> Observable<Result<Bool, JoinMeetingError>> {
+
+        let result = Observable<Result<Bool, JoinMeetingError>>.create { [weak self] observer in
+            guard let roomCode = try! self?.roomCode.value() else {
+                observer.onNext(.failure(.unknown))
+                observer.onCompleted()
+                return Disposables.create()
+            }
+
+            self?.meetingJoinRepository.fetchMeetingStatusWithCode(with: roomCode)
+                .subscribe(onNext: { [weak self] response in
+                    if response.code == 0 {
+                        observer.onNext(.success(true))
+                    } else {
+                        let error = self?.mapJoinMeetingError(from: response.code) ?? .unknown
+                        observer.onNext(.failure(error))
+                    }
+                    observer.onCompleted()
+                })
+                .disposed(by: self!.disposeBag)
+            
+            return Disposables.create()
+        }
+        
+        return result
+    }
+
 
 }
 
 // MARK: - Privates
 private extension JoinGuestUseCase {
     
+    private func mapJoinMeetingError(from errorCode: Int) -> JoinMeetingError {
+        switch errorCode {
+        case 403:
+            return .accessDenied
+        case 500:
+            return .serverError
+        case 1000:
+            return .serverError
+        case 4000:
+            return .roomDoesntExist
+        case 4001:
+            return .userDoesntExist
+        case 5000:
+            return .roomAlreadyStarted
+        default:
+            return .unknown
+        }
+    }
+
 }
 

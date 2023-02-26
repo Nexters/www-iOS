@@ -275,10 +275,11 @@ private extension PlaceViewController {
                     let viewmodel = CompletionViewModel(usecase: self!.viewModel.getHostUsecase())
                     self?.navigationController?.pushViewController(CompletionViewcController(viewModel: viewmodel), animated: true)
                 case .roomMain:
-                    self?.view.endEditing(true)
-                    self?.textFieldView.textField.resignFirstResponder()
-                    self?.navigationController?.popToRootViewController(animated: true)
+//                    self?.view.endEditing(true)
+//                    self?.textFieldView.textField.resignFirstResponder()
+//                    self?.navigationController?.popToRootViewController(animated: true)
                     // TODO: - 홈메인으로 이동
+                    print("🔥 완료되었습니다!")
                 case .error: break
                 }
             })
@@ -338,13 +339,13 @@ private extension PlaceViewController {
 
 // MARK: - Preview
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct PlaceViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        let viewModel = PlaceViewModel(guest: JoinGuestUseCase())
-        PlaceViewController(viewModel: viewModel, userMode: .guest).toPreview()
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct PlaceViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewModel = PlaceViewModel(guest: JoinGuestUseCase())
+//        PlaceViewController(viewModel: viewModel, userMode: .guest).toPreview()
+//    }
+//}
+//#endif
