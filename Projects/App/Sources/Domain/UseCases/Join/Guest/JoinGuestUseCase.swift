@@ -18,7 +18,6 @@ protocol JoinGuestUseCaseProtocol {
     var endDate: Date? { get }
     var userName: BehaviorSubject<String> { get }
     var roomCode: BehaviorSubject<String> { get }
-    var myPlaceList: [WrappedPlace]{ get }
     var selectedTimes: [SelectedTime] { get set }
 }
 
@@ -34,8 +33,7 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     internal var placeList: [WrappedPlace] = []
     var roomCode = BehaviorSubject<String>(value: "")
     var userName = BehaviorSubject<String>(value: "")
-    var myPlaceList: [WrappedPlace] = []
-    var myTimeList = PublishSubject<[SelectedTime]>()
+    internal var myPlaceList: [WrappedPlace] = []
     internal var selectedTimes: [SelectedTime] = []
     
     private let disposeBag = DisposeBag()
@@ -56,7 +54,6 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     func addSelectedTimes(_ times: [SelectedTime]) {
         self.selectedTimes = times
     }
-
     
     func checkMeetingRoomAvailable() -> Observable<Result<Bool, JoinMeetingError>> {
 
