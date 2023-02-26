@@ -188,7 +188,15 @@ extension TimeViewModel {
             .disposed(by: disposeBag)
         
         input.nextButtonDidTap
-            .subscribe(onNext: {
+            .subscribe(onNext: { [weak self] in
+                var timelist: [SelectedTime] = []
+                self?.selectedTimes
+                    .asDriver()
+                    .drive { times in
+                        timelist += times
+                    }
+                    .disposed(by: disposeBag)
+                self?.usecaseHost?.addSelectedTimes(timelist)
                 output.navigatePage.accept(.place)
             })
             .disposed(by: disposeBag)
@@ -290,7 +298,15 @@ extension TimeViewModel {
             .disposed(by: disposeBag)
         
         input.nextButtonDidTap
-            .subscribe(onNext: {
+            .subscribe(onNext: { [weak self] in
+                var timelist: [SelectedTime] = []
+                self?.selectedTimes
+                    .asDriver()
+                    .drive { times in
+                        timelist += times
+                    }
+                    .disposed(by: disposeBag)
+                self?.usecaseGuest?.addSelectedTimes(timelist)
                 output.navigatePage.accept(.place)
             })
             .disposed(by: disposeBag)

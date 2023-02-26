@@ -16,6 +16,7 @@ protocol JoinGuestUseCaseProtocol {
     var userName: BehaviorSubject<String> { get }
     var placeList: PublishSubject<[WrappedPlace]> { get }
     var myPlaceList: PublishSubject<[WrappedPlace]> { get }
+    var selectedTimes: [SelectedTime] { get set }
 }
 
 final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
@@ -29,6 +30,7 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     var myTimeList = PublishSubject<[SelectedTime]>()
     let startDate = "2023-03-06".strToDate()
     let endDate = "2023-03-15".strToDate()
+    internal var selectedTimes: [SelectedTime] = []
     
     // MARK: - Methods
     init() {}
@@ -41,6 +43,11 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
     func addMyPlaces(_ places: [WrappedPlace]) {
         self.placeList.onNext(places)
     }
+    
+    func addSelectedTimes(_ times: [SelectedTime]) {
+        self.selectedTimes = times
+    }
+
 
 }
 
