@@ -54,6 +54,7 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
         self.selectedTimes = times
     }
 
+    
     func checkMeetingRoomAvailable() -> Observable<Result<Bool, JoinMeetingError>> {
 
         let result = Observable<Result<Bool, JoinMeetingError>>.create { [weak self] observer in
@@ -64,14 +65,13 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
             }
 
             self?.meetingJoinRepository.fetchMeetingStatusWithCode(with: roomCode)
-                .subscribe(onNext: { [weak self] response in
-                    if response.code == 0 {
+                .subscribe(onNext: { result in
+                    switch result {
+                    case .success:
                         observer.onNext(.success(true))
-                    } else {
-                        let error = self?.mapJoinMeetingError(from: response.code) ?? .unknown
+                    case .failure(let error):
                         observer.onNext(.failure(error))
                     }
-                    observer.onCompleted()
                 })
                 .disposed(by: self!.disposeBag)
             
@@ -80,31 +80,7 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
         
         return result
     }
-
-
-}
-
-// MARK: - Privates
-private extension JoinGuestUseCase {
     
-    private func mapJoinMeetingError(from errorCode: Int) -> JoinMeetingError {
-        switch errorCode {
-        case 403:
-            return .accessDenied
-        case 500:
-            return .serverError
-        case 1000:
-            return .serverError
-        case 4000:
-            return .roomDoesntExist
-        case 4001:
-            return .userDoesntExist
-        case 5000:
-            return .roomAlreadyStarted
-        default:
-            return .unknown
-        }
-    }
 
 }
 

@@ -10,5 +10,7 @@ import Foundation
 import RxSwift
 
 protocol MeetingJoinRepository {
-    func fetchMeetingStatusWithCode(with code: String) -> Observable<MeetingCodeCheckResponseDTO>
+//    func fetchMeetingStatusWithCode(with code: String) -> Observable<MeetingInfoToJoin>
+    
+    func fetchMeetingStatusWithCode(with code: String) -> Observable<Result<MeetingInfoToJoin, JoinMeetingError>>
 }

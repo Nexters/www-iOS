@@ -73,9 +73,12 @@ final class RoomCodeViewModel: BaseViewModel {
                 self?.usecase.checkMeetingRoomAvailable()
                     .subscribe(onNext: { result in
                         switch result {
-                        case .success:
-                            output.navigatePage.accept(.nickName)
+                        case .success(let status):
+                            if status == true {
+                                output.navigatePage.accept(.nickName)
+                            }
                         case .failure(let error):
+                            print(error.localizedMsg)
                             output.makeErrorWithMessage.accept(error.localizedMsg)
                         }
                     })
