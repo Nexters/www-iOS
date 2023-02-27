@@ -10,6 +10,7 @@ import UIKit
 import RxCocoa
 import RxSwift
 import HorizonCalendar
+import Toast
 
 final class CalendarViewController: UIViewController {
     
@@ -113,13 +114,13 @@ final class CalendarViewController: UIViewController {
                 
                 if self.isValidDays(from: self.selectedStartDay, to: day) {
                     self.selectedEndDay = day
-                    self.input.selectEndDate.onNext(day.convertToDate())
+                    
                     self.titleView.subtitleLabel.text = "\(self.selectedStartDay!) - \(self.selectedEndDay!)"
                 } else {
-                    // TODO: Toast 띄우기
-                    self.input.selectEndDate.onNext(day.convertToDate())
                     "\(self.selectedStartDay!) - "
                 }
+                self.input.selectStartDate.onNext(self.selectedStartDay!.convertToDate())
+                self.input.selectEndDate.onNext(day.convertToDate())
             } // 3. 둘다 선택 -> 둘다 nil이 아니고 다름 -> start, end nil로 만듬
             else {
                 self.selectedStartDay = nil
@@ -176,7 +177,11 @@ final class CalendarViewController: UIViewController {
         output.toastMessage
             .subscribe(onNext: { [weak self] msg in
                 // TODO: - Toast
-                print(msg)
+                var style = ToastStyle()
+                style.imageSize = .init(width: 24, height: 24)
+                style.messageAlignment = .center
+//                style.
+                self?.view.makeToast(msg, position: .bottom, image: UIImage(.appIcon), style: style)
             }).disposed(by: bag)
     }
     
@@ -186,7 +191,7 @@ final class CalendarViewController: UIViewController {
         
         let caledar = Calendar.current
         let interval = caledar.dateComponents([.day], from: startDate!, to: endDate!).day ?? 0
-        if interval < 14 && interval >= 0 {
+        if interval < 14 && interval > 0 {
             return true
         }
         return false

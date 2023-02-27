@@ -62,16 +62,17 @@ final class CalendarViewModel: BaseViewModel {
             output.navigatePage.accept(.timeView)
         }).disposed(by: disposeBag)
         
-        Observable.combineLatest(input.selectStartDate, input.selectEndDate)
+        Observable.zip(input.selectStartDate, input.selectEndDate)
             .subscribe(onNext: { [weak self] start, end in
                 let interval = Calendar.current.dateComponents([.day], from: start, to: end).day ?? 0
+                print("start, end", start, end)
                 output.isNextButtonEnable.accept(interval < 14 && interval >= 1)
                 
                 if interval >= 14 {
                     output.toastMessage.accept("14일 이내로 선택할 수 있어요")
                 }
                 
-                if start != end && interval <= 0 {
+                if interval < 0 {
                     output.toastMessage.accept("끝 날짜는 시작 날짜 이후로 선택할 수 있어요")
                 }
             }).disposed(by: disposeBag)
