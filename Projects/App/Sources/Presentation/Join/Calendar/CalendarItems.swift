@@ -146,8 +146,6 @@ final class DayRangeIndicatorView: UIView {
                 if index == 0 {
                     roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topLeft, .bottomLeft], cornerRadii: .init(width: 30, height: 30)).cgPath
                     
-                    let a = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topLeft, .bottomLeft], cornerRadii: .init(width: 30, height: 30))
-                    
                     let rounded6 = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topRight, .bottomRight], cornerRadii: .init(width: 6, height: 6)).cgPath
                     
                     if #available(iOS 16.0, *) {
