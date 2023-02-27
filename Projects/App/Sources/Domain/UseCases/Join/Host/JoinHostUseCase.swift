@@ -24,9 +24,12 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     var userName = BehaviorSubject<String>(value: "")
     var minUser = BehaviorSubject<Int>(value: 1)
     var placeList = PublishSubject<[WrappedPlace]>()
-    let startDate = "2023-03-06".strToDate()
-    let endDate = "2023-03-15".strToDate()
+    var startDate = BehaviorSubject<Date>(value: Date())
+    var endDate = BehaviorSubject<Date>(value: Date())
+    // let startDate = "2023-03-06".strToDate()
+    // let endDate = "2023-03-15".strToDate()
     internal var selectedTimes: [SelectedTime] = []
+
     
     // MARK: - Methods
     init() {}

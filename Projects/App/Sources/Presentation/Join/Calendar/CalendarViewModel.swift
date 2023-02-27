@@ -24,11 +24,14 @@ final class CalendarViewModel: BaseViewModel {
         let viewDidLoad: Observable<Void>
         let nextButtonDidTap: Observable<Void>
         let backButtonDidTap: Observable<Void>
+        let selectStartDate: BehaviorSubject<Date>
+        let selectEndDate: BehaviorSubject<Date>
     }
     
     struct Output {
-        let startDate = BehaviorRelay<String>(value: "")
         let navigatePage = PublishRelay<CalendarPager>()
+        let isNextButtonEnable = BehaviorRelay(value: false)
+        let toastMessage = PublishRelay<String>()
     }
     
     init(usecase: JoinHostUseCase) {
@@ -41,11 +44,15 @@ final class CalendarViewModel: BaseViewModel {
     
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
         
-        let output = Output()
+        input.selectStartDate
+            .bind(to: self.usecase.startDate)
+            .disposed(by: disposeBag)
         
-        input.viewDidLoad.subscribe(onNext: {
-            output.startDate.accept("")
-        }).disposed(by: disposeBag)
+        input.selectEndDate
+            .bind(to: self.usecase.endDate)
+            .disposed(by: disposeBag)
+        
+        let output = Output()
         
         input.backButtonDidTap.subscribe(onNext: {
             output.navigatePage.accept(.back)
@@ -54,6 +61,21 @@ final class CalendarViewModel: BaseViewModel {
         input.nextButtonDidTap.subscribe(onNext: {
             output.navigatePage.accept(.timeView)
         }).disposed(by: disposeBag)
+        
+        Observable.zip(input.selectStartDate, input.selectEndDate)
+            .subscribe(onNext: { [weak self] start, end in
+                let interval = Calendar.current.dateComponents([.day], from: start, to: end).day ?? 0
+                print("start, end", start, end)
+                output.isNextButtonEnable.accept(interval < 14 && interval >= 1)
+                
+                if interval >= 14 {
+                    output.toastMessage.accept("14일 이내로 선택할 수 있어요")
+                }
+                
+                if interval < 0 {
+                    output.toastMessage.accept("끝 날짜는 시작 날짜 이후로 선택할 수 있어요")
+                }
+            }).disposed(by: disposeBag)
         
         return output
     }

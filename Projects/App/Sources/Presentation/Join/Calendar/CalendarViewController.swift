@@ -10,12 +10,20 @@ import UIKit
 import RxCocoa
 import RxSwift
 import HorizonCalendar
+import Toast
 
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
-    private let disposeBag = DisposeBag()
+    private let bag = DisposeBag()
     private let viewModel: CalendarViewModel
+    lazy var input = CalendarViewModel.Input(
+        viewDidLoad: Observable.just(()),
+        nextButtonDidTap: self.nextButton.rx.tap.asObservable(),
+        backButtonDidTap: self.navigationItem.leftBarButtonItem!.rx.tap.asObservable(),
+        selectStartDate: .init(value: defaultDate),
+        selectEndDate: .init(value: defaultDate))
+    
     private var selectedStartDay: Day? = nil
     private var selectedEndDay: Day? = nil
     private var defaultDate = Date()
@@ -28,7 +36,6 @@ final class CalendarViewController: UIViewController {
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
-        $0.setButtonState(true) // TODO: 화면 전환 연결용 -> 삭제
         return $0
     }(LargeButton(state: false))
     
@@ -49,8 +56,8 @@ final class CalendarViewController: UIViewController {
         setUI()
         configUI()
         setNavigationBar(title: "캘린더")
-        bindRx()
         setAction()
+        bindVM()
     }
     
     private func setUI() {
@@ -93,14 +100,34 @@ final class CalendarViewController: UIViewController {
         calendarView.layoutMargins = .init(top: 0, left: 0, bottom: 0, right: 0)
         calendarView.daySelectionHandler = { [weak self] day in
             guard let self else { return }
-            // TODO: - 동작에 따라 start, end 수정하는 부분 - 안드와 맞추기
+            // 1. 아무것도 선택x -> 둘다 nil(selectedStartDay nil) -> start == end 선택
             if self.selectedStartDay == nil {
                 self.selectedStartDay = day
                 self.selectedEndDay = day
-//                print("startDay", self.selectedStartDay)
-            } else {
-                self.selectedEndDay = day
-//                print("endDay", self.selectedEndDay)
+                self.input.selectStartDate.onNext((self.selectedStartDay?.convertToDate())!)
+                self.input.selectEndDate.onNext((self.selectedEndDay?.convertToDate())!)
+                
+                self.titleView.subtitleLabel.text =
+                "\(self.selectedStartDay!) - "
+            } // 2. 하나 선택 -> 둘다 nil이 아니고 같음 -> start~end 선택
+            else if self.selectedStartDay == self.selectedEndDay {
+                
+                if self.isValidDays(from: self.selectedStartDay, to: day) {
+                    self.selectedEndDay = day
+                    
+                    self.titleView.subtitleLabel.text = "\(self.selectedStartDay!) - \(self.selectedEndDay!)"
+                } else {
+                    "\(self.selectedStartDay!) - "
+                }
+                self.input.selectStartDate.onNext(self.selectedStartDay!.convertToDate())
+                self.input.selectEndDate.onNext(day.convertToDate())
+            } // 3. 둘다 선택 -> 둘다 nil이 아니고 다름 -> start, end nil로 만듬
+            else {
+                self.selectedStartDay = nil
+                self.selectedEndDay = nil
+                self.input.selectStartDate.onNext(self.defaultDate)
+                self.input.selectEndDate.onNext(self.defaultDate)
+                self.titleView.subtitleLabel.text = "약속 날짜 범위 내에서 가능한 날짜를 투표하게 됩니다."
             }
             
             let newContent = self.makeContent()
@@ -134,12 +161,40 @@ final class CalendarViewController: UIViewController {
             .asDriver()
             .drive(onNext: { [weak self] in
                 let viewmodel = TimeViewModel(joinHostUseCase: self!.viewModel.getUseCase())
+                
                 self?.navigationController?.pushViewController(TimeViewController(viewmodel: viewmodel, userMode: .host), animated: true)
-            }).disposed(by: disposeBag)
+            }).disposed(by: bag)
+    }
+        
+    private func bindVM() {
+        let output = viewModel.transform(input: input, disposeBag: bag)
+        
+        output.isNextButtonEnable
+            .subscribe(onNext: { [weak self] isEnable in
+                self?.nextButton.setButtonState(isEnable)
+            }).disposed(by: bag)
+        
+        output.toastMessage
+            .subscribe(onNext: { [weak self] msg in
+                // TODO: - Toast
+                var style = ToastStyle()
+                style.imageSize = .init(width: 24, height: 24)
+                style.messageAlignment = .center
+//                style.
+                self?.view.makeToast(msg, position: .bottom, image: UIImage(.appIcon), style: style)
+            }).disposed(by: bag)
     }
     
-    private func bindRx() {
+    private func isValidDays(from start: Day?, to end: Day?) -> Bool {
+        let startDate = start?.convertToDate()
+        let endDate = end?.convertToDate()
         
+        let caledar = Calendar.current
+        let interval = caledar.dateComponents([.day], from: startDate!, to: endDate!).day ?? 0
+        if interval < 14 && interval > 0 {
+            return true
+        }
+        return false
     }
 }
 
@@ -167,8 +222,8 @@ extension CalendarViewController {
             endDate = calendar.date(from: DateComponents(year: selectedEndDay.month.year, month: selectedEndDay.month.month, day: selectedEndDay.day))!
         }
         
-        var selectedDateRange: ClosedRange<Date> = ClosedRange<Date>(uncheckedBounds: (lower:   min(startDate, endDate), upper: max(startDate, endDate))) // default: defaultDate~defaultDate
-            selectedDateRange = startDate <= endDate ? startDate...endDate : endDate...startDate
+        var selectedDateRange: ClosedRange<Date> = ClosedRange<Date>(uncheckedBounds: (lower: startDate, upper: endDate))
+            selectedDateRange = startDate...endDate
         
       return CalendarViewContent(
         calendar: calendar,
@@ -206,6 +261,20 @@ extension CalendarViewController {
           DayRangeIndicatorView.calendarItemModel(invariantViewProperties: .init(), viewModel: .init(framesOfDaysToHighlight: dayRangeLayoutContext.daysAndFrames.map { $0.frame }))
       }
       
+    }
+}
+
+extension Day {
+    func convertToDate() -> Date {
+        let year = self.month.year
+        let month = self.month.month
+        let day = self.day
+        
+        let dateStr = "\(year)-\(month)-\(day)"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyy-MM-dd"
+        let date = formatter.date(from: dateStr)!
+        return date
     }
 }
 
