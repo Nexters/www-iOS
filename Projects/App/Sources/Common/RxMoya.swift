@@ -9,9 +9,9 @@ import Moya
 import RxSwift
 
 public class RxMoyaProvider<Target>: MoyaProvider<Target> where Target: TargetType {
-  public func request(_ token: Target) -> Observable<Response> {
+  public func request(_ api: Target) -> Observable<Response> {
     return Observable.create { [weak self] observer in
-      let cancellableToken = self?.request(token) { result in
+      let cancellableToken = self?.request(api) { result in
         switch result {
         case let .success(response):
           observer.onNext(response)
@@ -25,7 +25,7 @@ public class RxMoyaProvider<Target>: MoyaProvider<Target> where Target: TargetTy
         cancellableToken?.cancel()
       }
     }.observe(on: SerialDispatchQueueScheduler(qos: .background))
-  }
+  }    
 }
 
 class LoggerPlugin: PluginType {
@@ -60,7 +60,7 @@ class LoggerPlugin: PluginType {
         if let responseStr = String(bytes: response.data, encoding: String.Encoding.utf8) {
           log.append("\(responseStr)\n")
         }
-        log.append("🙆‍♂️----------End----------\n")
+        log.append("\n🙆‍♂️----------End----------\n")
         print(log)
     }
     
@@ -71,7 +71,7 @@ class LoggerPlugin: PluginType {
         
         var log = "🙅‍♂️ ----------\(error.errorCode) \(target)----------\n"
         log.append("\(error.failureReason ?? error.errorDescription ?? "unknown error)\n")")
-        log.append("🙅‍♂️----------End----------\n")
+        log.append("\n🙅‍♂️----------End----------\n")
         print(log)
     }
 }

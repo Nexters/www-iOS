@@ -6,6 +6,8 @@
 //  Copyright © 2023 com.promise8. All rights reserved.
 //
 
+import Foundation
+
 struct Place: Hashable {
     let title: String
 }

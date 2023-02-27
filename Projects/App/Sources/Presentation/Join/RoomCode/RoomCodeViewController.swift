@@ -143,6 +143,14 @@ private extension RoomCodeController {
             })
             .disposed(by: disposeBag)
         
+        output.makeErrorWithMessage
+            .asDriver(onErrorJustReturn: "다시 시도해주세요")
+            .drive(onNext: { [weak self] str in
+                self?.textFieldView.setErrorMode(message: str)
+            })
+            .disposed(by: disposeBag)
+            
+        
     }
     
     func bindPager(output: RoomCodeViewModel.Output?){
@@ -172,8 +180,9 @@ import SwiftUI
 
 struct RoomCodeController_Preview: PreviewProvider {
     static var previews: some View {
-        let viewModel = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
-        RoomCodeController(viewModel: viewModel).toPreview()
+        let usecase = JoinGuestUseCase(meetingJoinRepository: JoinMeetingDAO(network: MeetingAPIManager.provider))
+        let vm = RoomCodeViewModel(joinGuestUseCase: usecase)
+        RoomCodeController(viewModel: vm).toPreview()
     }
 }
 #endif

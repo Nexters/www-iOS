@@ -15,12 +15,25 @@ enum TimeSection {
     case meetingTime
 }
 
+struct PromiseDateViewData {
+    let date: Date?
+    let dateLabel: String
+    var status: [CheckStatus]
+}
+
 final class TimeViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
     private let viewModel: TimeViewModel
     private let userMode: UserType
+    private let promiseTimes: [PromiseTime] = [.morning, .lunch, .dinner, .night]
+    
+    private var promiseList: [PromiseDateViewData] = []
+    
+    private var selecteLabel: [String] = []
+    
+    private let cellSelection = PublishRelay<Int>()
     
     private lazy var dataSource = configureDataSource()
     
@@ -71,7 +84,7 @@ final class TimeViewController: UIViewController {
         flowLayout.scrollDirection = .horizontal
         flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        collectionView.register(DeleteChipCell.self, forCellWithReuseIdentifier: DeleteChipCell.identifier)
+        collectionView.register(BasicChipCell.self, forCellWithReuseIdentifier: BasicChipCell.identifier)
         collectionView.layer.cornerRadius = 10.verticallyAdjusted
         collectionView.layer.borderWidth = 1
         collectionView.layer.borderColor = UIColor.wwwColor(.Gray100).cgColor
@@ -79,12 +92,12 @@ final class TimeViewController: UIViewController {
         collectionView.contentInset.top = ((56.verticallyAdjusted - 34)/2)
         collectionView.contentInset.left = 14
         collectionView.contentInset.right = 14
+        collectionView.allowsMultipleSelection = true // 다중선택 허용
         return collectionView
     }()
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
-        $0.setButtonState(true) // TODO: 화면연결 임시
         return $0
     }(LargeButton(state: false))
     
@@ -106,17 +119,24 @@ final class TimeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUI()
-        setPicker(with: 2)
         setNavigationBar()
         bindViewModel()
         
-        let sample = ["25 (토) 낮","26 (일) 저녁", "27 (월) 저녁"]
-        applySnapshot(times: sample)
+
+        
+        promiseList = viewModel.makePromiseList(mode: userMode)
+        pickerView.delegate = self
+        pickerView.dataSource = self
+        
+        applySnapshot(times: [])
+       
+        setPageControl()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.view.endEditing(true)
     }
+
 }
 
 // MARK: - Function
@@ -201,15 +221,20 @@ extension TimeViewController {
         navigationItem.rightBarButtonItem = progressItem
         navigationItem.title = title
     }
-    
+
 }
 
 // MARK: - Binding
 private extension TimeViewController {
     func bindViewModel() {
+        
         let input = TimeViewModel.Input(
             viewDidLoad:
                 Observable.just(()).asObservable(),
+            timeCellDidTap:
+                cellSelection.asObservable(),
+            selectedCellDidTap:
+                self.chipCollectionView.rx.itemSelected.map{$0.row},
             nextButtonDidTap:
                 self.nextButton.rx.tap.asObservable(),
             backButtonDidTap:
@@ -219,7 +244,7 @@ private extension TimeViewController {
         let output = self.viewModel.transform(input: input, disposeBag: self.disposeBag)
         
         self.bindPager(output: output)
-        
+
         output.naviTitleText
             .asDriver()
             .drive(onNext: { [weak self] title in
@@ -236,6 +261,34 @@ private extension TimeViewController {
             })
             .disposed(by: disposeBag)
         
+        
+        output.initSelected
+            .asDriver(onErrorJustReturn: [])
+            .drive { [weak self] times in
+                self?.applySnapshot(times: times)
+            }
+            .disposed(by: disposeBag)
+        
+        output.updateSelected
+            .asDriver(onErrorJustReturn: [])
+            .drive { [weak self] times in
+                self?.updateSnapshot(times: times)
+            }
+            .disposed(by: disposeBag)
+        
+        output.fetchSubTitleText
+            .asDriver(onErrorJustReturn: "")
+            .drive { [weak self] text in
+                self?.titleView.subtitleLabel.text = text
+            }
+            .disposed(by: disposeBag)
+
+        output.nextButtonMakeEnable
+            .asDriver(onErrorJustReturn: false)
+            .drive(onNext: { [weak self] isEnabled in
+                self?.nextButton.setButtonState(isEnabled)
+            })
+            .disposed(by: disposeBag)
     }
     
     func bindPager(output: TimeViewModel.Output?){
@@ -262,12 +315,19 @@ private extension TimeViewController {
 
 }
  
-// MARK: - ScrollView
 extension TimeViewController {
-    private func setPicker(with pages: Int = 3) {
-        pickerView.delegate = self
-        pickerView.dataSource = self
+    private func setPageControl() {
+        var pages = 0
+        let numberOfItems = pickerView.numberOfItems(inSection: 0)
+        switch numberOfItems {
+        case 1...16: pages = 1
+        case 17...32: pages = 2
+        case 9...48: pages = 3
+        case 49...60: pages = 4
+        default: break
+        }
         pageControl.numberOfPages = pages
+        updateDateView(page: 0)
     }
 }
     
@@ -286,8 +346,8 @@ private extension TimeViewController {
         collectionView: chipCollectionView,
         cellProvider: { (collectionView, indexPath, selectedTime: String) ->
           UICollectionViewCell? in
-            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DeleteChipCell.identifier, for: indexPath)
-                    as? DeleteChipCell else {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: BasicChipCell.identifier, for: indexPath)
+                    as? BasicChipCell else {
                 return UICollectionViewCell()
             }
             cell.configure(selectedTime)
@@ -300,7 +360,6 @@ private extension TimeViewController {
         var snapshot = dataSource.snapshot()
         let previousItems = snapshot.itemIdentifiers(inSection: .meetingTime)
         snapshot.deleteItems(previousItems)
-        snapshot.appendItems(times, toSection: .meetingTime)
         snapshot.appendItems(times, toSection: .meetingTime)
         dataSource.apply(snapshot)
     }
@@ -316,26 +375,40 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 32
+        return promiseList.count * 4
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TimeCheckCell", for: indexPath)
                 as? TimeCheckCell else {
             return UICollectionViewCell()
-            
         }
-//        cell.configure(with: categories[indexPath.row])
+        let dateCol = indexPath.row / 4
+        let timeRow = indexPath.row % 4
+        
+        let data = promiseList[dateCol].status[timeRow]
+        
+        cell.configure(status: data)
+
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let cell = collectionView.cellForItem(at: indexPath) as! TimeCheckCell
-        cell.onSelected()
-        // 아이템 담기, 빼기
-//        print("😉",indexPath.row)
-        
+        let dateCol = indexPath.row / 4
+        let timeRow = indexPath.row % 4
+        cellSelection.accept(indexPath.row)
+        let data = promiseList[dateCol].status[timeRow]
+        if data == .selected {
+            promiseList[dateCol].status[timeRow] = .notSelected
+        } else if data == .notSelected{
+            promiseList[dateCol].status[timeRow] = .selected
+        } else {
+            promiseList[dateCol].status[timeRow] = .disabled
+        }
+        cell.changeImage(with: promiseList[dateCol].status[timeRow])
     }
+    
     
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         if let pageOffset = ScrollPageController().pageOffset(
@@ -360,6 +433,7 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let pageNumber = round(scrollView.contentOffset.x / scrollView.frame.size.width)
         pageControl.currentPage = Int(pageNumber)
+        updateDateView(page: Int(pageNumber))
     }
 
     private func pageOffsets(in scrollView: UIScrollView) -> [CGFloat] {
@@ -368,19 +442,26 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
                          .map { $0.frame.minX - scrollView.adjustedContentInset.left }
     }
     
-    
+    func updateDateView(page: Int) {
+        let start = 4 * page
+        var arr: [String] = []
+        for i in start...start+3 {
+            arr.append(promiseList[i].dateLabel)
+        }
+        self.dateView.configure(with: arr)
+    }
     
 }
 
 // MARK: - Preview
 
-//#if canImport(SwiftUI) && DEBUG
-//import SwiftUI
-//
-//struct TimeViewController_Preview: PreviewProvider {
-//    static var previews: some View {
-//        let viewmodel = TimeViewModel(joinGuestUseCase: JoinGuestUseCase(), joinHostUseCase: nil)
-//      TimeViewController(viewmodel: viewmodel, userMode: .guest)).toPreview()
-//    }
-//}
-//#endif
+#if canImport(SwiftUI) && DEBUG
+import SwiftUI
+
+struct TimeViewController_Preview: PreviewProvider {
+    static var previews: some View {
+        let viewmodel = TimeViewModel(joinHostUseCase: JoinHostUseCase())
+        TimeViewController(viewmodel: viewmodel, userMode: .host).toPreview()
+    }
+}
+#endif
