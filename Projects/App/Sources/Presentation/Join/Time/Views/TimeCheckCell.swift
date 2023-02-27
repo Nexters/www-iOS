@@ -37,7 +37,6 @@ final class TimeCheckCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.imageView.removeFromSuperview()    
         imageView.image = nil
     }
     
