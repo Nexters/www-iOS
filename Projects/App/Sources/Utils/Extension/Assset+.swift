@@ -10,6 +10,9 @@ import Foundation
 
 public enum WWWAssset: String {
     
+    // AppIcon
+    case appIcon
+    
     // WWW icon
     case chevron_left
     case link
