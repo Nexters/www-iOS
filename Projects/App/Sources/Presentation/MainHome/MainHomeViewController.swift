@@ -290,7 +290,8 @@ extension MainHomeViewController {
         dimView.enterWithCodeButton.rx.tap
             .asDriver()
             .drive(onNext: { [weak self] in
-                let vm = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
+                let usecase = JoinGuestUseCase(meetingJoinRepository: JoinMeetingDAO(network: MeetingAPIManager.provider))
+                let vm = RoomCodeViewModel(joinGuestUseCase: usecase)
                 self?.navigationController?.pushViewController(RoomCodeController(viewModel: vm), animated: true)
             }).disposed(by: bag)
     }

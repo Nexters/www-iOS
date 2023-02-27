@@ -11,5 +11,4 @@ import Foundation
 struct WrappedPlace: Hashable {
     let isFromLocal: Bool
     let place: Place
-    
 }

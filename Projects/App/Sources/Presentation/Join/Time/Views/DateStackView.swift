@@ -19,7 +19,6 @@ final class DateStackView: UIView {
     }(UIStackView())
     
     private lazy var dateLabel1: UILabel = {
-        $0.text = "25 (토)"
         $0.textAlignment = .center
         $0.textColor = UIColor.wwwColor(.WWWBlack)
         $0.font = UIFont.www.body4
@@ -27,7 +26,6 @@ final class DateStackView: UIView {
     }(UILabel())
     
     private lazy var dateLabel2: UILabel = {
-        $0.text = "26 (일)"
         $0.textAlignment = .center
         $0.textColor = UIColor.wwwColor(.WWWBlack)
         $0.font = UIFont.www.body4
@@ -35,7 +33,6 @@ final class DateStackView: UIView {
     }(UILabel())
     
     private lazy var dateLabel3: UILabel = {
-        $0.text = "27 (월)"
         $0.textAlignment = .center
         $0.textColor = UIColor.wwwColor(.WWWBlack)
         $0.font = UIFont.www.body4
@@ -43,7 +40,6 @@ final class DateStackView: UIView {
     }(UILabel())
     
     private lazy var dateLabel4: UILabel = {
-        $0.text = "28 (화)"
         $0.textAlignment = .center
         $0.textColor = UIColor.wwwColor(.WWWBlack)
         $0.font = UIFont.www.body4
@@ -58,6 +54,13 @@ final class DateStackView: UIView {
     
     required init(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func configure(with dates : [String]) {
+        dateLabel1.text = dates[0]
+        dateLabel2.text = dates[1]
+        dateLabel3.text = dates[2]
+        dateLabel4.text = dates[3]
     }
     
     

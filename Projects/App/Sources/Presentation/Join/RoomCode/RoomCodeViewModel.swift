@@ -28,6 +28,7 @@ final class RoomCodeViewModel: BaseViewModel {
     
     struct Output {
         var nextButtonMakeEnable = BehaviorRelay<Bool>(value: false)
+        var makeErrorWithMessage = PublishRelay<String>()
         var navigatePage = PublishRelay<RoomCodePager>()
     }
     
@@ -68,8 +69,21 @@ final class RoomCodeViewModel: BaseViewModel {
             .disposed(by: disposeBag)
         
         input.nextButtonDidTap
-            .subscribe(onNext: {
-                output.navigatePage.accept(.nickName)
+            .subscribe(onNext: { [weak self] in
+                self?.usecase.checkMeetingRoomAvailable()
+                    .subscribe(onNext: { result in
+                        switch result {
+                        case .success(let status):
+                            if status == true {
+                                output.navigatePage.accept(.nickName)
+                            }
+                        case .failure(let error):
+                            print(error.localizedMsg)
+                            output.makeErrorWithMessage.accept(error.localizedMsg)
+                        }
+                    })
+                    .disposed(by: disposeBag)
+                
             })
             .disposed(by: disposeBag)
         

@@ -203,13 +203,13 @@ private extension UserNameViewController {
 
 // MARK: - Preview
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct UserNameViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase(), joinHostUseCase: nil)
-        UserNameViewController(viewModel: viewModel, userMode: .host).toPreview()
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct UserNameViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewModel = UserNameViewModel(joinGuestUseCase: JoinGuestUseCase(), joinHostUseCase: nil)
+//        UserNameViewController(viewModel: viewModel, userMode: .host).toPreview()
+//    }
+//}
+//#endif
