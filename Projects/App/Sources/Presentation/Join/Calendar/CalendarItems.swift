@@ -132,23 +132,43 @@ final class DayRangeIndicatorView: UIView {
             }
         }
         
-        dayRowFrames.enumerated().forEach { index, dayRowFrame in
-            
+        let maxIndex = dayRowFrames.count - 1
+        
+        if dayRowFrames.count == 1 {
             var roundedRectanglePath = UIBezierPath()
-            // TODO: - 시작점, 끝점에 대한 UI처리... (디테일한거 어려워효...)
-//            if dayRowFrame.width == WINDOW_WIDTH - 40 // 길이로 판단
-//            if index == 0 {
-//                roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topLeft, .bottomLeft], cornerRadii: .init(width: 30, height: 30))
-//            } else if index == dayRowFrames.count - 1 {
-//                roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topRight, .bottomRight], cornerRadii: .init(width: 30, height: 30))
-//            } else {
-//                roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, cornerRadius: 6)
-//            }
-            
-            roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, cornerRadius: 30)
+            roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrames.first!, cornerRadius: 30)
             context?.addPath(roundedRectanglePath.cgPath)
             context?.fillPath()
+        } else {
+            dayRowFrames.enumerated().forEach { index, dayRowFrame in
+                var roundedRectanglePath = UIBezierPath().cgPath
+                
+                if index == 0 {
+                    roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topLeft, .bottomLeft], cornerRadii: .init(width: 30, height: 30)).cgPath
+                    
+                    let a = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topLeft, .bottomLeft], cornerRadii: .init(width: 30, height: 30))
+                    
+                    let rounded6 = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topRight, .bottomRight], cornerRadii: .init(width: 6, height: 6)).cgPath
+                    
+                    if #available(iOS 16.0, *) {
+                        roundedRectanglePath = roundedRectanglePath.intersection(rounded6)   
+                    }
+                } else if index == maxIndex {
+                    roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topRight, .bottomRight], cornerRadii: .init(width: 30, height: 30)).cgPath
+                    let rounded6 = UIBezierPath(roundedRect: dayRowFrame, byRoundingCorners: [.topLeft, .bottomLeft], cornerRadii: .init(width: 6, height: 6)).cgPath
+                    if #available(iOS 16.0, *) {
+                        roundedRectanglePath = roundedRectanglePath.intersection(rounded6)
+                    }
+                } else {
+                    roundedRectanglePath = UIBezierPath(roundedRect: dayRowFrame, cornerRadius: 6).cgPath
+                }
+                
+                context?.addPath(roundedRectanglePath)
+                context?.fillPath()
+            }
         }
+        
+        
     }
     
 }

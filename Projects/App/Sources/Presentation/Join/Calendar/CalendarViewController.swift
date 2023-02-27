@@ -14,8 +14,8 @@ import HorizonCalendar
 final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
-    private let disposeBag = DisposeBag()
-    private let viewModel: CalendarViewModel
+    private let bag = DisposeBag()
+    var viewModel: CalendarViewModel?
     private var selectedStartDay: Day? = nil
     private var selectedEndDay: Day? = nil
     private var defaultDate = Date()
@@ -49,8 +49,7 @@ final class CalendarViewController: UIViewController {
         setUI()
         configUI()
         setNavigationBar(title: "캘린더")
-        bindRx()
-        setAction()
+        bindVM()
     }
     
     private func setUI() {
@@ -93,14 +92,31 @@ final class CalendarViewController: UIViewController {
         calendarView.layoutMargins = .init(top: 0, left: 0, bottom: 0, right: 0)
         calendarView.daySelectionHandler = { [weak self] day in
             guard let self else { return }
-            // TODO: - 동작에 따라 start, end 수정하는 부분 - 안드와 맞추기
+            // 1. 아무것도 선택x -> 둘다 nil(selectedStartDay nil) -> start == end 선택
             if self.selectedStartDay == nil {
                 self.selectedStartDay = day
                 self.selectedEndDay = day
-//                print("startDay", self.selectedStartDay)
-            } else {
-                self.selectedEndDay = day
-//                print("endDay", self.selectedEndDay)
+                self.titleView.subtitleLabel.text =
+                "\(self.selectedStartDay) - "
+                self.nextButton.setButtonState(false)
+            } // 2. 하나 선택 -> 둘다 nil이 아니고 같음 -> start~end 선택
+            else if self.selectedStartDay == self.selectedEndDay {
+                if self.isAfter14Days(from: self.selectedStartDay, to: day) {
+                    // TODO: Toast 띄우기
+                    print("14일 이내만 가능")
+                    "\(self.selectedStartDay) - "
+                    self.nextButton.setButtonState(false)
+                } else {
+                    self.selectedEndDay = day
+                    self.titleView.subtitleLabel.text = "\(self.selectedStartDay) - \(self.selectedEndDay)"
+                    self.nextButton.setButtonState(true)
+                }
+            } // 3. 둘다 선택 -> 둘다 nil이 아니고 다름 -> start, end nil로 만듬
+            else {
+                self.selectedStartDay = nil
+                self.selectedEndDay = nil
+                self.titleView.subtitleLabel.text = "약속 날짜 범위 내에서 가능한 날짜를 투표하게 됩니다."
+                self.nextButton.setButtonState(false)
             }
             
             let newContent = self.makeContent()
@@ -140,6 +156,23 @@ final class CalendarViewController: UIViewController {
     
     private func bindRx() {
         
+    private func bindVM() {
+//        let output = viewModel?.transform(input: .init(
+//            viewDidLoad: Observable.just(()),
+//            nextButtonDidTap: Observable.just(()),
+//            backButtonDidTap: Observable.just(()),
+//            selectStartDate: <#T##Observable<Date>#>,
+//            selectEndDate: <#T##Observable<Date>#>), disposeBag: bag)
+    }
+    
+    private func isAfter14Days(from start: Day?, to end: Day?) -> Bool {
+        print(start, end)
+        print(start?.day, end?.day)
+        if end!.day > start!.day + 14 {
+            return true
+        }
+        // TODO: day -> Date , 14일 계산
+        return false
     }
 }
 
@@ -167,8 +200,8 @@ extension CalendarViewController {
             endDate = calendar.date(from: DateComponents(year: selectedEndDay.month.year, month: selectedEndDay.month.month, day: selectedEndDay.day))!
         }
         
-        var selectedDateRange: ClosedRange<Date> = ClosedRange<Date>(uncheckedBounds: (lower:   min(startDate, endDate), upper: max(startDate, endDate))) // default: defaultDate~defaultDate
-            selectedDateRange = startDate <= endDate ? startDate...endDate : endDate...startDate
+        var selectedDateRange: ClosedRange<Date> = ClosedRange<Date>(uncheckedBounds: (lower: startDate, upper: endDate))
+            selectedDateRange = startDate...endDate
         
       return CalendarViewContent(
         calendar: calendar,

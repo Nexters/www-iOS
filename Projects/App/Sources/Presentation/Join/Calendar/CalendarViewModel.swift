@@ -24,6 +24,8 @@ final class CalendarViewModel: BaseViewModel {
         let viewDidLoad: Observable<Void>
         let nextButtonDidTap: Observable<Void>
         let backButtonDidTap: Observable<Void>
+//        let selectStartDate: Observable<Date>
+//        let selectEndDate: Observable<Date>
     }
     
     struct Output {
