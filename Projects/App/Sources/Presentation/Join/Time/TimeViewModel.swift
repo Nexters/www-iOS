@@ -75,8 +75,8 @@ final class TimeViewModel: BaseViewModel {
                                                   end: (usecaseGuest?.endDate)!)
             return promiseList
         case .host:
-            promiseList = makePromiseDateViewData(start: (usecaseHost?.startDate)! ,
-                                                  end: (usecaseHost?.endDate)!)
+            promiseList = makePromiseDateViewData(start: try! (usecaseHost?.startDate)!.value(),
+                                                  end: try!  (usecaseHost?.endDate)!.value())
             return promiseList
         }
     }
@@ -173,9 +173,9 @@ extension TimeViewModel {
         
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
-                let start = self?.usecaseHost?.startDate?.formatted("MM월 dd일 (E)")
-                let end = self?.usecaseHost?.endDate?.formatted("MM월 dd일 (E)")
-                output.fetchSubTitleText.accept("\(start!) - \(end!)")
+                let start = try! ( self?.usecaseHost?.startDate)!.value().formatted("MM월 dd일 (E)")
+                let end = try! ( self?.usecaseHost?.endDate)!.value().formatted("MM월 dd일 (E)")
+                output.fetchSubTitleText.accept("\(start) - \(end)")
                 output.initSelected.accept([])
                 output.naviTitleText.accept(try! (self?.usecaseHost!.roomName)!.value())
             })
