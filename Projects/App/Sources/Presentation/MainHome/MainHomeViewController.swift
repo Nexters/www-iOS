@@ -40,7 +40,7 @@ final class MainHomeViewController: UIViewController {
     private let titleLabel: UIImageView = {
         let label = UIImageView()
         label.contentMode = .scaleAspectFit
-        label.image = UIImage(.union2)
+        label.image = UIImage(.logo_type3)
         return label
     }()
     

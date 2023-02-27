@@ -43,8 +43,8 @@ public enum WWWAssset: String {
     case calendar
     case place
     case promiseFrame
-    case union1
-    case union2
+    case logo_type2
+    case logo_type3
     case floating_add
     case floating_cancel
     case votingBox
