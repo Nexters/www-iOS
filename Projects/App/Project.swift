@@ -22,5 +22,6 @@ let project = Project.app(name: projectName,
                             .external(name: "RxMoya"),
                             .external(name: "SnapKit"),
                             .external(name: "DeviceKit"),
-                            .external(name: "HorizonCalendar")
+                            .external(name: "HorizonCalendar"),
+                            .external(name: "Toast")
                           ])

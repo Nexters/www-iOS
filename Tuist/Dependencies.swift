@@ -30,6 +30,10 @@ let dependencies = Dependencies(
         .remote(
             url: "https://github.com/airbnb/HorizonCalendar.git",
             requirement: .upToNextMajor(from: "1.16.0")
+        ),
+        .remote(
+            url: "https://github.com/scalessec/Toast-Swift.git",
+            requirement: .upToNextMajor(from: "5.0.0")
         )
     ],
     platforms: [.iOS]
