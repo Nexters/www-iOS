@@ -14,6 +14,7 @@ enum JoinMeetingError: Error {
     case roomDoesntExist
     case userDoesntExist
     case roomAlreadyStarted
+    case alreadyInRoom
     case unknown
     
     public var localizedMsg: String {
@@ -28,6 +29,8 @@ enum JoinMeetingError: Error {
             return "존재하지 않는 유저입니다. 앱을 재설치해주세요!"
         case .roomAlreadyStarted:
             return "이미 투표가 시작되어 참가할 수 없습니다."
+        case .alreadyInRoom:
+            return "이미 참여된 약속방입니다."
         case .unknown:
             return "다시 참여를 시도해주세요."
         }

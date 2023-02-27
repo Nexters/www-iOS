@@ -13,4 +13,7 @@ protocol MeetingJoinRepository {
 //    func fetchMeetingStatusWithCode(with code: String) -> Observable<MeetingInfoToJoin>
     
     func fetchMeetingStatusWithCode(with code: String) -> Observable<Result<MeetingInfoToJoin, JoinMeetingError>>
+    
+    func postMeeting(meetingId: Int, username: String, times: [SelectedTime], places: ([WrappedPlace])) -> Observable<Result<MeetingJoinResponseDTO, JoinMeetingError>>
+
 }

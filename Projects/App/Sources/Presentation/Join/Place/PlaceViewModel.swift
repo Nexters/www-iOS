@@ -15,6 +15,7 @@ enum PlacePager {
     case back
     case completion
     case roomMain
+    case errorAlert(msg: String)
 }
 
 final class PlaceViewModel: BaseViewModel {
@@ -251,8 +252,16 @@ extension PlaceViewModel {
                         placelist += places
                     }
                     .disposed(by: disposeBag)
-                self?.hostUsecase?.addMyPlaces(placelist)
-                output.navigatePage.accept(.roomMain)
+                self?.guestUsecase?.addMyPlaces(placelist)
+                self?.guestUsecase?.joinMeetingRoom()
+                    .subscribe(onNext: { msg in
+                        if msg == "성공" {
+                            output.navigatePage.accept(.roomMain)
+                        } else {
+                            output.navigatePage.accept(.errorAlert(msg: msg))
+                        }
+                    })
+                    .disposed(by: disposeBag)
             })
             .disposed(by: disposeBag)
         

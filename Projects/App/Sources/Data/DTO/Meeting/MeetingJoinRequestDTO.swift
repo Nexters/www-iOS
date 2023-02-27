@@ -8,7 +8,6 @@
 
 import Foundation
 
-// MARK: - Welcome
 struct MeetingJoinRequestDTO: Codable {
     let nickname: String
     let promisePlaceList: [String]

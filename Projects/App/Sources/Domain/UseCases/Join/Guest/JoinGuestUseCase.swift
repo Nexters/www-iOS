@@ -87,6 +87,44 @@ final class JoinGuestUseCase: JoinGuestUseCaseProtocol {
         return result
     }
     
+    func joinMeetingRoom() -> Observable<String> {
+        meetingJoinRepository.postMeeting(meetingId: id, username: try! userName.value(), times: selectedTimes, places: myPlaceList)
+            .flatMap { [weak self] result -> Observable<String> in
+                switch result {
+                case .success(let data):
+                    if data.code == 0 {
+                        debugPrint("🚪방생성🚪",data) // TODO: 삭제
+                        return Observable.just("성공")
+                    } else {
+                        return Observable.just(self?.meetingJoinRepository.mapJoinMeetingError(from: data.code).localizedMsg ?? JoinMeetingError.unknown.localizedMsg)
+                    }
+                case .failure(let error):
+                    print("Error: \(error)")
+                    return Observable.empty()
+                }
+            }
+    }
+    
+    private func mapJoinMeetingError(from errorCode: Int) -> JoinMeetingError {
+        switch errorCode {
+        case 403:
+            return .accessDenied
+        case 500:
+            return .serverError
+        case 1000:
+            return .serverError
+        case 3001:
+            return .alreadyInRoom
+        case 4000:
+            return .roomDoesntExist
+        case 4001:
+            return .userDoesntExist
+        case 5000:
+            return .roomAlreadyStarted
+        default:
+            return .unknown
+        }
+    }
 
 }
 

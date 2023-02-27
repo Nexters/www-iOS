@@ -25,7 +25,7 @@ public class RxMoyaProvider<Target>: MoyaProvider<Target> where Target: TargetTy
         cancellableToken?.cancel()
       }
     }.observe(on: SerialDispatchQueueScheduler(qos: .background))
-  }
+  }    
 }
 
 class LoggerPlugin: PluginType {
