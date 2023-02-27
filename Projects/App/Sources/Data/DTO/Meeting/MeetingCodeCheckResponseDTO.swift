@@ -36,7 +36,7 @@ extension MeetingCodeCheckResponseDTO {
         let joinedUserInfoList: [UserInfoList]
         let userPromiseDateTimeList: [UserPromiseDateTimeList]
         let userPromisePlaceList: [UserPromisePlaceList]
-        let meetingStatus: String
+        let meetingStatus: MeetingStatus
         var userVoteList: [Vote]
         
         enum CodingKeys: String, CodingKey {
