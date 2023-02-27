@@ -15,7 +15,14 @@ final class CalendarViewController: UIViewController {
     
     // MARK: - Properties
     private let bag = DisposeBag()
-    var viewModel: CalendarViewModel?
+    private let viewModel: CalendarViewModel
+    lazy var input = CalendarViewModel.Input(
+        viewDidLoad: Observable.just(()),
+        nextButtonDidTap: self.nextButton.rx.tap.asObservable(),
+        backButtonDidTap: self.navigationItem.leftBarButtonItem!.rx.tap.asObservable(),
+        selectStartDate: .init(value: defaultDate),
+        selectEndDate: .init(value: defaultDate))
+    
     private var selectedStartDay: Day? = nil
     private var selectedEndDay: Day? = nil
     private var defaultDate = Date()
@@ -28,7 +35,6 @@ final class CalendarViewController: UIViewController {
     
     private lazy var nextButton: LargeButton = {
         $0.setTitle("다음", for: .normal)
-        $0.setButtonState(true) // TODO: 화면 전환 연결용 -> 삭제
         return $0
     }(LargeButton(state: false))
     
@@ -49,6 +55,7 @@ final class CalendarViewController: UIViewController {
         setUI()
         configUI()
         setNavigationBar(title: "캘린더")
+        setAction()
         bindVM()
     }
     
@@ -96,27 +103,30 @@ final class CalendarViewController: UIViewController {
             if self.selectedStartDay == nil {
                 self.selectedStartDay = day
                 self.selectedEndDay = day
+                self.input.selectStartDate.onNext((self.selectedStartDay?.convertToDate())!)
+                self.input.selectEndDate.onNext((self.selectedEndDay?.convertToDate())!)
+                
                 self.titleView.subtitleLabel.text =
-                "\(self.selectedStartDay) - "
-                self.nextButton.setButtonState(false)
+                "\(self.selectedStartDay!) - "
             } // 2. 하나 선택 -> 둘다 nil이 아니고 같음 -> start~end 선택
             else if self.selectedStartDay == self.selectedEndDay {
-                if self.isAfter14Days(from: self.selectedStartDay, to: day) {
-                    // TODO: Toast 띄우기
-                    print("14일 이내만 가능")
-                    "\(self.selectedStartDay) - "
-                    self.nextButton.setButtonState(false)
-                } else {
+                
+                if self.isValidDays(from: self.selectedStartDay, to: day) {
                     self.selectedEndDay = day
-                    self.titleView.subtitleLabel.text = "\(self.selectedStartDay) - \(self.selectedEndDay)"
-                    self.nextButton.setButtonState(true)
+                    self.input.selectEndDate.onNext(day.convertToDate())
+                    self.titleView.subtitleLabel.text = "\(self.selectedStartDay!) - \(self.selectedEndDay!)"
+                } else {
+                    // TODO: Toast 띄우기
+                    self.input.selectEndDate.onNext(day.convertToDate())
+                    "\(self.selectedStartDay!) - "
                 }
             } // 3. 둘다 선택 -> 둘다 nil이 아니고 다름 -> start, end nil로 만듬
             else {
                 self.selectedStartDay = nil
                 self.selectedEndDay = nil
+                self.input.selectStartDate.onNext(self.defaultDate)
+                self.input.selectEndDate.onNext(self.defaultDate)
                 self.titleView.subtitleLabel.text = "약속 날짜 범위 내에서 가능한 날짜를 투표하게 됩니다."
-                self.nextButton.setButtonState(false)
             }
             
             let newContent = self.makeContent()
@@ -150,28 +160,35 @@ final class CalendarViewController: UIViewController {
             .asDriver()
             .drive(onNext: { [weak self] in
                 let viewmodel = TimeViewModel(joinHostUseCase: self!.viewModel.getUseCase())
+                
                 self?.navigationController?.pushViewController(TimeViewController(viewmodel: viewmodel, userMode: .host), animated: true)
-            }).disposed(by: disposeBag)
+            }).disposed(by: bag)
     }
-    
-    private func bindRx() {
         
     private func bindVM() {
-//        let output = viewModel?.transform(input: .init(
-//            viewDidLoad: Observable.just(()),
-//            nextButtonDidTap: Observable.just(()),
-//            backButtonDidTap: Observable.just(()),
-//            selectStartDate: <#T##Observable<Date>#>,
-//            selectEndDate: <#T##Observable<Date>#>), disposeBag: bag)
+        let output = viewModel.transform(input: input, disposeBag: bag)
+        
+        output.isNextButtonEnable
+            .subscribe(onNext: { [weak self] isEnable in
+                self?.nextButton.setButtonState(isEnable)
+            }).disposed(by: bag)
+        
+        output.toastMessage
+            .subscribe(onNext: { [weak self] msg in
+                // TODO: - Toast
+                print(msg)
+            }).disposed(by: bag)
     }
     
-    private func isAfter14Days(from start: Day?, to end: Day?) -> Bool {
-        print(start, end)
-        print(start?.day, end?.day)
-        if end!.day > start!.day + 14 {
+    private func isValidDays(from start: Day?, to end: Day?) -> Bool {
+        let startDate = start?.convertToDate()
+        let endDate = end?.convertToDate()
+        
+        let caledar = Calendar.current
+        let interval = caledar.dateComponents([.day], from: startDate!, to: endDate!).day ?? 0
+        if interval < 14 && interval >= 0 {
             return true
         }
-        // TODO: day -> Date , 14일 계산
         return false
     }
 }
@@ -239,6 +256,20 @@ extension CalendarViewController {
           DayRangeIndicatorView.calendarItemModel(invariantViewProperties: .init(), viewModel: .init(framesOfDaysToHighlight: dayRangeLayoutContext.daysAndFrames.map { $0.frame }))
       }
       
+    }
+}
+
+extension Day {
+    func convertToDate() -> Date {
+        let year = self.month.year
+        let month = self.month.month
+        let day = self.day
+        
+        let dateStr = "\(year)-\(month)-\(day)"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyy-MM-dd"
+        let date = formatter.date(from: dateStr)!
+        return date
     }
 }
 
