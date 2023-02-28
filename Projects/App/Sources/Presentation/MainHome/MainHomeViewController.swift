@@ -148,6 +148,9 @@ final class MainHomeViewController: UIViewController {
             textColor: .wwwColor(.Gray450),
             highlightTextColor: .wwwColor(.WWWGreen)
         )
+        label.snp.makeConstraints {
+            $0.height.equalTo(26)
+        }
         return label
     }()
     
