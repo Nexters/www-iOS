@@ -27,7 +27,7 @@ final class LaunchScreenViewModel: BaseViewModel {
     }
     
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
-        if UserDefaultKeyCase().getUserToken() == "" {
+        if UserDefaultKeyCase().getUserToken() == "" || UserDefaultKeyCase().getUserName() == "" {
             
             input.viewDidLoad
                 .flatMap { _ in
