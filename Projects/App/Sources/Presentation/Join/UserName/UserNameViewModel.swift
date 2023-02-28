@@ -98,7 +98,6 @@ extension UserNameViewModel {
         input.nextButtonDidTap
             .subscribe(onNext: {
                 output.navigatePage.accept(.timeslot)
-                UserDefaultKeyCase().setUserName(try! (self.usecaseGuest?.userName.value())!)
             })
             .disposed(by: disposeBag)
         
@@ -142,7 +141,6 @@ extension UserNameViewModel {
         input.nextButtonDidTap
             .subscribe(onNext: {
                 output.navigatePage.accept(.minUser)
-                UserDefaultKeyCase().setUserName(try! (self.usecaseHost?.userName.value())!)
             })
             .disposed(by: disposeBag)
         
