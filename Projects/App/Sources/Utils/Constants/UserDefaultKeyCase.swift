@@ -39,6 +39,16 @@ struct UserDefaultKeyCase {
         UserDefaults.standard.set(name, forKey: userName)
     }
     
+    private let onBoarding = "hasOnboarded"
+    
+    func getOnBoarding() -> Bool {
+        UserDefaults.standard.bool(forKey: onBoarding)
+    }
+    
+    func setOnBoarding(_ hasOnboarded: Bool) {
+        UserDefaults.standard.set(hasOnboarded, forKey: onBoarding)
+    }
+    
 }
 
 
