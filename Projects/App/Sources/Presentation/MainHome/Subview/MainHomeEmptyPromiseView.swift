@@ -9,6 +9,12 @@
 import UIKit
 
 final class MainHomeEmptyPromiseView: UIView {
+    
+    enum SelectedStatus: String {
+        case proceeding = "아직 진행 중인 약속이 없어요!"
+        case ended = "아직 종료된 약속이 없어요!"
+    }
+    
     private let messageLabel: UILabel = {
         let label = UILabel()
         label.textColor = .wwwColor(.Gray250)
@@ -16,9 +22,9 @@ final class MainHomeEmptyPromiseView: UIView {
         return label
     }()
     
-    init(message: String) {
+    init(status: SelectedStatus) {
         super.init(frame: .zero)
-        messageLabel.text = message
+        messageLabel.text = status.rawValue
         setUI()
     }
     
@@ -32,6 +38,10 @@ final class MainHomeEmptyPromiseView: UIView {
             $0.top.equalToSuperview()
             $0.centerX.equalToSuperview()
         }
+    }
+    
+    func changeStatus(status: SelectedStatus) {
+        messageLabel.text = status.rawValue
     }
     
 }
