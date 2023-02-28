@@ -73,7 +73,6 @@ final class RoomNameViewModel: BaseViewModel {
         
         input.nextButtonDidTap
             .subscribe(onNext: {
-                self.usecase.postMeeting()
                 output.navigatePage.accept(.nickName)
             })
             .disposed(by: disposeBag)

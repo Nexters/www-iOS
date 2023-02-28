@@ -10,6 +10,6 @@ import Foundation
 
 protocol MeetingCreateRepository {
     
-    func postMeeting()
+    func postMeeting(userName: String, meetingName: String, startDate: String, endDate: String, minMember: Int, selectedTime: [SelectedTime], placeList: [WrappedPlace])
 
 }

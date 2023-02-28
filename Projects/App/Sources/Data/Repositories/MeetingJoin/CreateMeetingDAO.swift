@@ -18,21 +18,30 @@ final class CreateMeetingDAO: MeetingCreateRepository {
         self.network = network
     }
     
-    func postMeeting() {
+    func postMeeting(
+        userName: String, meetingName: String, startDate: String, endDate: String, minMember: Int, selectedTime: [SelectedTime], placeList: [WrappedPlace]
+    ) {
+
+        var timelist: [PromiseDateTimeList] = []
+        for time in selectedTime {
+            let item = PromiseDateTimeList(promiseDate: time.promiseDate,
+                                promiseTime: time.promiseTime.rawValue)
+            timelist.append(item)
+        }
+        
+        var placelist: [String] = []
+        for place in placeList {
+            placelist += [place.place.title]
+        }
         
         let reqDTO = MeetingCreateRequestDTO(
-            userName: "정찬희",
-            meetingName: "약속이름은이걸로!",
-            startDate: "2023-03-05",
-            endDate: "2023-03-15",
-            minimumAlertMembers: 3,
-            promiseDateTimeList: [
-                PromiseDateTimeList(promiseDate: "2023-03-06",
-                                    promiseTime: "DINNER"),
-                PromiseDateTimeList(promiseDate: "2023-03-06",
-                                    promiseTime: "LUNCH"),
-            ],
-            promisePlaceList: ["신논현역", "신분당선어딘가"]
+            userName: userName,
+            meetingName: meetingName,
+            startDate: startDate,
+            endDate: endDate,
+            minimumAlertMembers: minMember,
+            promiseDateTimeList: timelist,
+            promisePlaceList: placelist
         )
         
         self.network.request(.createMeeting(body: reqDTO))
@@ -41,16 +50,6 @@ final class CreateMeetingDAO: MeetingCreateRepository {
             }
             .disposed(by: disposeBag)
         
-        
-//        {
-//          "code": 0,
-//          "message": "Success",
-//          "result": {
-//            "meetingCode": "GhaGOT",
-//            "shortLink": "https://whenwheres.page.link/YYd5uL8P7nD2zoVH9"
-//          }
-//        }
-//
     }
     
 }
