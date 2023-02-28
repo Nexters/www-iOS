@@ -69,7 +69,7 @@ final class CompletionViewcController: UIViewController {
         $0.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
         $0.layer.borderWidth = 1
         $0.layer.cornerRadius = 21
-        $0.setTitle(" 링크 복사하기", for: .normal)
+        $0.setTitle(" 코드 복사하기", for: .normal)
         $0.setTitleColor(.wwwColor(.WWWBlack).withAlphaComponent(0.7), for: .highlighted)
         $0.titleLabel?.font = .www.body3
         $0.setTitleColor(.wwwColor(.WWWBlack), for: .normal)
