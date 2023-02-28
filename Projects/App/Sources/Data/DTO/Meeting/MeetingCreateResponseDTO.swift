@@ -14,7 +14,11 @@ struct MeetingCreateResponseDTO: Codable {
     let result: Result
 }
 
-struct Result: Codable {
-    let meetingCode: String
-    let shortLink: String
+extension MeetingCreateResponseDTO {
+    
+    struct Result: Codable {
+        let meetingCode: String
+        let shortLink: String
+    }
+    
 }
