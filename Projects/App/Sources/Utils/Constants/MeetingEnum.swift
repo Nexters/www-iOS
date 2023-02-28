@@ -74,7 +74,7 @@ extension PromiseTime {
     }
 }
 
-enum YacksokoiType: String, Codable {
+enum YaksokiType: String, Codable {
     case eat = "EAT"
     case play = "PLAY"
     case rest = "REST"

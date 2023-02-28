@@ -325,7 +325,9 @@ extension MainHomeViewController {
         
         let output = viewModel?.transform(input: input, disposeBag: bag)
         
-        output?.mainHomeMeeting.subscribe(onSuccess: { [weak self] in
+        output?.mainHomeMeeting
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] in
             print("mainHomeMeeting",$0)
             self?.fetchedMainHomeMeeting = $0
             self?.maxIndex = $0.proceedingMeetings.count

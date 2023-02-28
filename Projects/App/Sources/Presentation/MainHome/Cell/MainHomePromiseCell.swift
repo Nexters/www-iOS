@@ -189,7 +189,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
         statusLabel.text = data.meetingStatus.toText(data.confirmedDate?.toDate())
         titleLabel.text = data.meetingName
         usersLabel.text = "\(data.votingUserCount)/\(data.joinedUserCount)"
-        characterImgView.image = data.yaksoki.toImg()
+        characterImgView.image = data.yaksokiType.toImg()
         if let confirmedDate = data.confirmedDate, let confirmedTime = data.confirmedTime {
             dateLabel.textColor = .wwwColor(.Gray700)
             dateLabel.text = "\(confirmedDate)• \(confirmedTime.toText())"
