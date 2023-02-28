@@ -57,13 +57,13 @@ extension MeetingAPI: TargetType {
     }
     
     var headers: [String : String]? {
-        let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjc2ODAzNzQyLCJleHAiOjkyMjMzNzIwMzY4NTQ3NzV9.I_uOzywGtMG0bxX5Yot13103RPHeDfXILhGoDthaBcaMcl26WN7OXp0Hg3u_ksLpZpZtIIt828kj5u7Tgc523Q"
+        // let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjc2ODAzNzQyLCJleHAiOjkyMjMzNzIwMzY4NTQ3NzV9.I_uOzywGtMG0bxX5Yot13103RPHeDfXILhGoDthaBcaMcl26WN7OXp0Hg3u_ksLpZpZtIIt828kj5u7Tgc523Q"
         switch self {
         case .getMeetings:
             return ["Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
         case .checkMeetingCode, .joinMeeting:
             return ["Content-Type": "application/json",
-                    "Authorization": "Bearer " + testToken]
+                    "Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
         }
     }
 }
