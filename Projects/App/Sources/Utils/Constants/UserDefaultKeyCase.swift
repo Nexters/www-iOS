@@ -28,6 +28,17 @@ struct UserDefaultKeyCase {
     func setIsPushAlarmOn(_ isPushAlarm: Bool) {
         UserDefaults.standard.set(isPushAlarm, forKey: isPushAlarmOn)
     }
+    
+    private let userName = "userName"
+    
+    func getUserName() -> String {
+        UserDefaults.standard.string(forKey: userName) ?? ""
+    }
+    
+    func setUserName(_ name: String) {
+        UserDefaults.standard.set(name, forKey: userName)
+    }
+    
 }
 
 
