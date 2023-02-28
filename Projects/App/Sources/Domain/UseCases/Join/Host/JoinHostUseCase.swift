@@ -29,6 +29,7 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     var placeList = AsyncSubject<[WrappedPlace]>()
     var startDate = BehaviorSubject<Date>(value: Date())
     var endDate = BehaviorSubject<Date>(value: Date())
+    var roomcode = ""
     internal var selectedTimes: [SelectedTime] = []
     internal var myPlaceList: [WrappedPlace] = []
     
@@ -65,18 +66,22 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
         self.endDate.onNext(date)
     }
     
-    func postMeeting() {
+    
+    func postMeeting() -> Observable<String> {
         let start = try! self.startDate.value()
         let end = try! self.endDate.value()
-        
-        self.meetingCreateRepository.postMeeting(userName: try! self.userName.value(),
+
+        return self.meetingCreateRepository.postMeeting(userName: try! self.userName.value(),
                                                  meetingName: try! self.roomName.value(),
                                                  startDate: start.formatted("yyyy-MM-dd"),
                                                  endDate: end.formatted("yyyy-MM-dd"),
                                                  minMember: try! self.minUser.value(),
                                                  selectedTime: self.selectedTimes,
                                                  placeList: self.myPlaceList)
-        print("🚗🚗🚗🚗🚗미팅을 만들어봄!🚗🚗🚗🚗🚗")
+            .map { result in
+                self.roomcode = result.meetingCode
+                return result.meetingCode
+            }
     }
     
 }

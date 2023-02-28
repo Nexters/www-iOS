@@ -9,6 +9,7 @@
 import Foundation
 
 enum JoinMeetingError: Error {
+    case mapping
     case accessDenied
     case serverError
     case roomDoesntExist
@@ -31,7 +32,7 @@ enum JoinMeetingError: Error {
             return "이미 투표가 시작되어 참가할 수 없습니다."
         case .alreadyInRoom:
             return "이미 참여된 약속방입니다."
-        case .unknown:
+        case .unknown, .mapping:
             return "다시 참여를 시도해주세요."
         }
     }

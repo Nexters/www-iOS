@@ -201,7 +201,6 @@ extension CompletionViewcController {
     }
     
     private func setMotion() {
-        //TODO: - GUI 변경 및 모션디테일 수정
         motionGenerator.applyParallaxEffect(to: imageView, magnitue: -40)
         motionGenerator.applyParallaxEffect(to: donutView, magnitue: 30)
         motionGenerator.applyParallaxEffect(to: heartView, magnitue: 20)
@@ -227,6 +226,7 @@ private extension CompletionViewcController {
         output.copiedRoomInfo
             .asDriver(onErrorJustReturn: "")
             .drive(onNext: { [weak self] text in
+                UIPasteboard.general.string = String((text))
                 self?.hapticGenerator.notificationOccurred(.success)
             })
             .disposed(by: disposeBag)

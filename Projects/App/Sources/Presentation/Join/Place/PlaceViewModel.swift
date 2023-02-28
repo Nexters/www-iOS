@@ -156,9 +156,16 @@ extension PlaceViewModel {
                     .disposed(by: disposeBag)
                 self?.hostUsecase?.addMyPlaces(placelist)
                 
-                self?.hostUsecase?.postMeeting() // TODO: 작업해야함!
+                self?.hostUsecase?.postMeeting()
+                    .subscribe(onNext: {code in
+                        if code != "" {
+                            output.navigatePage.accept(.completion)
+                        } else {
+                            output.navigatePage.accept(.errorAlert(msg: "약속방 생성에 실패했어요🥲"))
+                        }
+                    })
+                    .disposed(by: disposeBag)
                 
-                output.navigatePage.accept(.completion)
             })
             .disposed(by: disposeBag)
         

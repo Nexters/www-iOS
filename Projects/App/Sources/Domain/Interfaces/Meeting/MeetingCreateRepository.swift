@@ -7,9 +7,10 @@
 //
 
 import Foundation
+import RxSwift
 
 protocol MeetingCreateRepository {
     
-    func postMeeting(userName: String, meetingName: String, startDate: String, endDate: String, minMember: Int, selectedTime: [SelectedTime], placeList: [WrappedPlace])
+    func postMeeting(userName: String, meetingName: String, startDate: String, endDate: String, minMember: Int, selectedTime: [SelectedTime], placeList: [WrappedPlace]) -> RxSwift.Observable<MeetingCodeLinkInfo>
 
 }

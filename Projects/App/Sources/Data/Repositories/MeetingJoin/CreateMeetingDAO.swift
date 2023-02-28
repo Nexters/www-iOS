@@ -20,7 +20,7 @@ final class CreateMeetingDAO: MeetingCreateRepository {
     
     func postMeeting(
         userName: String, meetingName: String, startDate: String, endDate: String, minMember: Int, selectedTime: [SelectedTime], placeList: [WrappedPlace]
-    ) {
+    ) -> RxSwift.Observable<MeetingCodeLinkInfo> {
 
         var timelist: [PromiseDateTimeList] = []
         for time in selectedTime {
@@ -44,18 +44,20 @@ final class CreateMeetingDAO: MeetingCreateRepository {
             promisePlaceList: placelist
         )
         
-        self.network.request(.createMeeting(body: reqDTO))
-            .bind { response in
-                print("🚧🚧🚧🚧",response)
-            }
-            .disposed(by: disposeBag)
-        
+        return self.network.request(.createMeeting(body: reqDTO))
+            .map(MeetingCreateResponseDTO.self)
+            .compactMap({ response in
+                return MeetingCodeLinkInfo(meetingCode: response.result.meetingCode,
+                                    shortLink: response.result.shortLink)
+            }).asObservable()
+           
     }
+    
     
 }
 
 
-extension MeetingJoinRepository {
+extension MeetingCreateRepository {
      func mapCreateMeetingError(from errorCode: Int) -> JoinMeetingError {
         switch errorCode {
         case 403:
