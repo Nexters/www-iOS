@@ -24,6 +24,12 @@ final class PlaceVoteCell: UITableViewCell {
     static let id = "PlaceVoteCell"
     
     private var isClicked = false
+    private var isGradient = false
+    
+    private let container: UIView = {
+        $0.layer.cornerRadius = 15
+        return $0
+    }(UIView())
     
     private let containerView: UIView = {
         $0.layer.cornerRadius = 15
@@ -31,7 +37,10 @@ final class PlaceVoteCell: UITableViewCell {
         return $0
     }(UIView())
     
-    private let colorView = UIView()
+    private let colorView = {
+        $0.layer.cornerRadius = 15
+        return $0
+    }(UIView())
     
     private let nameLabel: UILabel = {
         $0.numberOfLines = 1
@@ -76,6 +85,10 @@ final class PlaceVoteCell: UITableViewCell {
     override func setSelected(_ selected: Bool, animated: Bool) {
        super.setSelected(selected, animated: animated)
         self.onSelected()
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
     }
     
 }
@@ -124,28 +137,31 @@ extension PlaceVoteCell {
 extension PlaceVoteCell {
     
     private func setUI(progress: CGFloat) {
-        contentView.addSubviews(containerView, colorView)
+        contentView.addSubviews(container)
 
-        containerView.snp.makeConstraints { make in
+        container.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(UIEdgeInsets(top: 6, left: 20, bottom: 6, right: 20))
-            make.height.equalTo(48)
         }
         
-        containerView.addSubview(colorView)
+        container.addSubview(containerView)
+        containerView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.equalTo(300.horizontallyAdjusted)
+            make.height.equalTo(48.verticallyAdjusted)
+        }
+        
+        container.addSubview(colorView)
         colorView.layer.cornerRadius = 15
         colorView.layer.masksToBounds = true
         hideGradient()
-        colorView.snp.makeConstraints { make in
-            make.leading.top.equalToSuperview()
-            make.height.equalTo(48)
-        }
         
-        let width = (self.containerView.bounds.width) * progress // TODO: 계산이상하게 안맞음
+        let width = (300.horizontallyAdjusted) * progress // TODO: 계산이상하게 안맞음
+        
         containerView.addSubview(colorView)
         colorView.snp.makeConstraints { make in
             make.leading.top.equalToSuperview()
-            make.width.equalTo(width)
-            make.height.equalTo(48)
+            make.width.equalTo(300.horizontallyAdjusted)
+            make.height.equalTo(48.verticallyAdjusted)
         }
         
         containerView.addSubview(countLabel)
@@ -214,6 +230,7 @@ extension PlaceVoteCell {
     }
     
     private func hideGradient() {
+        isGradient = false
         colorView.backgroundColor = .clear
         colorView.backgroundColor = .wwwColor(.Gray200)
         self.layoutIfNeeded()
