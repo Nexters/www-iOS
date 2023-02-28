@@ -13,7 +13,7 @@ final class LaunchScreenViewController: UIViewController {
     
     private let launchImg: UIImageView = {
         let img = UIImageView()
-        img.image = UIImage(.union2)
+        img.image = UIImage(.logo_type3)
         img.contentMode = .scaleAspectFit
         img.snp.makeConstraints {
             $0.width.equalTo(180.horizontallyAdjusted)
@@ -44,7 +44,7 @@ final class LaunchScreenViewController: UIViewController {
         self.view.backgroundColor = .wwwColor(.WWWWhite)
         view.addSubview(launchImg)
         launchImg.snp.makeConstraints {
-            $0.top.equalTo(view.safeAreaLayoutGuide).offset(240.verticallyAdjusted)
+            $0.centerY.equalToSuperview().multipliedBy(0.7)
             $0.centerX.equalToSuperview()
         }
     }
