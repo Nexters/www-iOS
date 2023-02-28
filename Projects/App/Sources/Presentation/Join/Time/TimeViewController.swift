@@ -455,13 +455,13 @@ extension TimeViewController: UIScrollViewDelegate, UICollectionViewDelegate, UI
 
 // MARK: - Preview
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct TimeViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        let viewmodel = TimeViewModel(joinHostUseCase: JoinHostUseCase())
-        TimeViewController(viewmodel: viewmodel, userMode: .host).toPreview()
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct TimeViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewmodel = TimeViewModel(joinHostUseCase: JoinHostUseCase())
+//        TimeViewController(viewmodel: viewmodel, userMode: .host).toPreview()
+//    }
+//}
+//#endif

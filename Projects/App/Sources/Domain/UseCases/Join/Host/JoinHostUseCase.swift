@@ -19,6 +19,8 @@ protocol JoinHostUseCaseProtocol {
 
 final class JoinHostUseCase: JoinHostUseCaseProtocol {
     
+    private let meetingCreateRepository: MeetingCreateRepository
+    
     // MARK: - Properties
     var roomName = BehaviorSubject<String>(value: "")
     var userName = BehaviorSubject<String>(value: "")
@@ -30,7 +32,9 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
 
     
     // MARK: - Methods
-    init() {}
+    init(meetingCreateRepository: MeetingCreateRepository) {
+        self.meetingCreateRepository = meetingCreateRepository
+    }
     
     func updateMinUser(with value: Int) {
         let current = try! self.minUser.value()
@@ -61,13 +65,18 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
         let current = try! self.endDate.value()
         self.endDate.onNext(date)
     }
+    
+    func postMeeting() {
+        print("🚗🚗🚗🚗🚗미팅을 만들어봄!🚗🚗🚗🚗🚗")
+        self.meetingCreateRepository.postMeeting()
+    }
+    
 }
 
 // MARK: - Privates
 private extension JoinHostUseCase {
     
 
-    
 }
 
 

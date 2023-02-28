@@ -186,7 +186,8 @@ private extension UserNameViewController {
                 case .minUser:
                     self?.view.endEditing(true)
                     self?.textFieldView.textField.resignFirstResponder()
-                    let viewmodel = MinUserViewModel(joinAdminUseCase: self?.viewModel?.getHostUseCase() ?? JoinHostUseCase())
+                    let usecase = JoinHostUseCase(meetingCreateRepository: CreateMeetingDAO(network: MeetingAPIManager.provider))
+                    let viewmodel = MinUserViewModel(joinAdminUseCase: self?.viewModel?.getHostUseCase() ?? usecase)
                     self?.navigationController?.pushViewController(MinUserViewController(viewModel: viewmodel), animated: true)
                 case .timeslot:
                     self?.view.endEditing(true)

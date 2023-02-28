@@ -13,13 +13,11 @@ import RxSwift
 final class JoinMeetingDAO: MeetingJoinRepository {
     
     private let network: RxMoyaProvider<MeetingAPI>
-    
     private let disposeBag = DisposeBag()
     
     init(network: RxMoyaProvider<MeetingAPI>) {
         self.network = network
     }
-    
     
     func fetchMeetingStatusWithCode(with code: String) -> RxSwift.Observable<Result<MeetingInfoToJoin, JoinMeetingError>> {
         
@@ -46,7 +44,6 @@ final class JoinMeetingDAO: MeetingJoinRepository {
         
         return result
     }
-    
     
     func postMeeting(meetingId: Int, username: String, times: [SelectedTime], places: ([WrappedPlace])) -> Observable<Result<MeetingJoinResponseDTO, JoinMeetingError>> {
             

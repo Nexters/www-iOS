@@ -164,12 +164,12 @@ private extension RoomNameViewController {
 // MARK: - Preview
 
 #if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct RoomNameViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        let viewModel = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
-        RoomNameViewController(viewModel: viewModel).toPreview()
-    }
-}
+//import SwiftUI
+//
+//struct RoomNameViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewModel = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
+//        RoomNameViewController(viewModel: viewModel).toPreview()
+//    }
+//}
 #endif

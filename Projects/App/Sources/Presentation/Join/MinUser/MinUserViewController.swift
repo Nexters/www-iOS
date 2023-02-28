@@ -179,14 +179,14 @@ private extension MinUserViewController {
 
 // MARK: - Preview
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct MinUserViewController_Preview: PreviewProvider {
-    static var previews: some View {
-        let viewModel = MinUserViewModel(joinAdminUseCase: JoinHostUseCase())
-        MinUserViewController(viewModel: viewModel).toPreview()
-    }
-}
-#endif
-
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct MinUserViewController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewModel = MinUserViewModel(joinAdminUseCase: JoinHostUseCase())
+//        MinUserViewController(viewModel: viewModel).toPreview()
+//    }
+//}
+//#endif
+//

@@ -253,13 +253,13 @@ private extension CompletionViewcController {
 
 // MARK: - Preview
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct CompletionViewcController_Preview: PreviewProvider {
-    static var previews: some View {
-        let viewModel = CompletionViewModel(usecase: JoinHostUseCase())
-        CompletionViewcController(viewModel: viewModel).toPreview()
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct CompletionViewcController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewModel = CompletionViewModel(usecase: JoinHostUseCase())
+//        CompletionViewcController(viewModel: viewModel).toPreview()
+//    }
+//}
+//#endif

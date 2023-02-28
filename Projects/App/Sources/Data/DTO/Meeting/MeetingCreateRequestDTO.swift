@@ -9,11 +9,11 @@
 import Foundation
 
 struct MeetingCreateRequestDTO: Codable {
-    let endDate, meetingName: String
+    let userName, meetingName: String
+    let startDate, endDate: String
     let minimumAlertMembers: Int
     let promiseDateTimeList: [PromiseDateTimeList]
     let promisePlaceList: [String]
-    let startDate, userName: String
 }
 
 struct PromiseDateTimeList: Codable {
