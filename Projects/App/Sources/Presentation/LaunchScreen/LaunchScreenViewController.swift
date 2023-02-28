@@ -44,7 +44,8 @@ final class LaunchScreenViewController: UIViewController {
         self.view.backgroundColor = .wwwColor(.WWWWhite)
         view.addSubview(launchImg)
         launchImg.snp.makeConstraints {
-            $0.center.equalToSuperview()
+            $0.top.equalTo(view.safeAreaLayoutGuide).offset(240.verticallyAdjusted)
+            $0.centerX.equalToSuperview()
         }
     }
     
