@@ -15,7 +15,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
     private let statusLabel: PaddingLabel = {
         let label = PaddingLabel(padding: UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10))
         label.backgroundColor = .wwwColor(.WWWGreen)
-        label.font = UIFont.www.title8
+        label.font = UIFont.www(size: 13, family: .Bold)
         label.textColor = .wwwColor(.WWWWhite)
         label.setRoundCorners([.topLeft, .topRight], radius: 6)
         return label
@@ -62,7 +62,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     private let usersLabel: UILabel = {
         let label = UILabel()
-        label.font = .www(size: 13, family: .Medium)
+        label.font = .www(size: 13, family: .Bold)
         label.textColor = .wwwColor(.WWWGreen)
         return label
     }()
@@ -186,7 +186,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     func setData(_ data: MeetingMain) {
         
-        statusLabel.text = data.meetingStatus.toText()
+        statusLabel.text = data.meetingStatus.toText(data.confirmedDate?.toDate())
         titleLabel.text = data.meetingName
         usersLabel.text = "\(data.votingUserCount)/\(data.joinedUserCount)"
         characterImgView.image = data.yaksoki.toImg()

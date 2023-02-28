@@ -18,12 +18,12 @@ enum MeetingStatus: String, Codable {
 }
 
 extension MeetingStatus {
-    func toText() -> String {
+    func toText(_ date: Date?) -> String {
         switch self {
         case .confirmed:
-            return "D-"
+            return "\(calculateDday(date))"
         case .done:
-            return "D+"
+            return "\(calculateDday(date))"
         case .voted:
             return "투표 종료"
         case .voting:
@@ -31,6 +31,24 @@ extension MeetingStatus {
         case .waiting:
             return "투표 시작 전"
         }
+    }
+
+    private func calculateDday(_ date: Date?) -> String {
+        
+        guard let date = date else { return "" }
+        
+        let now = Date().formatted("yyyy-MM-dd").toDate()!
+        let interval = Calendar.current.dateComponents([.day], from: now, to: date).day ?? 0
+        var resultStr = ""
+        
+        if interval > 0 {
+            resultStr = "D-\(interval)"
+        } else if interval == 0 {
+            resultStr = "D-Day"
+        } else {
+            resultStr = "D+\(abs(interval))"
+        }
+        return resultStr
     }
 }
 
