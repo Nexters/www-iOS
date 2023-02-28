@@ -53,7 +53,13 @@ public enum WWWAssset: String {
     case votingBox
     case settings
     
-   // profile
+    // profile
     case profileImg
     case profileBadge
+    
+    // yaksoki
+    case yaksoki_eat
+    case yaksoki_play
+    case yaksoki_rest
+    case yaksoki_work
 }
