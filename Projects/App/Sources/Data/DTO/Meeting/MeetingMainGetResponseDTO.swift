@@ -33,7 +33,7 @@ extension MeetingMainGetResponseDTO.MeetingMainGetResDTOWrapper {
         let meetingStatus: MeetingStatus
         let minimumAlertMembers: Int
         let votingUserCount: Int
-        let yaksogi: YacksokoiType
+        let yaksokiType: YaksokiType
     }
 }
 
@@ -49,6 +49,6 @@ extension MeetingMainGetResponseDTO.MeetingMainGetResDTOWrapper {
 
 extension MeetingMainGetResponseDTO.MeetingMainGetResDTOWrapper.MeetingMainGetResDto {
     func toDomain() -> MeetingMain {
-        return MeetingMain(confirmedDate: confirmedDate, confirmedPlace: confirmedPlace, confirmedTime: confirmedTime, hostName: hostName, joinedUserCount: joinedUserCount, meetingId: meetingId, meetingName: meetingName, meetingStatus: meetingStatus, minimumAlertMembers: minimumAlertMembers, votingUserCount: votingUserCount, yaksoki: yaksogi)
+        return MeetingMain(confirmedDate: confirmedDate, confirmedPlace: confirmedPlace, confirmedTime: confirmedTime, hostName: hostName, joinedUserCount: joinedUserCount, meetingId: meetingId, meetingName: meetingName, meetingStatus: meetingStatus, minimumAlertMembers: minimumAlertMembers, votingUserCount: votingUserCount, yaksokiType: yaksokiType)
     }
 }
