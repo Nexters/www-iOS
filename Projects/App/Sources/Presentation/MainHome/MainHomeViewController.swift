@@ -21,11 +21,23 @@ final class MainHomeViewController: UIViewController {
         case ended
     }
     var isOneStepPaging = true
-    var currentIndex: CGFloat = 0 {
+    lazy var currentIndex: Int = 0 {
         didSet {
             pageLabel.customAttributedString(
-                text: "\(Int(currentIndex)+1)/5",
-                highlightText: "\(Int(currentIndex)+1)",
+                text: "\(currentIndex + 1)/\(maxIndex)",
+                highlightText: "\(currentIndex + 1)",
+                textFont: .www(size: 14)!,
+                highlightTextFont: .www(size: 14)!,
+                textColor: .wwwColor(.Gray450),
+                highlightTextColor: .wwwColor(.WWWGreen)
+            )
+        }
+    }
+    lazy var maxIndex: Int = 0 {
+        didSet {
+            pageLabel.customAttributedString(
+                text: "\(currentIndex + 1)/\(maxIndex)",
+                highlightText: "\(currentIndex + 1)",
                 textFont: .www(size: 14)!,
                 highlightTextFont: .www(size: 14)!,
                 textColor: .wwwColor(.Gray450),
@@ -83,7 +95,7 @@ final class MainHomeViewController: UIViewController {
         return view
     }()
     
-    private let emptyPromiseView = MainHomeEmptyPromiseView(message: "아직 진행 중인 약속이 없어요!")
+    private let emptyPromiseView = MainHomeEmptyPromiseView(status: .proceeding)
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -129,13 +141,16 @@ final class MainHomeViewController: UIViewController {
         label.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
         label.layer.borderWidth = 1
         label.customAttributedString(
-            text: "\(Int(currentIndex)+1)/5",
-            highlightText: "\(Int(currentIndex)+1)",
+            text: "\(currentIndex+1)/\(maxIndex)",
+            highlightText: "\(currentIndex+1)",
             textFont: .www(size: 14)!,
             highlightTextFont: .www(size: 14)!,
             textColor: .wwwColor(.Gray450),
             highlightTextColor: .wwwColor(.WWWGreen)
         )
+        label.snp.makeConstraints {
+            $0.height.equalTo(26)
+        }
         return label
     }()
     
@@ -236,6 +251,7 @@ extension MainHomeViewController {
         snapshot.appendItems(items)
         self.dataSource.apply(snapshot, animatingDifferences: true)
         self.collectionView.setContentOffset(.init(x: -collectionView.contentInset.left, y: .zero), animated: true)
+        currentIndex = 0
     }
     
     private func setAction() {
@@ -253,6 +269,10 @@ extension MainHomeViewController {
                 self?.proceedingPromiseButton.isEnabled = false
                 self?.endedPromiseButton.isEnabled = true
                 let proceeding = self?.fetchedMainHomeMeeting.proceedingMeetings ?? []
+                self?.maxIndex = proceeding.count
+                self?.emptyPromiseView.changeStatus(status: .proceeding)
+                self?.collectionView.isHidden = proceeding.count == 0
+                self?.pageLabel.isHidden = proceeding.count == 0
                 self?.applyData(items: proceeding, section: .proceeding)
                 
             }).disposed(by: bag)
@@ -265,6 +285,10 @@ extension MainHomeViewController {
                 self?.endedPromiseButton.isEnabled = false
                 
                 let ended = self?.fetchedMainHomeMeeting.endedMeetings ?? []
+                self?.maxIndex = ended.count
+                self?.emptyPromiseView.changeStatus(status: .ended)
+                self?.collectionView.isHidden = ended.count == 0
+                self?.pageLabel.isHidden = ended.count == 0
                 self?.applyData(items: ended, section: .ended)
             }).disposed(by: bag)
         
@@ -304,6 +328,7 @@ extension MainHomeViewController {
         output?.mainHomeMeeting.subscribe(onSuccess: { [weak self] in
             print("mainHomeMeeting",$0)
             self?.fetchedMainHomeMeeting = $0
+            self?.maxIndex = $0.proceedingMeetings.count
             self?.applyData(items: $0.proceedingMeetings, section: .proceeding)
         }).disposed(by: bag)
         
@@ -328,17 +353,19 @@ extension MainHomeViewController: UICollectionViewDelegate {
             roundedIndex = round(index)
         }
         
+        var roundedIntIndex = Int(roundedIndex)
+        
         if isOneStepPaging {
-            if currentIndex > roundedIndex {
+            if currentIndex > roundedIntIndex {
                 currentIndex -= 1
-                roundedIndex = currentIndex
-            } else if currentIndex < roundedIndex {
+                roundedIntIndex = currentIndex
+            } else if currentIndex < roundedIntIndex {
                 currentIndex += 1
-                roundedIndex = currentIndex
+                roundedIntIndex = currentIndex
             }
         }
         
-        offset = CGPoint(x: roundedIndex * cellWidthIncludingSpacing - scrollView.contentInset.left, y: -scrollView.contentInset.top)
+        offset = CGPoint(x: CGFloat(roundedIntIndex) * cellWidthIncludingSpacing - scrollView.contentInset.left, y: -scrollView.contentInset.top)
         targetContentOffset.pointee = offset
     
     }

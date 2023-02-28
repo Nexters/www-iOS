@@ -15,7 +15,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
     private let statusLabel: PaddingLabel = {
         let label = PaddingLabel(padding: UIEdgeInsets(top: 3, left: 10, bottom: 3, right: 10))
         label.backgroundColor = .wwwColor(.WWWGreen)
-        label.font = UIFont.www.title8
+        label.font = UIFont.www(size: 13, family: .Bold)
         label.textColor = .wwwColor(.WWWWhite)
         label.setRoundCorners([.topLeft, .topRight], radius: 6)
         return label
@@ -43,7 +43,6 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     private let characterImgView: UIImageView = {
         let imgView = UIImageView()
-        imgView.image = UIImage(.monster)
         imgView.contentMode = .scaleAspectFit
         return imgView
     }()
@@ -63,7 +62,7 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     private let usersLabel: UILabel = {
         let label = UILabel()
-        label.font = .www(size: 13, family: .Medium)
+        label.font = .www(size: 13, family: .Bold)
         label.textColor = .wwwColor(.WWWGreen)
         return label
     }()
@@ -103,6 +102,11 @@ final class MainHomePromiseCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        characterImgView.image = nil
     }
     
     private func setUI() {
@@ -181,18 +185,14 @@ final class MainHomePromiseCell: UICollectionViewCell {
     }
     
     func setData(_ data: MeetingMain) {
-//        statusLabel.text = "D-30"
-//        titleLabel.text = "제주도로 놀러가자아아"
-//        usersLabel.text = "3/4명"
-//        dateLabel.text = "23.02.13 아침"
-//        placeLabel.text = "강남역"
         
-        statusLabel.text = data.meetingStatus.rawValue
+        statusLabel.text = data.meetingStatus.toText(data.confirmedDate?.toDate())
         titleLabel.text = data.meetingName
         usersLabel.text = "\(data.votingUserCount)/\(data.joinedUserCount)"
+        characterImgView.image = data.yaksoki.toImg()
         if let confirmedDate = data.confirmedDate, let confirmedTime = data.confirmedTime {
             dateLabel.textColor = .wwwColor(.Gray700)
-            dateLabel.text = "\(confirmedDate) \(confirmedTime.toText())"
+            dateLabel.text = "\(confirmedDate)• \(confirmedTime.toText())"
         } else {
             dateLabel.text = "미확정"
             dateLabel.textColor = .wwwColor(.Gray250)
