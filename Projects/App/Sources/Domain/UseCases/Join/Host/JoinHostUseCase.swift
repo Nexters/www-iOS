@@ -53,7 +53,16 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
     func addSelectedTimes(_ times: [SelectedTime]) {
         self.selectedTimes = times
     }
-
+    
+    func updateStartDate(date: Date) {
+        let current = try! self.startDate.value()
+        self.startDate.onNext(date)
+    }
+    
+    func updateEndDate(date: Date) {
+        let current = try! self.endDate.value()
+        self.endDate.onNext(date)
+    }
 }
 
 // MARK: - Privates
