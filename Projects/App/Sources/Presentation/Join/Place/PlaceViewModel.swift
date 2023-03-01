@@ -97,7 +97,6 @@ extension PlaceViewModel {
         
         input.viewDidLoad
             .subscribe(onNext: { [weak self] in
-                self?.places = self?.hostUsecase!.getServerPlaceList() ?? []
                 output.initPlaces.accept(self?.places ?? [])
                 output.naviTitleText.accept(try! (self?.hostUsecase!.roomName)!.value())
             })
@@ -156,7 +155,17 @@ extension PlaceViewModel {
                     }
                     .disposed(by: disposeBag)
                 self?.hostUsecase?.addMyPlaces(placelist)
-                output.navigatePage.accept(.completion)
+                
+                self?.hostUsecase?.postMeeting()
+                    .subscribe(onNext: {code in
+                        if code != "" {
+                            output.navigatePage.accept(.completion)
+                        } else {
+                            output.navigatePage.accept(.errorAlert(msg: "약속방 생성에 실패했어요🥲"))
+                        }
+                    })
+                    .disposed(by: disposeBag)
+                
             })
             .disposed(by: disposeBag)
         

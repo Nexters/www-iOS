@@ -307,7 +307,8 @@ extension MainHomeViewController {
         dimView.addPromiseButton.rx.tap
             .asDriver()
             .drive(onNext: { [weak self] in
-                let vm = RoomNameViewModel(joinAdminUseCase: JoinHostUseCase())
+                let usecase = JoinHostUseCase(meetingCreateRepository: CreateMeetingDAO(network: MeetingAPIManager.provider))
+                let vm = RoomNameViewModel(joinAdminUseCase: usecase)
                 self?.navigationController?.pushViewController(RoomNameViewController(viewModel: vm), animated: true)
             }).disposed(by: bag)
         

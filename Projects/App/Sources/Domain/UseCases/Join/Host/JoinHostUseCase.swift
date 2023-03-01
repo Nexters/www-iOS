@@ -13,24 +13,33 @@ protocol JoinHostUseCaseProtocol {
     var roomName: BehaviorSubject<String> { get }
     var userName: BehaviorSubject<String> { get }
     var minUser: BehaviorSubject<Int> { get }
-    var placeList: PublishSubject<[WrappedPlace]> { get }
+    var placeList: AsyncSubject<[WrappedPlace]> { get }
     var selectedTimes: [SelectedTime] { get set }
+    var myPlaceList: [WrappedPlace] { get set }
 }
 
 final class JoinHostUseCase: JoinHostUseCaseProtocol {
+    
+    private let meetingCreateRepository: MeetingCreateRepository
     
     // MARK: - Properties
     var roomName = BehaviorSubject<String>(value: "")
     var userName = BehaviorSubject<String>(value: "")
     var minUser = BehaviorSubject<Int>(value: 1)
-    var placeList = PublishSubject<[WrappedPlace]>()
+    var placeList = AsyncSubject<[WrappedPlace]>()
     var startDate = BehaviorSubject<Date>(value: Date())
     var endDate = BehaviorSubject<Date>(value: Date())
+    var roomcode = ""
     internal var selectedTimes: [SelectedTime] = []
+    internal var myPlaceList: [WrappedPlace] = []
+    
+    private let disposeBag = DisposeBag()
 
     
     // MARK: - Methods
-    init() {}
+    init(meetingCreateRepository: MeetingCreateRepository) {
+        self.meetingCreateRepository = meetingCreateRepository
+    }
     
     func updateMinUser(with value: Int) {
         let current = try! self.minUser.value()
@@ -39,13 +48,8 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
         }
     }
     
-    func getServerPlaceList() -> [WrappedPlace] {
-        return Place.mockServerData
-            .map { WrappedPlace(isFromLocal: false, place: $0) }
-    }
-    
     func addMyPlaces(_ places: [WrappedPlace]) {
-        self.placeList.onNext(places)
+        self.myPlaceList += places
     }
     
     func addSelectedTimes(_ times: [SelectedTime]) {
@@ -61,13 +65,31 @@ final class JoinHostUseCase: JoinHostUseCaseProtocol {
         let current = try! self.endDate.value()
         self.endDate.onNext(date)
     }
+    
+    
+    func postMeeting() -> Observable<String> {
+        let start = try! self.startDate.value()
+        let end = try! self.endDate.value()
+
+        return self.meetingCreateRepository.postMeeting(userName: try! self.userName.value(),
+                                                 meetingName: try! self.roomName.value(),
+                                                 startDate: start.formatted("yyyy-MM-dd"),
+                                                 endDate: end.formatted("yyyy-MM-dd"),
+                                                 minMember: try! self.minUser.value(),
+                                                 selectedTime: self.selectedTimes,
+                                                 placeList: self.myPlaceList)
+            .map { result in
+                self.roomcode = result.meetingCode
+                return result.meetingCode
+            }
+    }
+    
 }
 
 // MARK: - Privates
 private extension JoinHostUseCase {
     
 
-    
 }
 
 

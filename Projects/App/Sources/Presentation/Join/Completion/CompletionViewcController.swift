@@ -69,7 +69,7 @@ final class CompletionViewcController: UIViewController {
         $0.layer.borderColor = UIColor.wwwColor(.Gray200).cgColor
         $0.layer.borderWidth = 1
         $0.layer.cornerRadius = 21
-        $0.setTitle(" 링크 복사하기", for: .normal)
+        $0.setTitle(" 코드 복사하기", for: .normal)
         $0.setTitleColor(.wwwColor(.WWWBlack).withAlphaComponent(0.7), for: .highlighted)
         $0.titleLabel?.font = .www.body3
         $0.setTitleColor(.wwwColor(.WWWBlack), for: .normal)
@@ -201,7 +201,6 @@ extension CompletionViewcController {
     }
     
     private func setMotion() {
-        //TODO: - GUI 변경 및 모션디테일 수정
         motionGenerator.applyParallaxEffect(to: imageView, magnitue: -40)
         motionGenerator.applyParallaxEffect(to: donutView, magnitue: 30)
         motionGenerator.applyParallaxEffect(to: heartView, magnitue: 20)
@@ -227,6 +226,7 @@ private extension CompletionViewcController {
         output.copiedRoomInfo
             .asDriver(onErrorJustReturn: "")
             .drive(onNext: { [weak self] text in
+                UIPasteboard.general.string = String((text))
                 self?.hapticGenerator.notificationOccurred(.success)
             })
             .disposed(by: disposeBag)
@@ -253,13 +253,13 @@ private extension CompletionViewcController {
 
 // MARK: - Preview
 
-#if canImport(SwiftUI) && DEBUG
-import SwiftUI
-
-struct CompletionViewcController_Preview: PreviewProvider {
-    static var previews: some View {
-        let viewModel = CompletionViewModel(usecase: JoinHostUseCase())
-        CompletionViewcController(viewModel: viewModel).toPreview()
-    }
-}
-#endif
+//#if canImport(SwiftUI) && DEBUG
+//import SwiftUI
+//
+//struct CompletionViewcController_Preview: PreviewProvider {
+//    static var previews: some View {
+//        let viewModel = CompletionViewModel(usecase: JoinHostUseCase())
+//        CompletionViewcController(viewModel: viewModel).toPreview()
+//    }
+//}
+//#endif

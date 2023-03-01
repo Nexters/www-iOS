@@ -47,6 +47,7 @@ final class CompletionViewModel: BaseViewModel {
     
     private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
+        
         input.nextButtonDidTap
             .subscribe(onNext: {
                 output.navigatePage.accept(.roomMain)
@@ -55,8 +56,7 @@ final class CompletionViewModel: BaseViewModel {
         
         input.copyButtonDidTap
             .subscribe(onNext: {
-                // TODO: 서버통신
-                output.copiedRoomInfo.accept("방코드1234가 복사되었어요!")
+                output.copiedRoomInfo.accept(self.usecase.roomcode)
             })
             .disposed(by: disposeBag)
         
