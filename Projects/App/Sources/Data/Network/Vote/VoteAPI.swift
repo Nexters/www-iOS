@@ -12,7 +12,7 @@ import RxMoya
 import RxSwift
 
 enum VoteAPI {
-    case fetchVoteLists(code: Int)
+    case fetchVoteLists(id: Int)
 }
 
 extension VoteAPI: TargetType {

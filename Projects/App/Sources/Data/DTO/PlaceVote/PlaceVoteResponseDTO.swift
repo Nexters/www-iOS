@@ -1,5 +1,5 @@
 //
-//  MeetingPlaceResponseDTO.swift
+//  PlaceVoteResponseDTO.swift
 //  App
 //
 //  Created by Chanhee Jeong on 2023/03/02.
@@ -9,17 +9,18 @@
 import Foundation
 
 // MARK: - MeetingPlaceResponseDTO
-struct MeetingPlaceResponseDTO: Codable {
+struct PlaceVoteResponseDTO: Codable {
     let code: Int
     let message: String
     let result: Result
 }
 
-extension MeetingPlaceResponseDTO {
+extension PlaceVoteResponseDTO {
     
     struct Result: Codable {
         let userVoteList: [Vote]
         let myVoteList: [String]
+        let votedUserCount: Int
     }
 
     struct Vote: Codable {
