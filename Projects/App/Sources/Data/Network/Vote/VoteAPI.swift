@@ -12,7 +12,7 @@ import RxMoya
 import RxSwift
 
 enum VoteAPI {
-    case fetchVoteLists(code: MeetingPlaceResponseDTO)
+    case fetchVoteLists(code: Int)
 }
 
 extension VoteAPI: TargetType {
@@ -22,8 +22,8 @@ extension VoteAPI: TargetType {
     
     var path: String {
         switch self {
-        case .fetchVoteLists(let code):
-            return "votes/\(code)"
+        case .fetchVoteLists(let id):
+            return "votes/\(id)"
         }
     }
     
@@ -36,8 +36,8 @@ extension VoteAPI: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case .fetchVoteLists(let dto):
-            return .requestJSONEncodable(dto)
+        case .fetchVoteLists(let id):
+            return .requestJSONEncodable(id)
         }
     }
     
