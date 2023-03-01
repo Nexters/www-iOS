@@ -31,7 +31,7 @@ final class PlaceVoteViewController: UIViewController {
         $0.numberOfLines = 0
         $0.textColor = UIColor.wwwColor(.Gray350)
         $0.font = UIFont.www.body6
-        $0.text = "N명 참여중"
+        $0.text = "N명 참여"
         return $0
     }(UILabel())
     

@@ -19,7 +19,7 @@ final class PlaceVoteDAO: MeetingVoteRepository {
     }
     
     func fetchVoteUsers(meetingId id: Int) -> Observable<Int> {
-        return self.network.request(.fetchVoteLists(id: 193))
+        return self.network.request(.fetchVoteLists(id: id))
             .map(PlaceVoteResponseDTO.self)
             .compactMap({ response in
                 if response.code == 0 {
