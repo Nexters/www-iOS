@@ -49,6 +49,7 @@ final class RoomNameViewController: UIViewController {
         setUI()
         setNavigationBar()
         bindViewModel()
+        bindUI()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -118,6 +119,35 @@ extension RoomNameViewController {
 
 // MARK: - Binding
 private extension RoomNameViewController {
+    
+    func bindUI() {
+        textFieldView.textField.rx.text.orEmpty
+            .map(checkTextValidation(_:))
+            .subscribe(onNext: { [weak self] e in
+                switch e {
+                case .over:
+                    self?.textFieldView.setErrorMode(message: "최대 12자 이내로 작성해 주세요.")
+                case .under:
+                    self?.textFieldView.setNormalMode()
+                case .normal:
+                    self?.textFieldView.setNormalMode()
+                }
+            })
+            .disposed(by: disposeBag)
+    }
+    
+    func checkTextValidation(_ input: String) -> TextInputError {
+        if input.count > 12 {
+            let index = input.index(input.startIndex, offsetBy: 12)
+            self.textFieldView.textField.text = String(input[..<index])
+            return .over
+        }
+        if input.count < 2 {
+            return .under
+        }
+        return .normal
+    }
+    
     func bindViewModel() {
         let input = RoomNameViewModel.Input(
             roomNameTextFieldDidEdit:
