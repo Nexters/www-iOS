@@ -117,7 +117,7 @@ extension PlaceVoteViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
                 as? PlaceVoteCell else { return UITableViewCell() }
-        cell.configure(with: "\(indexPath.row)번째 아이템")
+//        cell.configure(with: "\(indexPath.row)번째 아이템")
         cell.selectionStyle = .none
         return cell
     }
