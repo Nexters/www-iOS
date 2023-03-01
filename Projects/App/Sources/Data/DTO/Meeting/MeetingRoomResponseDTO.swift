@@ -1,23 +1,20 @@
 //
-//  MeetingCodeCheckRequest.swift
+//  MeetingRoomResponseDTO.swift
 //  App
 //
-//  Created by Chanhee Jeong on 2023/02/27.
+//  Created by kokojong on 2023/03/01.
 //  Copyright © 2023 com.promise8. All rights reserved.
 //
 
 import Foundation
 
-// MARK: - Welcome
-struct MeetingCodeCheckResponseDTO: Codable {
+struct MeetingRoomResponseDTO: ModelType {
     let code: Int
     let message: String
-    var result: Result?
+    let result: Result?
 }
 
-
-extension MeetingCodeCheckResponseDTO {
-    // MARK: - Result
+extension MeetingRoomResponseDTO {
     struct Result: Codable {
         let meetingID: Int
         let meetingName: String
@@ -38,14 +35,17 @@ extension MeetingCodeCheckResponseDTO {
         let userPromisePlaceList: [UserPromisePlaceList]
         let meetingStatus: MeetingStatus
         var userVoteList: [Vote]
+        var yaksokiType: YaksokiType
         
         enum CodingKeys: String, CodingKey {
             case meetingID = "meetingId"
-            case meetingName, minimumAlertMembers, hostName, currentUserName, isHost, joinedUserCount, votingUserCount, meetingCode, shortLink, confirmedDate, confirmedTime, confirmedPlace, isJoined, startDate, endDate, joinedUserInfoList, userPromiseDateTimeList, userPromisePlaceList, meetingStatus, userVoteList
+            case meetingName, minimumAlertMembers, hostName, currentUserName, isHost, joinedUserCount, votingUserCount, meetingCode, shortLink, confirmedDate, confirmedTime, confirmedPlace, isJoined, startDate, endDate, joinedUserInfoList, userPromiseDateTimeList, userPromisePlaceList, meetingStatus, userVoteList, yaksokiType
         }
         
     }
-    
+}
+
+extension MeetingRoomResponseDTO {
     struct VoteList: Codable {
         let location: String
         let users: [String]
@@ -120,26 +120,54 @@ extension MeetingCodeCheckResponseDTO {
         }
     }
 
+    
 }
 
-extension MeetingCodeCheckResponseDTO {
-
-    func toDomain() -> MeetingInfoToJoin {
-        guard let result = result else { return MeetingInfoToJoin(id: -1, meetingCode: "", meetingName: "", startDate: "", endDate:"", placelist: []) }
+extension MeetingRoomResponseDTO {
+    
+    func toDomian() -> MainRoomMeetingInfo {
+        guard let result = result else { return MainRoomMeetingInfo.emtpyData }
         
-        var places: [WrappedPlace] = []
-        for promisePlace in result.userPromisePlaceList {
-            let place = WrappedPlace(isFromLocal: false,
-                                     place: Place(title: promisePlace.promisePlace))
-            places.append(place)
+        var joinedUserInfoList: [MainRoomMeetingInfo.UserInfoList] = []
+        for joinedUserInfo in result.joinedUserInfoList {
+            joinedUserInfoList.append(MainRoomMeetingInfo.UserInfoList(joinedUserName: joinedUserInfo.joinedUserName, characterType: joinedUserInfo.characterType))
         }
         
-        return MeetingInfoToJoin(id: result.meetingID,
-                                 meetingCode: result.meetingCode,
-                                 meetingName: result.meetingName,
-                                 startDate: result.startDate,
-                                 endDate:result.endDate,
-                                 placelist: places)
+        var userPromiseDateTimeList: [MainRoomMeetingInfo.UserPromiseDateTimeList] = []
+        for userPromiseDateTime in result.userPromiseDateTimeList {
+            
+            var userInfoList: [MainRoomMeetingInfo.UserInfoList] = []
+            
+            userPromiseDateTime.userInfoList.forEach {
+                userInfoList.append(MainRoomMeetingInfo.UserInfoList(joinedUserName: $0.joinedUserName, characterType: $0.characterType))
+            }
+            
+            userPromiseDateTimeList.append(MainRoomMeetingInfo.UserPromiseDateTimeList(promiseDate: userPromiseDateTime.promiseDate, promiseTime: userPromiseDateTime.promiseTime, promiseDayOfWeek: userPromiseDateTime.promiseDayOfWeek, userInfoList: userInfoList))
+        }
+        
+        var userPromisePlaceList: [MainRoomMeetingInfo.UserPromisePlaceList] = []
+        for userPromisePlace in result.userPromisePlaceList {
+            userPromisePlaceList.append(MainRoomMeetingInfo.UserPromisePlaceList(userName: userPromisePlace.userName, userCharacter: userPromisePlace.userCharacter, promisePlace: userPromisePlace.promisePlace))
+        }
+        
+        var userVoteList: [MainRoomMeetingInfo.Vote] = []
+        for userVote in result.userVoteList {
+            userVoteList.append(MainRoomMeetingInfo.Vote(location: userVote.location, users: userVote.users))
+        }
+        
+        let mainRoomMeetingInfo = MainRoomMeetingInfo(
+            meetingID: result.meetingID,
+            meetingName: result.meetingName,
+            minimumAlertMembers: result.minimumAlertMembers,
+            joinedUserCount: result.joinedUserCount,
+            votingUserCount: result.votingUserCount,
+            joinedUserInfoList: joinedUserInfoList,
+            userPromiseDateTimeList: userPromiseDateTimeList,
+            userPromisePlaceList: userPromisePlaceList,
+            meetingStatus: result.meetingStatus,
+            userVoteList: userVoteList, yaksokiType: result.yaksokiType)
+        
+        return mainRoomMeetingInfo
     }
     
 }
