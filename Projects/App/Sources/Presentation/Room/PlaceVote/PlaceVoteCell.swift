@@ -79,11 +79,6 @@ final class PlaceVoteCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-//
-//    override func setSelected(_ selected: Bool, animated: Bool) {
-//       super.setSelected(selected, animated: animated)
-//        self.onSelected()
-//    }
     
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -122,7 +117,6 @@ extension PlaceVoteCell {
     }
     
     private func setStatus(type: PlaceVoteCellStatus) {
-        
         switch type {
         case .progSelected:
             containerView.layer.borderWidth = 1.0
@@ -143,9 +137,7 @@ extension PlaceVoteCell {
             hideBadge()
         }
     }
-
 }
-
 
 
 // MARK: - Private Methods
