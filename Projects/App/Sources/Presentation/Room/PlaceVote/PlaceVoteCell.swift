@@ -9,14 +9,13 @@
 import UIKit
 import SnapKit
 
-enum PlaceVoteCellType {
+enum PlaceVoteCellStatus {
     case progSelected
     case progNotSelected
     case doneSelected
     case doneNotSelected
     //    case comfirm
 }
-
 
 final class PlaceVoteCell: UITableViewCell {
     // MARK: - Properties
@@ -74,21 +73,23 @@ final class PlaceVoteCell: UITableViewCell {
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        setUI(progress: 1.0)
-        setStatus(type: .doneNotSelected)
+        setUI()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    override func setSelected(_ selected: Bool, animated: Bool) {
-       super.setSelected(selected, animated: animated)
-        self.onSelected()
-    }
+//
+//    override func setSelected(_ selected: Bool, animated: Bool) {
+//       super.setSelected(selected, animated: animated)
+//        self.onSelected()
+//    }
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        nameLabel.text = ""
+        countLabel.text = "0명"
+        setProgress(progress: 0.0)
     }
     
 }
@@ -97,35 +98,48 @@ final class PlaceVoteCell: UITableViewCell {
 // MARK: privates
 extension PlaceVoteCell {
     
-    func configure(title: String, count: Int) {
-        nameLabel.text = title
-        countLabel.text = "\(count)명"
+    func configure(
+        isVoted: Bool,
+        placevote: PlaceVote,
+        total: Int
+    ) {
+        nameLabel.text = "\(placevote.placeName)"
+        countLabel.text = "\(placevote.count)명"
+        
+        let progress = CGFloat(placevote.count) / CGFloat(total)
+        
+        if isVoted {
+            setProgress(progress: progress)
+            setStatus(type: placevote.isMyVote
+                      ? .doneSelected
+                      : .doneNotSelected)
+        } else {
+            setProgress(progress: progress)
+            setStatus(type: placevote.isMyVote
+                      ? .progSelected
+                      : .progNotSelected)
+        }
     }
     
-    func onSelected() {
-        isClicked = !isClicked
-        manageSelection()
-        self.layoutIfNeeded()
-    }
-    
-    private func setStatus(type: PlaceVoteCellType) {
+    private func setStatus(type: PlaceVoteCellStatus) {
+        
         switch type {
         case .progSelected:
             containerView.layer.borderWidth = 1.0
             containerView.layer.borderColor = UIColor.wwwColor(.WWWGreen).cgColor
             badgeView.backgroundColor = UIColor.wwwColor(.WWWGreen)
-            makeGradient(opacity: 0.5)
             showBadge()
+            setGradient(status: .progSelected)
         case .progNotSelected:
+            gradientClear()
             containerView.layer.borderWidth = 0
-            hideGradient()
             hideBadge()
         case .doneSelected:
             badgeView.backgroundColor = .clear
-            makeGradient(opacity:1.0)
+            setGradient(status: type)
             showBadge()
         case .doneNotSelected:
-            makeGradient(opacity: 0.1)
+            setGradient(status: type)
             hideBadge()
         }
     }
@@ -137,7 +151,34 @@ extension PlaceVoteCell {
 // MARK: - Private Methods
 extension PlaceVoteCell {
     
-    private func setUI(progress: CGFloat) {
+    private func setProgress(progress: CGFloat) {
+        
+        container.addSubview(colorView)
+        
+        colorView.layer.cornerRadius = 15
+        colorView.layer.masksToBounds = true
+        
+        let width = (300.horizontallyAdjusted) * progress
+        
+        containerView.addSubview(colorView)
+        colorView.snp.makeConstraints { make in
+            make.leading.top.equalToSuperview()
+            make.width.equalTo(width)
+            make.height.equalTo(48.verticallyAdjusted)
+        }
+        
+        containerView.addSubview(countLabel)
+        countLabel.snp.makeConstraints { make in
+            make.trailing.equalToSuperview().offset(-18)
+            make.centerY.equalToSuperview()
+        }
+        
+        containerView.addSubview(nameLabel)
+        
+        self.layoutIfNeeded()
+    }
+    
+    private func setUI() {
         contentView.addSubviews(container)
 
         container.snp.makeConstraints { make in
@@ -151,40 +192,6 @@ extension PlaceVoteCell {
             make.height.equalTo(48.verticallyAdjusted)
         }
         
-        container.addSubview(colorView)
-        colorView.layer.cornerRadius = 15
-        colorView.layer.masksToBounds = true
-        hideGradient()
-        
-        let width = (300.horizontallyAdjusted) * progress // TODO: 계산이상하게 안맞음
-        
-        containerView.addSubview(colorView)
-        colorView.snp.makeConstraints { make in
-            make.leading.top.equalToSuperview()
-            make.width.equalTo(300.horizontallyAdjusted)
-            make.height.equalTo(48.verticallyAdjusted)
-        }
-        
-        containerView.addSubview(countLabel)
-        countLabel.snp.makeConstraints { make in
-            make.trailing.equalToSuperview().offset(-18)
-            make.centerY.equalToSuperview()
-        }
-        
-        containerView.addSubview(nameLabel)
-        
-    }
-    
-    private func manageSelection(){
-        if isSelected {
-            UIView.animate(withDuration: 0.1) {
-                self.setStatus(type: .doneSelected)
-            }
-        } else {
-            UIView.animate(withDuration: 0.1) {
-                self.setStatus(type: .doneNotSelected)
-            }
-        }
     }
     
     private func showBadge() {
@@ -218,34 +225,62 @@ extension PlaceVoteCell {
         }
     }
     
-    
-    private func makeGradient(opacity: CGFloat) {
-        colorView.backgroundColor = .clear
-        colorView.addGradientLayer(colors: [UIColor.wwwColor(.WWWMint).withAlphaComponent(opacity).cgColor,
-                                            UIColor.wwwColor(.WWWGreen).withAlphaComponent(opacity).cgColor],
-                                   locations: nil,
-                                   startPoint: CGPoint(x: 0, y: 0.5),
-                                   endPoint: CGPoint(x: 1, y: 0.5))
-        // TODO: 버튼 막아서 레이어 더 못쌓이게 해야함! -> 한번더 누르면 해지되도록하면됨!
+    private func setGradient(status: PlaceVoteCellStatus) {
+        
+        var opacity = 0.0
+        switch status {
+        case .progSelected: opacity = 0.5
+        case .progNotSelected: opacity = 0.0
+        case .doneSelected: opacity = 1.0
+        case .doneNotSelected: opacity = 0.1
+        }
+        
         self.layoutIfNeeded()
+        let gradient: CAGradientLayer = CAGradientLayer()
+        gradient.locations = [0.0, 1.0]
+        let colors: [CGColor] = [
+            UIColor.wwwColor(.WWWMint).withAlphaComponent(opacity).cgColor,
+            UIColor.wwwColor(.WWWGreen).withAlphaComponent(opacity).cgColor
+        ]
+        gradient.colors = colors
+        gradient.startPoint = CGPoint(x: 0.0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1.0, y: 1.5)
+        gradient.frame = .init(x: 0, y: 0,
+                               width: self.colorView.frame.width,
+                               height: self.colorView.frame.height)
+        if let sublayers = colorView.layer.sublayers, sublayers.count > 0 {
+            let indexToRemove = 0
+            let sublayerToRemove = sublayers[indexToRemove]
+            sublayerToRemove.removeFromSuperlayer()
+            colorView.layer.sublayers?.remove(at: indexToRemove)
+        }
+        self.colorView.layer.insertSublayer(gradient, at: 0)
     }
     
-    private func hideGradient() {
-        isGradient = false
-        colorView.backgroundColor = .clear
-        colorView.backgroundColor = .wwwColor(.Gray200)
+    private func gradientClear() {
         self.layoutIfNeeded()
+        let gradient: CAGradientLayer = CAGradientLayer()
+        gradient.locations = [0.0, 1.0]
+        let colors: [CGColor] = [
+            UIColor.wwwColor(.Gray200).withAlphaComponent(1.0).cgColor,
+            UIColor.wwwColor(.Gray200).withAlphaComponent(1.0).cgColor
+        ]
+        gradient.colors = colors
+        gradient.startPoint = CGPoint(x: 0.0, y: 0.5)
+        gradient.endPoint = CGPoint(x: 1.0, y: 1.5)
+        gradient.frame = .init(x: 0, y: 0,
+                               width: self.colorView.frame.width,
+                               height: self.colorView.frame.height)
+        
+        if let sublayers = colorView.layer.sublayers, sublayers.count > 0 {
+            let indexToRemove = 0
+            let sublayerToRemove = sublayers[indexToRemove]
+            sublayerToRemove.removeFromSuperlayer()
+            colorView.layer.sublayers?.remove(at: indexToRemove)
+        }
+        self.colorView.layer.insertSublayer(gradient, at: 0)
+        
     }
     
-//    private func setProgress(progress: CGFloat) {
-//        let width = self.contentView.bounds.width - 10 * progress
-//        containerView.addSubview(colorView)
-//        colorView.snp.makeConstraints { make in
-//            make.leading.top.equalToSuperview()
-//            make.width.equalTo(width)
-//            make.height.equalTo(48)
-//        }
-//        self.layoutIfNeeded()
-//    }
-//
+
 }
