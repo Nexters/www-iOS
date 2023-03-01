@@ -69,6 +69,7 @@ final class PlaceVoteViewModel: BaseViewModel {
                         self?.placelist = list
                         output.placeVoteList.accept(list)
                     }).disposed(by: disposeBag)
+                output.voteButtonStatus.accept(self?.meetingStatus ?? .voted)
             })
             .disposed(by: disposeBag)
         

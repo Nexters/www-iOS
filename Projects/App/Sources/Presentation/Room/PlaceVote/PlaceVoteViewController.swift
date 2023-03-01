@@ -43,7 +43,6 @@ final class PlaceVoteViewController: UIViewController {
     }(UIImageView())
     
     private lazy var voteButton: LargeButton = {
-        $0.setTitle("투표하기", for: .normal)
         $0.setButtonState(true)
         return $0
     }(LargeButton(state: false))
@@ -144,11 +143,15 @@ extension PlaceVoteViewController {
         output.voteButtonStatus
             .asDriver(onErrorJustReturn: .done)
             .drive(onNext: { [weak self] status in
-                self?.voteButton.setTitle("투표하기", for: .normal)
-                self?.voteButton.setTitle(status == MeetingStatus.waiting
-                                          ? "투표시작 대기"
-                                          : "투표완료",
-                                          for: .disabled)
+                var txt = ""
+                switch status {
+                case .voted: txt = "투표완료"
+                case .voting: txt = "투표하기"
+                case .waiting: txt = "투표시작대기"
+                case .done, .confirmed: txt = "투표종료"
+                }
+                self?.voteButton.setTitle(txt, for: .normal)
+                self?.voteButton.setTitle(txt, for: .disabled)
                 self?.voteButton.setButtonState(status == MeetingStatus.voting ? true : false)
             })
             .disposed(by: disposeBag)
