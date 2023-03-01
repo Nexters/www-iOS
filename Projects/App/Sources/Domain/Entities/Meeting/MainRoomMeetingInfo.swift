@@ -41,6 +41,8 @@ extension MainRoomMeetingInfo{
         let userName: String
         let userCharacter: String
         let promisePlace: String
+        let userInfoList: [UserInfoList]
+        let votedUserCount: Int
     }
     
     // MARK: - UserVoteList

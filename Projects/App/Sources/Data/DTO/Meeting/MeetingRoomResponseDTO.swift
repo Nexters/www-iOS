@@ -76,6 +76,8 @@ extension MeetingRoomResponseDTO {
         let userName: String
         let userCharacter: String
         let promisePlace: String
+        let userInfoList: [UserInfoList]
+        let votedUserCount: Int
     }
         
     
@@ -147,7 +149,13 @@ extension MeetingRoomResponseDTO {
         
         var userPromisePlaceList: [MainRoomMeetingInfo.UserPromisePlaceList] = []
         for userPromisePlace in result.userPromisePlaceList {
-            userPromisePlaceList.append(MainRoomMeetingInfo.UserPromisePlaceList(userName: userPromisePlace.userName, userCharacter: userPromisePlace.userCharacter, promisePlace: userPromisePlace.promisePlace))
+            var userInfoList: [MainRoomMeetingInfo.UserInfoList] = []
+            
+            userPromisePlace.userInfoList.forEach {
+                userInfoList.append(MainRoomMeetingInfo.UserInfoList(joinedUserName: $0.joinedUserName, characterType: $0.characterType))
+            }
+            
+            userPromisePlaceList.append(MainRoomMeetingInfo.UserPromisePlaceList(userName: userPromisePlace.userName, userCharacter: userPromisePlace.userCharacter, promisePlace: userPromisePlace.promisePlace, userInfoList: userInfoList, votedUserCount: userPromisePlace.votedUserCount))
         }
         
         var userVoteList: [MainRoomMeetingInfo.Vote] = []
