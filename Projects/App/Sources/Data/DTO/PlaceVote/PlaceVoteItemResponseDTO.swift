@@ -19,6 +19,7 @@ extension PlaceVoteItemResponseDTO {
     // MARK: - Result
     struct Result: Codable {
         let userPromisePlaceList: [UserPromisePlaceList]
+        let voteFinishedUserCount: Int
     }
 
     // MARK: - UserPromisePlaceList
