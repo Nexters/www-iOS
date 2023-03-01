@@ -117,12 +117,15 @@ extension PlaceVoteViewController {
             })
             .disposed(by: disposeBag)
         
-        output.voteButtonMakeCompleted
-            .asDriver(onErrorJustReturn: false)
-            .drive(onNext: { [weak self] isEnabled in
+        output.voteButtonStatus
+            .asDriver(onErrorJustReturn: .done)
+            .drive(onNext: { [weak self] status in
                 self?.voteButton.setTitle("투표하기", for: .normal)
-                self?.voteButton.setTitle("투표완료", for: .disabled)
-                self?.voteButton.setButtonState(isEnabled)
+                self?.voteButton.setTitle(status == MeetingStatus.waiting
+                                          ? "투표시작 대기"
+                                          : "투표완료",
+                                          for: .disabled)
+                self?.voteButton.setButtonState(status == MeetingStatus.voting ? true : false)
             })
             .disposed(by: disposeBag)
     }

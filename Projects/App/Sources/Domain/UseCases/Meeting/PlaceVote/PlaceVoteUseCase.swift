@@ -48,7 +48,7 @@ final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
      
      */
     func votePlace(votes: [PlaceVote]) {
-        
+        self.isVoted.onNext(true)
     }
 
 }
