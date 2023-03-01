@@ -16,7 +16,7 @@ final class PlaceVoteViewModel: BaseViewModel {
     private let meetingId: Int
     private var meetingStatus: MeetingStatus
     private var placelist: [PlaceVote] = []
-    private var myVoteSelection:  [PlaceVote] = []
+    private var myVoteSelection: [PlaceVote] = []
     
     struct Input {
         let viewWillAppear: Observable<Void>
@@ -82,7 +82,7 @@ final class PlaceVoteViewModel: BaseViewModel {
             })
             .disposed(by: disposeBag)
         
-        self.usecase.isVoted
+        self.usecase.isCurrentUserVoted
             .subscribe(onNext: { isVoted in
                 if isVoted == true {
                     self.meetingStatus = .voted

@@ -20,6 +20,7 @@ final class PlaceVoteViewController: UIViewController {
     private let viewmodel: PlaceVoteViewModel
     private var placeList: [PlaceVote] = []
     private var isVoted = false
+    private var totalCount = 0
     
     private let cellSelection = PublishRelay<Int>()
     
@@ -137,6 +138,8 @@ extension PlaceVoteViewController {
             .asDriver(onErrorJustReturn: 0)
             .drive(onNext: { [weak self] count in
                 self?.peopleNumLabel.text = "\(count)명 참가"
+                self?.totalCount = count
+                self?.tableView.reloadData()
             })
             .disposed(by: disposeBag)
         
@@ -145,14 +148,21 @@ extension PlaceVoteViewController {
             .drive(onNext: { [weak self] status in
                 var txt = ""
                 switch status {
-                case .voted: txt = "투표완료"
-                case .voting: txt = "투표하기"
-                case .waiting: txt = "투표시작대기"
-                case .done, .confirmed: txt = "투표종료"
+                case .voted:
+                    txt = "투표완료"
+                    self?.isVoted = true
+                case .voting:
+                    txt = "투표하기"
+                    self?.isVoted = false
+                case .waiting:
+                    txt = "투표시작대기"
+                case .done, .confirmed:
+                    txt = "투표종료"
                 }
                 self?.voteButton.setTitle(txt, for: .normal)
                 self?.voteButton.setTitle(txt, for: .disabled)
                 self?.voteButton.setButtonState(status == MeetingStatus.voting ? true : false)
+                self?.tableView.reloadData()
             })
             .disposed(by: disposeBag)
     }
@@ -206,7 +216,7 @@ extension PlaceVoteViewController: UITableViewDataSource {
                 as? PlaceVoteCell else { return UITableViewCell() }
         cell.configure(isVoted: isVoted,
                        placevote: placeList[indexPath.row],
-                       total: 9)
+                       total: totalCount)
         cell.selectionStyle = .none
         cell.isUserInteractionEnabled = !isVoted
         return cell
