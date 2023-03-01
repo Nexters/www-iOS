@@ -13,12 +13,15 @@ final class RoomMainViewController: UIViewController {
     
     // MARK: - Properties
     private let bag = DisposeBag()
-    var viewModel: RoomMainViewModel
+    var viewModel: RoomHomeViewModel
+    var voteDict: [String: Int] = [:]
+    
+    lazy var fetchedMainRoomMeetingInfo: MainRoomMeetingInfo = MainRoomMeetingInfo.emtpyData
     
     // MARK: - UI
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
-        scrollView.backgroundColor = .red
+        scrollView.backgroundColor = .wwwColor(.Gray50)
         return scrollView
     }()
     
@@ -66,15 +69,17 @@ final class RoomMainViewController: UIViewController {
     
     private let yaksokiImgView: UIImageView = {
         let img = UIImageView()
-        img.image = UIImage(.monster)
+        img.image = UIImage(.yaksoki_eat)
         img.contentMode = .scaleAspectFit
         return img
     }()
     
     private let whenContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .wwwColor(.Gray50)
-//        view.backgroundColor = .clear
+        view.snp.makeConstraints {
+            $0.height.equalTo(44 + 28)
+            $0.width.equalTo(WINDOW_WIDTH-40)
+        }
         return view
     }()
     
@@ -95,8 +100,10 @@ final class RoomMainViewController: UIViewController {
     
     private let whereContainerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .wwwColor(.Gray50)
-        view.backgroundColor = .clear
+        view.snp.makeConstraints {
+            $0.height.equalTo(44 + 28)
+            $0.width.equalTo(WINDOW_WIDTH-40)
+        }
         return view
     }()
     
@@ -119,7 +126,7 @@ final class RoomMainViewController: UIViewController {
     private let whereTableView = UITableView(frame: CGRect.zero, style: .grouped)
     
     // MARK: - Life Cycle
-    init(viewModel: RoomMainViewModel) {
+    init(viewModel: RoomHomeViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -140,7 +147,7 @@ final class RoomMainViewController: UIViewController {
         self.view.backgroundColor = .wwwColor(.Gray50)
         self.view.addSubview(scrollView)
         scrollView.snp.makeConstraints {
-            $0.edges.equalTo(view.safeAreaLayoutGuide)
+            $0.edges.equalToSuperview()
         }
         
         self.scrollView.addSubview(contentView)
@@ -172,9 +179,6 @@ final class RoomMainViewController: UIViewController {
         }
         
         self.contentView.addArrangedSubview(whenContainerView)
-        whenContainerView.snp.makeConstraints {
-            $0.width.equalTo(WINDOW_WIDTH-40)
-        }
         
         whenContainerView.addSubview(whenTitleLabel)
         whenTitleLabel.snp.makeConstraints {
@@ -195,26 +199,26 @@ final class RoomMainViewController: UIViewController {
         }
         
         self.contentView.addArrangedSubview(whereContainerView)
-//
         whereContainerView.addSubview(whereTitleLabel)
         whereTitleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(24)
-            $0.leading.equalToSuperview().inset(20)
+            $0.leading.equalToSuperview()
             $0.bottom.equalToSuperview().inset(20)
         }
-
+        
         whereContainerView.addSubview(whereArrowButton)
         whereArrowButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(20)
             $0.centerY.equalTo(whereTitleLabel)
         }
-//
+        
+        //
         self.contentView.addArrangedSubview(whereTableView)
         whereTableView.snp.makeConstraints {
             $0.height.equalTo(500)
         }
         
-     
+        
     }
     
     private func setTableView() {
@@ -223,9 +227,10 @@ final class RoomMainViewController: UIViewController {
             tableView.dataSource = self
             tableView.showsVerticalScrollIndicator = false
             tableView.register(PlaceVoteCell.self, forCellReuseIdentifier: PlaceVoteCell.id)
-            tableView.backgroundColor = .green
+            tableView.backgroundColor = .clear
             tableView.separatorStyle = .none
             tableView.isScrollEnabled = false
+            tableView.isUserInteractionEnabled = false
             tableView.layer.applyFigmaShadow(color: .black, opacity: 0.05, x: 0, y: 0, blur: 20, spread: 0)
             tableView.snp.makeConstraints {
                 $0.width.equalTo(WINDOW_WIDTH - 40)
@@ -234,7 +239,22 @@ final class RoomMainViewController: UIViewController {
     }
     
     private func bindViewModel() {
+        let input = RoomHomeViewModel.Input(viewDidLoad: Observable.just(()))
         
+        let output = viewModel.transform(input: input, disposeBag: bag)
+        
+        output.mainRoomMeetingInfo
+            .observe(on: MainScheduler.instance)
+            .subscribe(onSuccess: { [weak self] in
+                self?.fetchedMainRoomMeetingInfo = $0
+                
+                self?.voteDict = [:]
+                let userVoteList = $0.userVoteList
+                userVoteList.forEach { vote in
+                    self?.voteDict[vote.location] = vote.users.count
+                }
+                self?.fetchUI(data: $0)
+            }).disposed(by: bag)
     }
     
     private func setNavigationBar() {
@@ -245,6 +265,25 @@ final class RoomMainViewController: UIViewController {
     }
     
     @objc func backButtonDidTap() {}
+    
+    private func fetchUI(data: MainRoomMeetingInfo) {
+        
+        titleLabel.text = data.meetingName
+        usersLabel.text = "\(data.joinedUserCount)/\(data.minimumAlertMembers)명 입장 중"
+        yaksokiImgView.image = data.yaksokiType.toImg()
+        
+        let whenHeight = data.userPromiseDateTimeList.count * 60 + 52
+        self.whenTableView.snp.updateConstraints({ make in
+            make.height.equalTo(whenHeight)
+        })
+        self.whenTableView.reloadData()
+        
+        let whereHeight = data.userPromisePlaceList.count * 60 + 52
+        self.whereTableView.snp.updateConstraints({ make in
+            make.height.equalTo(whereHeight)
+        })
+        self.whereTableView.reloadData()
+    }
 }
 
 extension RoomMainViewController: UITableViewDelegate {
@@ -259,7 +298,7 @@ extension RoomMainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 11.0
     }
-
+    
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 40.0 + 1.0
     }
@@ -267,7 +306,11 @@ extension RoomMainViewController: UITableViewDelegate {
 
 extension RoomMainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-       return 20
+        if tableView == whenTableView {
+            return fetchedMainRoomMeetingInfo.userPromiseDateTimeList.count
+        } else {
+            return fetchedMainRoomMeetingInfo.userPromisePlaceList.count
+        }
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -278,13 +321,21 @@ extension RoomMainViewController: UITableViewDataSource {
         if tableView == whenTableView {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
                     as? PlaceVoteCell else { return UITableViewCell() }
-            cell.configure(with: "\(indexPath.row)번째 아이템")
+            if fetchedMainRoomMeetingInfo.userPromiseDateTimeList.count > 0 {
+                let timeInfo = fetchedMainRoomMeetingInfo.userPromiseDateTimeList[indexPath.row]
+                cell.configure(title: "\(timeInfo.promiseDate.toDate()!.formatted("yy.MM.dd"))" + " \(timeInfo.promiseDayOfWeek)" + "  \(timeInfo.promiseTime.toText())", count: timeInfo.userInfoList.count)
+            }
+            
             cell.selectionStyle = .none
             return cell
         } else {
             guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
                     as? PlaceVoteCell else { return UITableViewCell() }
-            cell.configure(with: "\(indexPath.row)번째 아이템")
+            if fetchedMainRoomMeetingInfo.userPromisePlaceList.count > 0 {
+                let placeInfo = fetchedMainRoomMeetingInfo.userPromisePlaceList[indexPath.row]
+
+                cell.configure(title: "\(placeInfo.promisePlace)", count: voteDict[placeInfo.promisePlace] ?? 0)
+            }
             cell.selectionStyle = .none
             return cell
         }
@@ -298,12 +349,12 @@ extension RoomMainViewController: UITableViewDataSource {
         headerView.contentView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         return headerView
     }
-
+    
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-
+        
         let line = UIView()
         line.backgroundColor = UIColor.wwwColor(.Gray150)
-
+        
         let peopleNumLabel: UILabel = {
             $0.numberOfLines = 0
             $0.textColor = UIColor.wwwColor(.Gray350)
@@ -311,37 +362,39 @@ extension RoomMainViewController: UITableViewDataSource {
             $0.text = "N명 참여중"
             return $0
         }(UILabel())
-
+        
         let icon: UIImageView = { // TODO: 아이콘으로 교체
             let imageIcon = UIImage(systemName: "chevron.right")?.withTintColor(.wwwColor(.Gray350), renderingMode: .alwaysOriginal)
             $0.image = imageIcon
             $0.contentMode = .scaleAspectFit
             return $0
         }(UIImageView())
-
+        
         let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "footer") ?? UITableViewHeaderFooterView()
         footerView.contentView.backgroundColor = .white
         footerView.contentView.layer.cornerRadius = 10
         footerView.contentView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-
+        
         footerView.contentView.addSubviews(line, peopleNumLabel, icon)
         line.snp.makeConstraints { make in
             make.top.leading.equalToSuperview()
             make.height.equalTo(1)
             make.width.equalToSuperview()
         }
-
+        
         peopleNumLabel.snp.makeConstraints { make in
             make.top.equalTo(line.snp.bottom).offset(10)
             make.leading.equalToSuperview().offset(20)
         }
-
+        
         icon.snp.makeConstraints { make in
             make.leading.equalTo(peopleNumLabel.snp.trailing).offset(2)
             make.centerY.equalTo(peopleNumLabel.snp.centerY)
             make.width.height.equalTo(14)
         }
-
+        
+        peopleNumLabel.text = "\( fetchedMainRoomMeetingInfo.votingUserCount)명 참여"
+       
         return footerView
     }
     
@@ -354,8 +407,8 @@ extension RoomMainViewController: UITableViewDataSource {
 import SwiftUI
 
 struct RoomHomeViewController_Preview: PreviewProvider {
-   static var previews: some View {
-       RoomMainViewController(viewModel: RoomMainViewModel()).toPreview()
-   }
+    static var previews: some View {
+        RoomMainViewController(viewModel: RoomHomeViewModel(mainRoomUseCase: MainRoomUseCase(meetingRoomRepository: MainRoomDAO(network: MeetingAPIManager.provider)))).toPreview()
+    }
 }
 #endif
