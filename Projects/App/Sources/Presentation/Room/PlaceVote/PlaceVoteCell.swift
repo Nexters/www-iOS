@@ -97,8 +97,9 @@ final class PlaceVoteCell: UITableViewCell {
 // MARK: privates
 extension PlaceVoteCell {
     
-    func configure(with text: String) {
-        nameLabel.text = "\(text)번째"
+    func configure(title: String, count: Int) {
+        nameLabel.text = title
+        countLabel.text = "\(count)명"
     }
     
     func onSelected() {
