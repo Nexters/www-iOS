@@ -1,5 +1,5 @@
 //
-//  RoomHomeViewModel.swift
+//  RoomMainViewModel.swift
 //  App
 //
 //  Created by kokojong on 2023/02/28.
@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 import RxRelay
 
-final class RoomHomeViewModel: BaseViewModel {
+final class RoomMainViewModel: BaseViewModel {
     func transform(input: Input, disposeBag: DisposeBag) -> Output {
         input.viewDidLoad.subscribe(onNext: {
             

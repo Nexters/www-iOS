@@ -1,5 +1,5 @@
 //
-//  RoomHomeViewController.swift
+//  RoomMainViewController.swift
 //  App
 //
 //  Created by kokojong on 2023/02/28.
@@ -9,28 +9,34 @@
 import UIKit
 import RxSwift
 
-final class RoomHomeViewController: UIViewController {
+final class RoomMainViewController: UIViewController {
     
     // MARK: - Properties
     private let bag = DisposeBag()
-    var viewModel: RoomHomeViewModel
+    var viewModel: RoomMainViewModel
     
     // MARK: - UI
     private let scrollView: UIScrollView = {
         let scrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.backgroundColor = .red
-        scrollView.showsVerticalScrollIndicator = false
-        
         return scrollView
+    }()
+    
+    private let contentView: UIStackView = {
+        let view = UIStackView()
+        view.axis = .vertical
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.backgroundColor = .wwwColor(.Gray50)
+        view.distribution = .fillProportionally
+        view.alignment = .center
+        return view
     }()
     
     private let headerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .yellow
+        view.backgroundColor = .blue
         view.setRoundCorners([.bottomLeft, .bottomRight], radius: 30)
-//        view.addGradientLayer(colors: [UIColor.wwwColor(.WWWGreen).withAlphaComponent(1).cgColor, UIColor.wwwColor(.WWWWhite).withAlphaComponent(1).cgColor], locations: nil, startPoint: CGPoint(x: 0.5, y: 0), endPoint: CGPoint(x: 0.5, y: 1))
-//        view.layoutIfNeeded()
+        // TODO: - img로 변경
         view.snp.makeConstraints {
             $0.width.equalTo(WINDOW_WIDTH)
             $0.height.equalTo(235)
@@ -68,6 +74,7 @@ final class RoomHomeViewController: UIViewController {
     private let whenContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .wwwColor(.Gray50)
+//        view.backgroundColor = .clear
         return view
     }()
     
@@ -89,6 +96,7 @@ final class RoomHomeViewController: UIViewController {
     private let whereContainerView: UIView = {
         let view = UIView()
         view.backgroundColor = .wwwColor(.Gray50)
+        view.backgroundColor = .clear
         return view
     }()
     
@@ -111,7 +119,7 @@ final class RoomHomeViewController: UIViewController {
     private let whereTableView = UITableView(frame: CGRect.zero, style: .grouped)
     
     // MARK: - Life Cycle
-    init(viewModel: RoomHomeViewModel) {
+    init(viewModel: RoomMainViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
     }
@@ -122,16 +130,25 @@ final class RoomHomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.setTableView()
         self.setUI()
         self.setNavigationBar()
-        self.setTableView()
         bindViewModel()
     }
     
     private func setUI() {
         self.view.backgroundColor = .wwwColor(.Gray50)
+        self.view.addSubview(scrollView)
+        scrollView.snp.makeConstraints {
+            $0.edges.equalTo(view.safeAreaLayoutGuide)
+        }
         
-        self.view.addSubview(headerView)
+        self.scrollView.addSubview(contentView)
+        contentView.snp.makeConstraints {
+            $0.width.edges.equalTo(scrollView)
+        }
+        
+        contentView.addArrangedSubview(headerView)
         headerView.snp.makeConstraints {
             $0.top.horizontalEdges.equalToSuperview()
         }
@@ -154,59 +171,49 @@ final class RoomHomeViewController: UIViewController {
             $0.top.equalTo(usersLabel.snp.bottom).offset(3)
         }
         
-        self.view.addSubview(whenContainerView)
+        self.contentView.addArrangedSubview(whenContainerView)
         whenContainerView.snp.makeConstraints {
-            $0.top.equalTo(headerView.snp.bottom)
-            $0.horizontalEdges.equalToSuperview()
-//            $0.bottom.equalToSuperview()
+            $0.width.equalTo(WINDOW_WIDTH-40)
         }
         
         whenContainerView.addSubview(whenTitleLabel)
         whenTitleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(24)
-            $0.leading.equalToSuperview().inset(20)
+            $0.leading.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(20)
         }
         
         whenContainerView.addSubview(whenArrowButton)
         whenArrowButton.snp.makeConstraints {
-            $0.trailing.equalToSuperview().inset(20)
+            $0.trailing.equalToSuperview()
             $0.centerY.equalTo(whenTitleLabel)
         }
         
-        self.whenContainerView.addSubview(whenTableView)
+        self.contentView.addArrangedSubview(whenTableView)
         whenTableView.snp.makeConstraints {
-            $0.top.equalTo(whenTitleLabel.snp.bottom).offset(20)
-            $0.horizontalEdges.equalToSuperview().inset(20)
-            $0.height.equalTo(200)
-//            $0.bottom.equalToSuperview()
+            $0.height.equalTo(500)
         }
         
-        self.view.addSubview(whereContainerView)
-        whereContainerView.snp.makeConstraints {
-            $0.top.equalTo(whenContainerView.snp.bottom)
-            $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalToSuperview()
-        }
-
+        self.contentView.addArrangedSubview(whereContainerView)
+//
         whereContainerView.addSubview(whereTitleLabel)
         whereTitleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(24)
             $0.leading.equalToSuperview().inset(20)
+            $0.bottom.equalToSuperview().inset(20)
         }
 
         whereContainerView.addSubview(whereArrowButton)
         whereArrowButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(20)
-            $0.centerY.equalTo(whenTitleLabel)
+            $0.centerY.equalTo(whereTitleLabel)
         }
-
-        self.whereContainerView.addSubview(whereTableView)
+//
+        self.contentView.addArrangedSubview(whereTableView)
         whereTableView.snp.makeConstraints {
-            $0.top.equalTo(whereTitleLabel.snp.bottom).offset(20)
-            $0.horizontalEdges.equalToSuperview().inset(20)
-            $0.height.equalTo(200)
-            $0.bottom.equalToSuperview()
+            $0.height.equalTo(500)
         }
+        
      
     }
     
@@ -216,10 +223,13 @@ final class RoomHomeViewController: UIViewController {
             tableView.dataSource = self
             tableView.showsVerticalScrollIndicator = false
             tableView.register(PlaceVoteCell.self, forCellReuseIdentifier: PlaceVoteCell.id)
-            tableView.backgroundColor = .yellow
+            tableView.backgroundColor = .green
             tableView.separatorStyle = .none
-            tableView.rowHeight = UITableView.automaticDimension
+            tableView.isScrollEnabled = false
             tableView.layer.applyFigmaShadow(color: .black, opacity: 0.05, x: 0, y: 0, blur: 20, spread: 0)
+            tableView.snp.makeConstraints {
+                $0.width.equalTo(WINDOW_WIDTH - 40)
+            }
         }
     }
     
@@ -237,7 +247,7 @@ final class RoomHomeViewController: UIViewController {
     @objc func backButtonDidTap() {}
 }
 
-extension RoomHomeViewController: UITableViewDelegate {
+extension RoomMainViewController: UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -255,17 +265,30 @@ extension RoomHomeViewController: UITableViewDelegate {
     }
 }
 
-extension RoomHomeViewController: UITableViewDataSource {
+extension RoomMainViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 8
+       return 20
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
-                as? PlaceVoteCell else { return UITableViewCell() }
-        cell.configure(with: "\(indexPath.row)번째 아이템")
-        cell.selectionStyle = .none
-        return cell
+        if tableView == whenTableView {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
+                    as? PlaceVoteCell else { return UITableViewCell() }
+            cell.configure(with: "\(indexPath.row)번째 아이템")
+            cell.selectionStyle = .none
+            return cell
+        } else {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
+                    as? PlaceVoteCell else { return UITableViewCell() }
+            cell.configure(with: "\(indexPath.row)번째 아이템")
+            cell.selectionStyle = .none
+            return cell
+        }
+        
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -275,12 +298,12 @@ extension RoomHomeViewController: UITableViewDataSource {
         headerView.contentView.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMinXMinYCorner]
         return headerView
     }
-    
+
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        
+
         let line = UIView()
         line.backgroundColor = UIColor.wwwColor(.Gray150)
-        
+
         let peopleNumLabel: UILabel = {
             $0.numberOfLines = 0
             $0.textColor = UIColor.wwwColor(.Gray350)
@@ -288,37 +311,37 @@ extension RoomHomeViewController: UITableViewDataSource {
             $0.text = "N명 참여중"
             return $0
         }(UILabel())
-        
+
         let icon: UIImageView = { // TODO: 아이콘으로 교체
             let imageIcon = UIImage(systemName: "chevron.right")?.withTintColor(.wwwColor(.Gray350), renderingMode: .alwaysOriginal)
             $0.image = imageIcon
             $0.contentMode = .scaleAspectFit
             return $0
         }(UIImageView())
-        
+
         let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "footer") ?? UITableViewHeaderFooterView()
         footerView.contentView.backgroundColor = .white
         footerView.contentView.layer.cornerRadius = 10
         footerView.contentView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
-        
+
         footerView.contentView.addSubviews(line, peopleNumLabel, icon)
         line.snp.makeConstraints { make in
             make.top.leading.equalToSuperview()
             make.height.equalTo(1)
             make.width.equalToSuperview()
         }
-        
+
         peopleNumLabel.snp.makeConstraints { make in
             make.top.equalTo(line.snp.bottom).offset(10)
             make.leading.equalToSuperview().offset(20)
         }
-        
+
         icon.snp.makeConstraints { make in
             make.leading.equalTo(peopleNumLabel.snp.trailing).offset(2)
             make.centerY.equalTo(peopleNumLabel.snp.centerY)
             make.width.height.equalTo(14)
         }
-        
+
         return footerView
     }
     
@@ -332,7 +355,7 @@ import SwiftUI
 
 struct RoomHomeViewController_Preview: PreviewProvider {
    static var previews: some View {
-       RoomHomeViewController(viewModel: RoomHomeViewModel()).toPreview()
+       RoomMainViewController(viewModel: RoomMainViewModel()).toPreview()
    }
 }
 #endif
