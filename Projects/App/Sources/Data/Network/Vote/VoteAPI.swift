@@ -13,6 +13,7 @@ import RxSwift
 
 enum VoteAPI {
     case fetchVoteLists(id: Int)
+    case fetchVotePlaces(id: Int) // 유저들이 선택한 장소
 }
 
 extension VoteAPI: TargetType {
@@ -24,6 +25,8 @@ extension VoteAPI: TargetType {
         switch self {
         case .fetchVoteLists(let id):
             return "votes/\(id)"
+        case .fetchVotePlaces(let id):
+            return "places/\(id)"
         }
     }
     
@@ -31,20 +34,24 @@ extension VoteAPI: TargetType {
         switch self {
         case .fetchVoteLists:
             return .get
+        case .fetchVotePlaces:
+            return .get
         }
     }
     
     var task: Moya.Task {
         switch self {
-        case .fetchVoteLists(let id):
-            return .requestJSONEncodable(id)
+        case .fetchVoteLists:
+            return .requestPlain
+        case .fetchVotePlaces:
+            return .requestPlain
         }
     }
     
     var headers: [String : String]? {
-        // let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjc2ODAzNzQyLCJleHAiOjkyMjMzNzIwMzY4NTQ3NzV9.I_uOzywGtMG0bxX5Yot13103RPHeDfXILhGoDthaBcaMcl26WN7OXp0Hg3u_ksLpZpZtIIt828kj5u7Tgc523Q"
+        // let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLssKztnazrlJTrsJTsnbTsiqQiLCJpYXQiOjE2Nzc2MDI2ODcsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.5j7rUCS9Elo42BbNLxMmbMtkoTy5DsabG74_ESuQAvr2GfyYfHdjb3v98UYTUDTh9EnhQ1iV7VNXSDpjKPPMHA"
         switch self {
-        case .fetchVoteLists:
+        case .fetchVoteLists, .fetchVotePlaces:
             return ["Content-Type": "application/json",
                     "Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
         }
