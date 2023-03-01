@@ -15,11 +15,11 @@ final class PlaceVoteViewModel: BaseViewModel {
     private var disposeBag = DisposeBag()
     private let meetingId: Int
     private var meetingStatus: MeetingStatus
-    private var placelist: [PlaceVote] = []
+    var placelist: [PlaceVote] = []
     private var myVoteSelection: [PlaceVote] = []
     
     struct Input {
-        let viewWillAppear: Observable<Void>
+        let viewDidLoad: Observable<Void>
         let voteCellDidTap: Observable<Int>
         let voteButtonDidTap: Observable<Void>
     }
@@ -62,7 +62,7 @@ final class PlaceVoteViewModel: BaseViewModel {
     private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
         
-        input.viewWillAppear
+        input.viewDidLoad
             .subscribe(onNext: { [weak self] in
                 self?.usecase.fetchPlaceVotes(meetingId: self!.meetingId)
                     .subscribe(onNext: { [weak self] list in
@@ -75,19 +75,24 @@ final class PlaceVoteViewModel: BaseViewModel {
         
         input.voteButtonDidTap
             .subscribe(onNext: { [weak self] in
-                guard let myvote =  self?.myVoteSelection else { return }
+                guard let myvote =  self?.myVoteSelection, let id = self?.meetingId else { return }
                 if myvote.count > 0 {
-                    self?.usecase.votePlace(votes: myvote)
+                    self?.usecase.votePlace(meetingId: id, votes: myvote)
+                        .subscribe(onNext: { [weak self] list in
+                            self?.placelist = list
+                            output.placeVoteList.accept(list)
+                        }).disposed(by: disposeBag)
+                    output.voteButtonStatus.accept(self?.meetingStatus ?? .voted)
                 }
             })
             .disposed(by: disposeBag)
         
         self.usecase.isCurrentUserVoted
-            .subscribe(onNext: { isVoted in
+            .subscribe(onNext: { [weak self] isVoted in
                 if isVoted == true {
-                    self.meetingStatus = .voted
+                    self?.meetingStatus = .voted
+                    output.voteButtonStatus.accept(self?.meetingStatus ?? .voted)
                 }
-                output.voteButtonStatus.accept(self.meetingStatus)
             })
             .disposed(by: disposeBag)
         

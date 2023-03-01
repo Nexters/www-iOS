@@ -29,7 +29,7 @@ extension VoteAPI: TargetType {
         case .fetchVotePlaces(let id):
             return "places/\(id)"
         case .postVote(let id, _):
-            return "/meetings/\(id)/votes"
+            return "meetings/\(id)/votes"
         }
     }
     
@@ -56,7 +56,7 @@ extension VoteAPI: TargetType {
     }
     
     var headers: [String : String]? {
-         let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLssKztnazrlJTrsJTsnbTsiqQiLCJpYXQiOjE2Nzc2MDI2ODcsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.5j7rUCS9Elo42BbNLxMmbMtkoTy5DsabG74_ESuQAvr2GfyYfHdjb3v98UYTUDTh9EnhQ1iV7VNXSDpjKPPMHA"
+         let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZGxrZGxrZmxramRma2wiLCJpYXQiOjE2Nzc3MTQ0NjUsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.DjOvNwKRbyfUd_qwsZbpo3WOzmGW0UFzkTA_0PpKngfDjV2mAcunlZbdemnmb3IoKgBso_cNY8TlaOWISFmZIA"
         switch self {
         case .fetchVoteLists, .fetchVotePlaces, .postVote:
             return ["Content-Type": "application/json",

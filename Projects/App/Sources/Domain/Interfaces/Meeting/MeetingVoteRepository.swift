@@ -10,6 +10,7 @@ import Foundation
 import RxSwift
 
 protocol MeetingVoteRepository {
+    func postMyVote(meetingId id: Int, votes: [PlaceVote]) -> Observable<Bool>
     func fetchMyVote(meetingId id: Int) -> Observable<[String]>
     func fetchVoteUsers(meetingId id: Int) -> Observable<Int>
     func fetchPlaceToVoteList(meetingId id: Int) -> Observable<[PlaceVote]>

@@ -10,7 +10,6 @@ import Foundation
 import RxSwift
 
 protocol PlaceVoteUseCaseProtocol {
-    var meetingId: Int { get set }
     var isCurrentUserVoted: PublishSubject<Bool> { get } // 나의 투표여부
     var fetchedVotes: [PlaceVote] { get set }
     var votedUserCount: PublishSubject<Int> { get }
@@ -19,7 +18,6 @@ protocol PlaceVoteUseCaseProtocol {
 final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
     
     // MARK: - Properties
-    internal var meetingId: Int = -1
     var isCurrentUserVoted = PublishSubject<Bool>()
     internal var fetchedVotes: [PlaceVote] = []
     var votedUserCount = PublishSubject<Int>()
@@ -32,14 +30,14 @@ final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
     init(repository: MeetingVoteRepository) {
         self.repository = repository
     }
-
+    
     func fetchPlaceVotes(meetingId: Int) -> Observable<[PlaceVote]> {
         self.repository.fetchVoteUsers(meetingId: meetingId)
             .subscribe(onNext: { [weak self] count in
                 self?.votedUserCount.onNext(count)
             })
             .disposed(by: bag)
-
+        
         return self.repository.fetchPlaceToVoteList(meetingId: meetingId)
             .compactMap({ [weak self] placeVotes in
                 self?.fetchedVotes = placeVotes
@@ -57,8 +55,14 @@ final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
      2. 결과 -> 성공적으로 투표되면 투표완료 버튼 비활성화
      
      */
-    func votePlace(votes: [PlaceVote]) {
-        self.isCurrentUserVoted.onNext(true)
+    func votePlace(meetingId: Int, votes: [PlaceVote]) -> Observable<[PlaceVote]> {
+        self.repository.postMyVote(meetingId: meetingId,
+                                   votes: votes)
+        .bind(to: self.isCurrentUserVoted)
+        .disposed(by: bag)
+        
+        return fetchPlaceVotes(meetingId: meetingId)
+        
     }
     
 }

@@ -59,20 +59,24 @@ final class PlaceVoteViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.bindViewModel()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationBar(title: "어디서")
         self.setUI()
-        self.bindViewModel()
-        self.setTableView()
     }
     
     
 }
 // MARK: - Methods
 extension PlaceVoteViewController {
-    
-    private func setTableView() {
+    private func setUI() {
+        self.view.backgroundColor = .wwwColor(.WWWWhite)
+        
         tableView.delegate = self
         tableView.dataSource = self
         tableView.showsVerticalScrollIndicator = false
@@ -80,10 +84,6 @@ extension PlaceVoteViewController {
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
         tableView.layer.applyFigmaShadow(color: .black, opacity: 0.05, x: 0, y: 0, blur: 20, spread: 0)
-    }
-    
-    private func setUI() {
-        self.view.backgroundColor = .wwwColor(.WWWWhite)
   
         self.view.addSubview(tableView)
         tableView.snp.makeConstraints {
@@ -117,7 +117,8 @@ extension PlaceVoteViewController {
     func bindViewModel() {
         
         let input = PlaceVoteViewModel.Input(
-            viewWillAppear: self.rx.methodInvoked(#selector(UIViewController.viewWillAppear)).map { _ in },
+            viewDidLoad:
+                Observable.just(()).asObservable(),
             voteCellDidTap:
                 cellSelection.asObservable(),
             voteButtonDidTap:
@@ -197,7 +198,7 @@ extension PlaceVoteViewController: UITableViewDelegate {
         
         cell.configure(isVoted: self.isVoted,
                        placevote: placeList[indexPath.row],
-                       total: 9)
+                       total: totalCount)
         cell.isUserInteractionEnabled = !isVoted
         
     }

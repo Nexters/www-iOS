@@ -82,9 +82,13 @@ final class PlaceVoteCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        nameLabel.text = ""
-        countLabel.text = "0명"
-        setProgress(progress: 0.0)
+//        nameLabel.text = ""
+//        countLabel.text = "0명"
+//        setProgress(progress: 0.0)
+//        containerView.layer.borderWidth = 0.0
+//        containerView.layer.borderColor = UIColor.clear.cgColor
+//        hideBadge()
+//        gradientClear()
     }
     
 }
@@ -102,14 +106,16 @@ extension PlaceVoteCell {
         countLabel.text = "\(placevote.count)명"
         
         let progress = CGFloat(placevote.count) / CGFloat(total)
-        
+        print("셀마스터\(placevote) : \(isVoted)")
         if isVoted {
             setProgress(progress: progress)
             setStatus(type: placevote.isMyVote
                       ? .doneSelected
                       : .doneNotSelected)
         } else {
-            setProgress(progress: progress)
+            setProgress(progress: placevote.isMyVote
+                        ? 1.0
+                        : progress)
             setStatus(type: placevote.isMyVote
                       ? .progSelected
                       : .progNotSelected)
