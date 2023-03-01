@@ -18,6 +18,16 @@ final class PlaceVoteDAO: MeetingVoteRepository {
         self.network = network
     }
     
+    func fetchMyVote(meetingId id: Int) -> Observable<[String]> {
+        return self.network.request(.fetchVoteLists(id: id))
+            .map(PlaceVoteResponseDTO.self)
+            .compactMap({ response in
+                if response.code == 0 {
+                    return response.result.myVoteList
+                } else { return [] } // TODO: 에러처리
+            }).asObservable()
+    }
+    
     func fetchVoteUsers(meetingId id: Int) -> Observable<Int> {
         return self.network.request(.fetchVoteLists(id: id))
             .map(PlaceVoteResponseDTO.self)
@@ -34,14 +44,17 @@ final class PlaceVoteDAO: MeetingVoteRepository {
             .compactMap { response in
                 if response.code == 0 {
                     var placelist: [PlaceVote] = []
-                    let myname = UserDefaultKeyCase().getUserName()
+                    var myVote: [String] = []
                     for place in response.result.userPromisePlaceList {
                         var isMyVote = false
-                        for i in place.userInfoList {
-                            if i.joinedUserName == myname {
+                        let myname = UserDefaultKeyCase().getUserName()
+                        
+                        for user in place.userInfoList {
+                            if user.joinedUserName == myname {
                                 isMyVote = true
                             }
                         }
+                        if myVote.contains(place.promisePlace) { isMyVote = true}
                         placelist += [PlaceVote(id: place.placeID,
                                                 placeName: place.promisePlace,
                                                 count: place.userInfoList.count,

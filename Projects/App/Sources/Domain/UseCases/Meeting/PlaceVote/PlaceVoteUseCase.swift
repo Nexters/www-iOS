@@ -11,7 +11,7 @@ import RxSwift
 
 protocol PlaceVoteUseCaseProtocol {
     var meetingId: Int { get set }
-    var isVoted: PublishSubject<Bool> { get } // 나의 투표여부
+    var isCurrentUserVoted: PublishSubject<Bool> { get } // 나의 투표여부
     var fetchedVotes: [PlaceVote] { get set }
     var votedUserCount: PublishSubject<Int> { get }
 }
@@ -20,7 +20,7 @@ final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
     
     // MARK: - Properties
     internal var meetingId: Int = -1
-    var isVoted = PublishSubject<Bool>()
+    var isCurrentUserVoted = PublishSubject<Bool>()
     internal var fetchedVotes: [PlaceVote] = []
     var votedUserCount = PublishSubject<Int>()
     
@@ -45,7 +45,7 @@ final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
                 self?.fetchedVotes = placeVotes
                 let checkMyVoteStatus = self?.containsMyVote(placeVotes)
                 if checkMyVoteStatus! {
-                    self?.isVoted.onNext(true)
+                    self?.isCurrentUserVoted.onNext(true)
                 }
                 return placeVotes
             }).asObservable()
@@ -58,7 +58,7 @@ final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
      
      */
     func votePlace(votes: [PlaceVote]) {
-        self.isVoted.onNext(true)
+        self.isCurrentUserVoted.onNext(true)
     }
     
 }
