@@ -25,6 +25,23 @@ final class PlaceVoteViewController: UIViewController {
     
     private let tableView = UITableView(frame: CGRect.zero, style: .grouped)
     
+    let line = UIView()
+    
+    let peopleNumLabel: UILabel = {
+        $0.numberOfLines = 0
+        $0.textColor = UIColor.wwwColor(.Gray350)
+        $0.font = UIFont.www.body6
+        $0.text = "N명 참여중"
+        return $0
+    }(UILabel())
+    
+    let icon: UIImageView = { // TODO: 아이콘으로 교체
+        let imageIcon = UIImage(systemName: "chevron.right")?.withTintColor(.wwwColor(.Gray350), renderingMode: .alwaysOriginal)
+        $0.image = imageIcon
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
+    
     private lazy var voteButton: LargeButton = {
         $0.setTitle("투표하기", for: .normal)
         $0.setButtonState(true)
@@ -117,6 +134,13 @@ extension PlaceVoteViewController {
             })
             .disposed(by: disposeBag)
         
+        output.totalVote
+            .asDriver(onErrorJustReturn: 0)
+            .drive(onNext: { [weak self] count in
+                self?.peopleNumLabel.text = "\(count)명 참가"
+            })
+            .disposed(by: disposeBag)
+        
         output.voteButtonStatus
             .asDriver(onErrorJustReturn: .done)
             .drive(onNext: { [weak self] status in
@@ -194,24 +218,7 @@ extension PlaceVoteViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        
-        let line = UIView()
         line.backgroundColor = UIColor.wwwColor(.Gray150)
-        
-        let peopleNumLabel: UILabel = {
-            $0.numberOfLines = 0
-            $0.textColor = UIColor.wwwColor(.Gray350)
-            $0.font = UIFont.www.body6
-            $0.text = "N명 참여중"
-            return $0
-        }(UILabel())
-        
-        let icon: UIImageView = { // TODO: 아이콘으로 교체 
-            let imageIcon = UIImage(systemName: "chevron.right")?.withTintColor(.wwwColor(.Gray350), renderingMode: .alwaysOriginal)
-            $0.image = imageIcon
-            $0.contentMode = .scaleAspectFit
-            return $0
-        }(UIImageView())
         
         let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "footer") ?? UITableViewHeaderFooterView()
         footerView.contentView.backgroundColor = .white

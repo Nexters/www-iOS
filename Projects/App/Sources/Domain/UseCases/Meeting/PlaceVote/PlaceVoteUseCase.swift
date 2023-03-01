@@ -12,7 +12,8 @@ import RxSwift
 protocol PlaceVoteUseCaseProtocol {
     var meetingId: Int { get set }
     var isVoted: PublishSubject<Bool> { get } // 나의 투표여부
-    var placeList: [PlaceVote] { get set }
+    var fetchedVotes: [PlaceVote] { get set }
+    var votedUserCount: PublishSubject<Int> { get }
 }
 
 final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
@@ -20,25 +21,34 @@ final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
     // MARK: - Properties
     internal var meetingId: Int = -1
     var isVoted = PublishSubject<Bool>()
-    internal var placeList: [PlaceVote] = []
+    internal var fetchedVotes: [PlaceVote] = []
+    var votedUserCount = PublishSubject<Int>()
     
-    private let disposeBag = DisposeBag()
-
+    private let bag = DisposeBag()
+    private let repository: MeetingVoteRepository
+    
     
     // MARK: - Methods
-    init() {
-//        self.meetingCreateRepository = meetingCreateRepository
+    init(repository: MeetingVoteRepository) {
+        self.repository = repository
     }
-    
-    /*
-     방 초기화 세팅
-     1. 방정보를 가져온다. (/meetings/{meetingId})
-     2. 나의 투표여부(isVoted)를 체크한다.
-     3. 투표선택지와 현재 투표현황을 매핑하여 placeList 만들기
-     ( ​/votes​/{meetingId} )
-     */
-    func fetchPlaceVotes(meetingId: Int) -> [PlaceVote] {
-        return PlaceVote.mockData
+
+    func fetchPlaceVotes(meetingId: Int) -> Observable<[PlaceVote]> {
+        self.repository.fetchVoteUsers(meetingId: meetingId)
+            .subscribe(onNext: { [weak self] count in
+                self?.votedUserCount.onNext(count)
+            })
+            .disposed(by: bag)
+
+        return self.repository.fetchPlaceToVoteList(meetingId: meetingId)
+            .compactMap({ [weak self] placeVotes in
+                self?.fetchedVotes = placeVotes
+                let checkMyVoteStatus = self?.containsMyVote(placeVotes)
+                if checkMyVoteStatus! {
+                    self?.isVoted.onNext(true)
+                }
+                return placeVotes
+            }).asObservable()
     }
     
     /*
@@ -50,5 +60,12 @@ final class PlaceVoteUseCase: PlaceVoteUseCaseProtocol {
     func votePlace(votes: [PlaceVote]) {
         self.isVoted.onNext(true)
     }
+    
+}
 
+private extension PlaceVoteUseCase {
+    
+    func containsMyVote(_ data: [PlaceVote]) -> Bool {
+        return data.contains { $0.isMyVote }
+    }
 }

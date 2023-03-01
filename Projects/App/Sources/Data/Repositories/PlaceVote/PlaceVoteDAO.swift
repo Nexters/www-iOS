@@ -9,29 +9,49 @@
 import Foundation
 import RxSwift
 
-final class PlaceVoteDAO {
+final class PlaceVoteDAO: MeetingVoteRepository {
     
     private let network: RxMoyaProvider<VoteAPI>
     private let disposeBag = DisposeBag()
-    private var myVotes: [String] = []
     
     init(network: RxMoyaProvider<VoteAPI>) {
         self.network = network
     }
     
-    
-    // 투표참가인원
     func fetchVoteUsers(meetingId id: Int) -> Observable<Int> {
         return self.network.request(.fetchVoteLists(id: 193))
             .map(PlaceVoteResponseDTO.self)
             .compactMap({ response in
-                self.myVotes = response.result.myVoteList
-                return response.result.votedUserCount
+                if response.code == 0 {
+                    return response.result.votedUserCount
+                } else { return -1 } // TODO: 에러처리
             }).asObservable()
     }
     
-    
-    
+    func fetchPlaceToVoteList(meetingId id: Int) -> Observable<[PlaceVote]> {
+        return self.network.request(.fetchVotePlaces(id: id))
+            .map(PlaceVoteItemResponseDTO.self)
+            .compactMap { response in
+                if response.code == 0 {
+                    var placelist: [PlaceVote] = []
+                    let myname = UserDefaultKeyCase().getUserName()
+                    for place in response.result.userPromisePlaceList {
+                        var isMyVote = false
+                        for i in place.userInfoList {
+                            if i.joinedUserName == myname {
+                                isMyVote = true
+                            }
+                        }
+                        placelist += [PlaceVote(id: place.placeID,
+                                                placeName: place.promisePlace,
+                                                count: place.userInfoList.count,
+                                                isMyVote: isMyVote)]
+                    }
+                    return placelist
+                } else { return [] } // TODO: 에러처리
+            }
+            .asObservable()
+    }
     
     
 }

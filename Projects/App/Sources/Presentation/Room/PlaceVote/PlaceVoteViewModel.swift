@@ -27,6 +27,7 @@ final class PlaceVoteViewModel: BaseViewModel {
     struct Output {
         var placeVoteList = PublishRelay<[PlaceVote]>()
         var isVoted = BehaviorRelay<Bool>(value: false)
+        var totalVote = PublishRelay<Int>()
         var updateSelected = BehaviorRelay<[String]>(value: [])
         var voteButtonStatus = PublishRelay<MeetingStatus>()
     }
@@ -63,12 +64,11 @@ final class PlaceVoteViewModel: BaseViewModel {
         
         input.viewWillAppear
             .subscribe(onNext: { [weak self] in
-                let list = self?.usecase.fetchPlaceVotes(meetingId: self!.meetingId)
-                self?.placelist = list ?? []
-                output.placeVoteList.accept(list ?? [])
-                
-                output.isVoted.accept(false)
-                
+                self?.usecase.fetchPlaceVotes(meetingId: self!.meetingId)
+                    .subscribe(onNext: { [weak self] list in
+                        self?.placelist = list
+                        output.placeVoteList.accept(list)
+                    }).disposed(by: disposeBag)
             })
             .disposed(by: disposeBag)
         
@@ -87,6 +87,12 @@ final class PlaceVoteViewModel: BaseViewModel {
                     self.meetingStatus = .voted
                 }
                 output.voteButtonStatus.accept(self.meetingStatus)
+            })
+            .disposed(by: disposeBag)
+        
+        self.usecase.votedUserCount
+            .subscribe(onNext: { count in
+                output.totalVote.accept(count)
             })
             .disposed(by: disposeBag)
         

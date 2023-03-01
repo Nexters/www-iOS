@@ -49,11 +49,13 @@ extension VoteAPI: TargetType {
     }
     
     var headers: [String : String]? {
-        // let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLssKztnazrlJTrsJTsnbTsiqQiLCJpYXQiOjE2Nzc2MDI2ODcsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.5j7rUCS9Elo42BbNLxMmbMtkoTy5DsabG74_ESuQAvr2GfyYfHdjb3v98UYTUDTh9EnhQ1iV7VNXSDpjKPPMHA"
+         let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLssKztnazrlJTrsJTsnbTsiqQiLCJpYXQiOjE2Nzc2MDI2ODcsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.5j7rUCS9Elo42BbNLxMmbMtkoTy5DsabG74_ESuQAvr2GfyYfHdjb3v98UYTUDTh9EnhQ1iV7VNXSDpjKPPMHA"
         switch self {
         case .fetchVoteLists, .fetchVotePlaces:
             return ["Content-Type": "application/json",
-                    "Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
+                    "Authorization": "Bearer " + testToken]
+//            return ["Content-Type": "application/json",
+//                    "Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
         }
     }
 }
