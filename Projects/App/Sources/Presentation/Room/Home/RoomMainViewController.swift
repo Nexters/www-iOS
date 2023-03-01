@@ -15,6 +15,12 @@ final class RoomMainViewController: UIViewController {
     private let bag = DisposeBag()
     var viewModel: RoomHomeViewModel
     var voteDict: [String: Int] = [:]
+    var whenRank1Count = -1
+    var whenRank2Count = -1
+    var whenRank3Count = -1
+    var whereRank1Count = -1
+    var whereRank2Count = -1
+    var whereRank3Count = -1
     
     lazy var fetchedMainRoomMeetingInfo: MainRoomMeetingInfo = MainRoomMeetingInfo.emtpyData
     
@@ -37,12 +43,18 @@ final class RoomMainViewController: UIViewController {
     
     private let headerView: UIView = {
         let view = UIView()
-        view.backgroundColor = .blue
         view.setRoundCorners([.bottomLeft, .bottomRight], radius: 30)
-        // TODO: - img로 변경
+        let gradient = UIImageView(image: UIImage(.gradient_room))
+        gradient.contentMode = .scaleAspectFill
+        view.addSubview(gradient)
+        gradient.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalTo(WINDOW_WIDTH)
+            $0.height.equalTo(235.verticallyAdjusted)
+        }
         view.snp.makeConstraints {
             $0.width.equalTo(WINDOW_WIDTH)
-            $0.height.equalTo(235)
+            $0.height.equalTo(235.verticallyAdjusted)
         }
         return view
     }()
@@ -226,7 +238,6 @@ final class RoomMainViewController: UIViewController {
             tableView.delegate = self
             tableView.dataSource = self
             tableView.showsVerticalScrollIndicator = false
-            tableView.register(PlaceVoteCell.self, forCellReuseIdentifier: PlaceVoteCell.id)
             tableView.backgroundColor = .clear
             tableView.separatorStyle = .none
             tableView.isScrollEnabled = false
@@ -236,6 +247,9 @@ final class RoomMainViewController: UIViewController {
                 $0.width.equalTo(WINDOW_WIDTH - 40)
             }
         }
+        
+        whenTableView.register(RoomHomeTimetablesCell.self, forCellReuseIdentifier: RoomHomeTimetablesCell.id)
+        whereTableView.register(RoomHomeVotesCell.self, forCellReuseIdentifier: RoomHomeVotesCell.id)
     }
     
     private func bindViewModel() {
@@ -253,6 +267,36 @@ final class RoomMainViewController: UIViewController {
                 userVoteList.forEach { vote in
                     self?.voteDict[vote.location] = vote.users.count
                 }
+                self?.whenRank1Count = -1
+                self?.whenRank2Count = -1
+                self?.whenRank3Count = -1
+                
+                $0.userPromiseDateTimeList.forEach {
+                    let cnt = $0.userInfoList.count
+                    if self?.whenRank1Count ?? -1 < 0 {
+                        self?.whenRank1Count = cnt
+                    } else if self?.whenRank2Count ?? -1 < 0 && cnt < self?.whenRank1Count ?? -1 {
+                        self?.whenRank2Count = cnt
+                    } else if self?.whenRank3Count ?? -1 < 0 && cnt < self?.whenRank2Count ?? -1 {
+                        self?.whenRank3Count = cnt
+                    }
+                }
+                
+                self?.whereRank1Count = -1
+                self?.whereRank2Count = -1
+                self?.whereRank3Count = -1
+                
+                $0.userPromiseDateTimeList.forEach {
+                    let cnt = $0.userInfoList.count
+                    if self?.whereRank1Count ?? -1 < 0 {
+                        self?.whereRank1Count = cnt
+                    } else if self?.whereRank2Count ?? -1 < 0 && cnt < self?.whereRank1Count ?? -1 {
+                        self?.whereRank2Count = cnt
+                    } else if self?.whereRank3Count ?? -1 < 0 && cnt < self?.whereRank2Count ?? -1 {
+                        self?.whereRank3Count = cnt
+                    }
+                }
+                
                 self?.fetchUI(data: $0)
             }).disposed(by: bag)
     }
@@ -319,22 +363,51 @@ extension RoomMainViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if tableView == whenTableView {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
-                    as? PlaceVoteCell else { return UITableViewCell() }
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: RoomHomeTimetablesCell.id, for: indexPath)
+                    as? RoomHomeTimetablesCell else { return UITableViewCell() }
             if fetchedMainRoomMeetingInfo.userPromiseDateTimeList.count > 0 {
                 let timeInfo = fetchedMainRoomMeetingInfo.userPromiseDateTimeList[indexPath.row]
-                cell.configure(title: "\(timeInfo.promiseDate.toDate()!.formatted("yy.MM.dd"))" + " \(timeInfo.promiseDayOfWeek)" + "  \(timeInfo.promiseTime.toText())", count: timeInfo.userInfoList.count)
+                var rank = -1
+                let count = timeInfo.userInfoList.count
+                if count == whenRank1Count {
+                    rank = 1
+                    whenRank1Count = -1
+                } else if count == whenRank2Count {
+                    rank = 2
+                    whenRank2Count = -1
+                } else if count == whenRank3Count {
+                    rank = 3
+                    whenRank3Count = -1
+                }
+                
+                let title = "\(timeInfo.promiseDate.toDate()!.formatted("yy.MM.dd"))" + " \(timeInfo.promiseDayOfWeek)" + "  \(timeInfo.promiseTime.toText())"
+                cell.configure(rank: rank, title: title, count: count, total: fetchedMainRoomMeetingInfo.votingUserCount)
+                
             }
             
             cell.selectionStyle = .none
             return cell
         } else {
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
-                    as? PlaceVoteCell else { return UITableViewCell() }
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: RoomHomeVotesCell.id, for: indexPath)
+                    as? RoomHomeVotesCell else { return UITableViewCell() }
             if fetchedMainRoomMeetingInfo.userPromisePlaceList.count > 0 {
                 let placeInfo = fetchedMainRoomMeetingInfo.userPromisePlaceList[indexPath.row]
-
-                cell.configure(title: "\(placeInfo.promisePlace)", count: voteDict[placeInfo.promisePlace] ?? 0)
+                
+                var rank = -1
+                let count = placeInfo.userInfoList.count
+                if count == whereRank1Count {
+                    rank = 1
+                    whereRank1Count = -1
+                } else if count == whereRank2Count {
+                    rank = 2
+                    whereRank2Count = -1
+                } else if count == whereRank3Count {
+                    rank = 3
+                    whereRank3Count = -1
+                }
+                
+                
+                cell.configure(rank: rank, title: placeInfo.promisePlace, count: placeInfo.userInfoList.count, total: fetchedMainRoomMeetingInfo.votingUserCount)
             }
             cell.selectionStyle = .none
             return cell
