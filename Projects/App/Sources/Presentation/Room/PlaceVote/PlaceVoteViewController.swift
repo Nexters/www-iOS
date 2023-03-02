@@ -20,13 +20,30 @@ final class PlaceVoteViewController: UIViewController {
     private let viewmodel: PlaceVoteViewModel
     private var placeList: [PlaceVote] = []
     private var isVoted = false
+    private var totalCount = 0
     
     private let cellSelection = PublishRelay<Int>()
     
     private let tableView = UITableView(frame: CGRect.zero, style: .grouped)
     
+    let line = UIView()
+    
+    let peopleNumLabel: UILabel = {
+        $0.numberOfLines = 0
+        $0.textColor = UIColor.wwwColor(.Gray350)
+        $0.font = UIFont.www.body6
+        $0.text = "N명 참여"
+        return $0
+    }(UILabel())
+    
+    let icon: UIImageView = { // TODO: 아이콘으로 교체
+        let imageIcon = UIImage(systemName: "chevron.right")?.withTintColor(.wwwColor(.Gray350), renderingMode: .alwaysOriginal)
+        $0.image = imageIcon
+        $0.contentMode = .scaleAspectFit
+        return $0
+    }(UIImageView())
+    
     private lazy var voteButton: LargeButton = {
-        $0.setTitle("투표하기", for: .normal)
         $0.setButtonState(true)
         return $0
     }(LargeButton(state: false))
@@ -42,20 +59,24 @@ final class PlaceVoteViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        self.bindViewModel()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNavigationBar(title: "어디서")
         self.setUI()
-        self.bindViewModel()
-        self.setTableView()
     }
     
     
 }
 // MARK: - Methods
 extension PlaceVoteViewController {
-    
-    private func setTableView() {
+    private func setUI() {
+        self.view.backgroundColor = .wwwColor(.WWWWhite)
+        
         tableView.delegate = self
         tableView.dataSource = self
         tableView.showsVerticalScrollIndicator = false
@@ -63,10 +84,6 @@ extension PlaceVoteViewController {
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
         tableView.layer.applyFigmaShadow(color: .black, opacity: 0.05, x: 0, y: 0, blur: 20, spread: 0)
-    }
-    
-    private func setUI() {
-        self.view.backgroundColor = .wwwColor(.WWWWhite)
   
         self.view.addSubview(tableView)
         tableView.snp.makeConstraints {
@@ -100,7 +117,8 @@ extension PlaceVoteViewController {
     func bindViewModel() {
         
         let input = PlaceVoteViewModel.Input(
-            viewWillAppear: self.rx.methodInvoked(#selector(UIViewController.viewWillAppear)).map { _ in },
+            viewDidLoad:
+                Observable.just(()).asObservable(),
             voteCellDidTap:
                 cellSelection.asObservable(),
             voteButtonDidTap:
@@ -112,7 +130,18 @@ extension PlaceVoteViewController {
         output.placeVoteList
             .asDriver(onErrorJustReturn: PlaceVote.mockData)
             .drive(onNext: { [weak self] list in
-                self?.placeList = list
+                DispatchQueue.main.async{
+                    self?.placeList = list
+                    self?.tableView.reloadData()
+                }
+            })
+            .disposed(by: disposeBag)
+        
+        output.totalVote
+            .asDriver(onErrorJustReturn: 0)
+            .drive(onNext: { [weak self] count in
+                self?.peopleNumLabel.text = "\(count)명 참가"
+                self?.totalCount = count
                 self?.tableView.reloadData()
             })
             .disposed(by: disposeBag)
@@ -120,14 +149,29 @@ extension PlaceVoteViewController {
         output.voteButtonStatus
             .asDriver(onErrorJustReturn: .done)
             .drive(onNext: { [weak self] status in
-                self?.voteButton.setTitle("투표하기", for: .normal)
-                self?.voteButton.setTitle(status == MeetingStatus.waiting
-                                          ? "투표시작 대기"
-                                          : "투표완료",
-                                          for: .disabled)
+                var txt = ""
+                switch status {
+                case .voted:
+                    txt = "투표완료"
+                    self?.isVoted = true
+                case .voting:
+                    txt = "투표하기"
+                    self?.isVoted = false
+                case .waiting:
+                    txt = "투표시작대기"
+                case .done, .confirmed:
+                    txt = "투표종료"
+                }
+                self?.voteButton.setTitle(txt, for: .normal)
+                self?.voteButton.setTitle(txt, for: .disabled)
                 self?.voteButton.setButtonState(status == MeetingStatus.voting ? true : false)
             })
             .disposed(by: disposeBag)
+        
+        output.pop.subscribe(onNext: { _ in
+            self.navigationController?.popViewController(animated: true)
+        })
+        .disposed(by: disposeBag)
     }
     
 }
@@ -160,7 +204,7 @@ extension PlaceVoteViewController: UITableViewDelegate {
         
         cell.configure(isVoted: self.isVoted,
                        placevote: placeList[indexPath.row],
-                       total: 9)
+                       total: totalCount)
         cell.isUserInteractionEnabled = !isVoted
         
     }
@@ -179,7 +223,7 @@ extension PlaceVoteViewController: UITableViewDataSource {
                 as? PlaceVoteCell else { return UITableViewCell() }
         cell.configure(isVoted: isVoted,
                        placevote: placeList[indexPath.row],
-                       total: 9)
+                       total: totalCount)
         cell.selectionStyle = .none
         cell.isUserInteractionEnabled = !isVoted
         return cell
@@ -194,24 +238,7 @@ extension PlaceVoteViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
-        
-        let line = UIView()
         line.backgroundColor = UIColor.wwwColor(.Gray150)
-        
-        let peopleNumLabel: UILabel = {
-            $0.numberOfLines = 0
-            $0.textColor = UIColor.wwwColor(.Gray350)
-            $0.font = UIFont.www.body6
-            $0.text = "N명 참여중"
-            return $0
-        }(UILabel())
-        
-        let icon: UIImageView = { // TODO: 아이콘으로 교체 
-            let imageIcon = UIImage(systemName: "chevron.right")?.withTintColor(.wwwColor(.Gray350), renderingMode: .alwaysOriginal)
-            $0.image = imageIcon
-            $0.contentMode = .scaleAspectFit
-            return $0
-        }(UIImageView())
         
         let footerView = tableView.dequeueReusableHeaderFooterView(withIdentifier: "footer") ?? UITableViewHeaderFooterView()
         footerView.contentView.backgroundColor = .white

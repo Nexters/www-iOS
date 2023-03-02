@@ -15,11 +15,11 @@ final class PlaceVoteViewModel: BaseViewModel {
     private var disposeBag = DisposeBag()
     private let meetingId: Int
     private var meetingStatus: MeetingStatus
-    private var placelist: [PlaceVote] = []
-    private var myVoteSelection:  [PlaceVote] = []
+    var placelist: [PlaceVote] = []
+    private var myVoteSelection: [PlaceVote] = []
     
     struct Input {
-        let viewWillAppear: Observable<Void>
+        let viewDidLoad: Observable<Void>
         let voteCellDidTap: Observable<Int>
         let voteButtonDidTap: Observable<Void>
     }
@@ -27,8 +27,10 @@ final class PlaceVoteViewModel: BaseViewModel {
     struct Output {
         var placeVoteList = PublishRelay<[PlaceVote]>()
         var isVoted = BehaviorRelay<Bool>(value: false)
+        var totalVote = PublishRelay<Int>()
         var updateSelected = BehaviorRelay<[String]>(value: [])
         var voteButtonStatus = PublishRelay<MeetingStatus>()
+        var pop = PublishRelay<Bool>()
     }
     
     init(usecase: PlaceVoteUseCase, roomId: Int, status: MeetingStatus) {
@@ -61,32 +63,44 @@ final class PlaceVoteViewModel: BaseViewModel {
     private func makeOutput(with input: Input, disposeBag: DisposeBag) -> Output {
         let output = Output()
         
-        input.viewWillAppear
+        input.viewDidLoad
             .subscribe(onNext: { [weak self] in
-                let list = self?.usecase.fetchPlaceVotes(meetingId: self!.meetingId)
-                self?.placelist = list ?? []
-                output.placeVoteList.accept(list ?? [])
-                
-                output.isVoted.accept(false)
-                
+                self?.usecase.fetchPlaceVotes(meetingId: self!.meetingId)
+                    .subscribe(onNext: { [weak self] list in
+                        self?.placelist = list
+                        output.placeVoteList.accept(list)
+                    }).disposed(by: disposeBag)
+                output.voteButtonStatus.accept(self?.meetingStatus ?? .voted)
             })
             .disposed(by: disposeBag)
         
         input.voteButtonDidTap
             .subscribe(onNext: { [weak self] in
-                guard let myvote =  self?.myVoteSelection else { return }
+                guard let myvote =  self?.myVoteSelection, let id = self?.meetingId else { return }
                 if myvote.count > 0 {
-                    self?.usecase.votePlace(votes: myvote)
+                    self?.usecase.votePlace(meetingId: id, votes: myvote)
+                        .subscribe(onNext: { [weak self] list in
+                            self?.placelist = list
+                            output.placeVoteList.accept(list)
+                        }).disposed(by: disposeBag)
+                    output.voteButtonStatus.accept(self?.meetingStatus ?? .voted)
+                    output.pop.accept(true)
                 }
             })
             .disposed(by: disposeBag)
         
-        self.usecase.isVoted
-            .subscribe(onNext: { isVoted in
+        self.usecase.isCurrentUserVoted
+            .subscribe(onNext: { [weak self] isVoted in
                 if isVoted == true {
-                    self.meetingStatus = .voted
+                    self?.meetingStatus = .voted
+                    output.voteButtonStatus.accept(self?.meetingStatus ?? .voted)
                 }
-                output.voteButtonStatus.accept(self.meetingStatus)
+            })
+            .disposed(by: disposeBag)
+        
+        self.usecase.votedUserCount
+            .subscribe(onNext: { count in
+                output.totalVote.accept(count)
             })
             .disposed(by: disposeBag)
         
