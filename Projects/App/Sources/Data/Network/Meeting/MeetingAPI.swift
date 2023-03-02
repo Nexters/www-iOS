@@ -16,6 +16,9 @@ enum MeetingAPI {
     case checkMeetingCode(code: String)
     case joinMeeting(meetingId:Int, body: MeetingJoinRequestDTO)
     case createMeeting(body: MeetingCreateRequestDTO)
+    case fetchMeetingRoom(meetingId: Int)
+    case fetchTimetables(meetingId: Int)
+    case fetchVotes(meetingId: Int)
     
 }
 
@@ -34,7 +37,12 @@ extension MeetingAPI: TargetType {
             return "meetings/\(id)"
         case .createMeeting:
             return "meetings/"
-            
+        case .fetchMeetingRoom(let id):
+            return "meetings/\(id)"
+        case .fetchTimetables(let id):
+            return "timetables/\(id)"
+        case .fetchVotes(let id):
+            return "votes/\(id)"
         }
     }
     
@@ -48,6 +56,12 @@ extension MeetingAPI: TargetType {
             return .post
         case .createMeeting:
             return .post
+        case .fetchMeetingRoom:
+            return .get
+        case .fetchTimetables:
+            return .get
+        case .fetchVotes:
+            return .get
         }
     }
     
@@ -61,6 +75,12 @@ extension MeetingAPI: TargetType {
             return .requestJSONEncodable(dto)
         case .createMeeting(let dto):
             return .requestJSONEncodable(dto)
+        case .fetchMeetingRoom:
+            return .requestPlain
+        case .fetchTimetables:
+            return .requestPlain
+        case .fetchVotes:
+            return .requestPlain
         }
     }
     
@@ -69,7 +89,7 @@ extension MeetingAPI: TargetType {
         switch self {
         case .getMeetings:
             return ["Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
-        case .checkMeetingCode, .joinMeeting, .createMeeting:
+        case .checkMeetingCode, .joinMeeting, .createMeeting, .fetchMeetingRoom, .fetchTimetables, .fetchVotes:
             return ["Content-Type": "application/json",
                     "Authorization": "Bearer " + UserDefaultKeyCase().getUserToken()]
         }

@@ -11,14 +11,21 @@ import SnapKit
 import RxCocoa
 import RxSwift
 
+//MeetingStatus
+
 final class PlaceVoteViewController: UIViewController {
     
     // MARK: - Properties
     private let disposeBag = DisposeBag()
+    private let viewmodel: PlaceVoteViewModel
+    private var placeList: [PlaceVote] = []
+    private var isVoted = false
+    
+    private let cellSelection = PublishRelay<Int>()
     
     private let tableView = UITableView(frame: CGRect.zero, style: .grouped)
     
-    private lazy var nextButton: LargeButton = {
+    private lazy var voteButton: LargeButton = {
         $0.setTitle("투표하기", for: .normal)
         $0.setButtonState(true)
         return $0
@@ -26,8 +33,8 @@ final class PlaceVoteViewController: UIViewController {
     
     
     // MARK: - LifeCycle
-    init() {
-        //        self.viewModel = viewModel
+    init(viewmodel: PlaceVoteViewModel) {
+        self.viewmodel = viewmodel
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -39,6 +46,7 @@ final class PlaceVoteViewController: UIViewController {
         super.viewDidLoad()
         self.setNavigationBar(title: "어디서")
         self.setUI()
+        self.bindViewModel()
         self.setTableView()
     }
     
@@ -67,8 +75,8 @@ extension PlaceVoteViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-88)
         }
         
-        self.view.addSubview(nextButton)
-        nextButton.snp.makeConstraints {
+        self.view.addSubview(voteButton)
+        voteButton.snp.makeConstraints {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).offset(-20)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
@@ -86,8 +94,47 @@ extension PlaceVoteViewController {
     
 }
 
+// MARK: - Bingindg
+extension PlaceVoteViewController {
+    
+    func bindViewModel() {
+        
+        let input = PlaceVoteViewModel.Input(
+            viewWillAppear: self.rx.methodInvoked(#selector(UIViewController.viewWillAppear)).map { _ in },
+            voteCellDidTap:
+                cellSelection.asObservable(),
+            voteButtonDidTap:
+                self.voteButton.rx.tap.asObservable()
+        )
+        
+        let output = self.viewmodel.transform(input: input, disposeBag: self.disposeBag)
+
+        output.placeVoteList
+            .asDriver(onErrorJustReturn: PlaceVote.mockData)
+            .drive(onNext: { [weak self] list in
+                self?.placeList = list
+                self?.tableView.reloadData()
+            })
+            .disposed(by: disposeBag)
+        
+        output.voteButtonStatus
+            .asDriver(onErrorJustReturn: .done)
+            .drive(onNext: { [weak self] status in
+                self?.voteButton.setTitle("투표하기", for: .normal)
+                self?.voteButton.setTitle(status == MeetingStatus.waiting
+                                          ? "투표시작 대기"
+                                          : "투표완료",
+                                          for: .disabled)
+                self?.voteButton.setButtonState(status == MeetingStatus.voting ? true : false)
+            })
+            .disposed(by: disposeBag)
+    }
+    
+}
+
+
 // MARK: - UITableViewDelegate
-extension PlaceVoteViewController: UITableViewDelegate{
+extension PlaceVoteViewController: UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -104,6 +151,19 @@ extension PlaceVoteViewController: UITableViewDelegate{
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         return 40.0 + 1.0
     }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath) as! PlaceVoteCell
+        cellSelection.accept(indexPath.row) // 이벤트 방출
+        
+        placeList[indexPath.row].isMyVote = !placeList[indexPath.row].isMyVote
+        
+        cell.configure(isVoted: self.isVoted,
+                       placevote: placeList[indexPath.row],
+                       total: 9)
+        cell.isUserInteractionEnabled = !isVoted
+        
+    }
 
 }
 
@@ -111,14 +171,17 @@ extension PlaceVoteViewController: UITableViewDelegate{
 extension PlaceVoteViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 20
+        return placeList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: PlaceVoteCell.id, for: indexPath)
                 as? PlaceVoteCell else { return UITableViewCell() }
-        cell.configure(with: "\(indexPath.row)번째 아이템")
+        cell.configure(isVoted: isVoted,
+                       placevote: placeList[indexPath.row],
+                       total: 9)
         cell.selectionStyle = .none
+        cell.isUserInteractionEnabled = !isVoted
         return cell
     }
     
@@ -184,10 +247,10 @@ extension PlaceVoteViewController: UITableViewDataSource {
 #if canImport(SwiftUI) && DEBUG
 import SwiftUI
 
-struct PlaceVoteViewController_Preview: PreviewProvider {
-   static var previews: some View {
-//        let viewModel = PlaceViewModel(guest: JoinGuestUseCase())
-       PlaceVoteViewController().toPreview()
-   }
-}
+//struct PlaceVoteViewController_Preview: PreviewProvider {
+//   static var previews: some View {
+////        let viewModel = PlaceViewModel(guest: JoinGuestUseCase())
+////       PlaceVoteViewController().toPreview()
+//   }
+//}
 #endif

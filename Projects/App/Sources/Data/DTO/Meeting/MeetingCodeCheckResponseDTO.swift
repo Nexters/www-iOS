@@ -23,7 +23,7 @@ extension MeetingCodeCheckResponseDTO {
         let meetingName: String
         let minimumAlertMembers: Int
         let hostName: String
-        let currentUserName: String
+        let currentUserName: String?
         let isHost: Bool
         let joinedUserCount, votingUserCount: Int
         let meetingCode: String
