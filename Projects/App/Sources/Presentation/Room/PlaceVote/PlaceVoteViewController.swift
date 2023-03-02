@@ -130,8 +130,10 @@ extension PlaceVoteViewController {
         output.placeVoteList
             .asDriver(onErrorJustReturn: PlaceVote.mockData)
             .drive(onNext: { [weak self] list in
-                self?.placeList = list
-                self?.tableView.reloadData()
+                DispatchQueue.main.async{
+                    self?.placeList = list
+                    self?.tableView.reloadData()
+                }
             })
             .disposed(by: disposeBag)
         
@@ -163,9 +165,13 @@ extension PlaceVoteViewController {
                 self?.voteButton.setTitle(txt, for: .normal)
                 self?.voteButton.setTitle(txt, for: .disabled)
                 self?.voteButton.setButtonState(status == MeetingStatus.voting ? true : false)
-                self?.tableView.reloadData()
             })
             .disposed(by: disposeBag)
+        
+        output.pop.subscribe(onNext: { _ in
+            self.navigationController?.popViewController(animated: true)
+        })
+        .disposed(by: disposeBag)
     }
     
 }

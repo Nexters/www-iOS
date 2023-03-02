@@ -63,7 +63,7 @@ final class PlaceVoteDAO: MeetingVoteRepository {
                     var myVote: [String] = []
                     for place in response.result.userPromisePlaceList {
                         var isMyVote = false
-                        let myname = "테스트11"
+                        let myname = "테스트20"
                         
                         for user in place.userInfoList {
                             if user.joinedUserName == myname {

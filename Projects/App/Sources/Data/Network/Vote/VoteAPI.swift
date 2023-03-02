@@ -56,7 +56,7 @@ extension VoteAPI: TargetType {
     }
     
     var headers: [String : String]? {
-         let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzZGxrZGxrZmxramRma2wiLCJpYXQiOjE2Nzc3MTQ0NjUsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.DjOvNwKRbyfUd_qwsZbpo3WOzmGW0UFzkTA_0PpKngfDjV2mAcunlZbdemnmb3IoKgBso_cNY8TlaOWISFmZIA"
+         let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiLslYTri4jrgpjsnbTrn7zjhYfrgpjjhaPjhLkiLCJpYXQiOjE2Nzc3MTY5NzMsImV4cCI6OTIyMzM3MjAzNjg1NDc3NX0.U1ssdkjFP67FXQrn-kEpy8C_eWc1sNPrYkmSQfQMkyZ1vGk_IrxHgd6R-mtdYfUHuKYLoBCjvPFBiGbp5cC3zg"
         switch self {
         case .fetchVoteLists, .fetchVotePlaces, .postVote:
             return ["Content-Type": "application/json",

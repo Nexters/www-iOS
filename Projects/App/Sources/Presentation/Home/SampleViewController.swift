@@ -17,12 +17,11 @@ class SampleViewController: UIViewController {
         return $0
     }(LargeButton(state: true))
 
-    private var viewModel: SampleViewModel?
+//    private var viewModel: SampleViewModel?
     
     private var bag = DisposeBag()
     
-    init(viewModel: SampleViewModel) {
-        self.viewModel = viewModel
+    init() {
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -52,22 +51,22 @@ class SampleViewController: UIViewController {
 //        let hostVM = PlaceViewModel(host: JoinHostUseCase())
 //        let guestVM = PlaceViewModel(guest: JoinGuestUseCase())
         
-//        self.navigationController?.pushViewController(PlaceVoteViewController(viewmodel: PlaceVoteViewModel(usecase: PlaceVoteUseCase(PlaceVote), roomId: 193, status: .voting)), animated: true)
+        self.navigationController?.pushViewController(PlaceVoteViewController(viewmodel: PlaceVoteViewModel(usecase: PlaceVoteUseCase(repository: PlaceVoteDAO.init(network: VoteAPI.provider)), roomId: 193, status: .voting)), animated: true)
     
     }
     
-    private func bindRx() {
-        let output = viewModel?.transform(input: SampleViewModel.Input(viewDidLoad: Single<Void>.just(()) ), disposeBag: DisposeBag())
+//    private func bindRx() {
+//        let output = viewModel?.transform(input: SampleViewModel.Input(viewDidLoad: Single<Void>.just(()) ), disposeBag: DisposeBag())
         
         // 참가자 플로우
 //        let viewModel = RoomCodeViewModel(joinGuestUseCase: JoinGuestUseCase())
 //        self.navigationController?.pushViewController(RoomCodeController(viewModel: viewModel), animated: true)
         
-        output?.loginResult.subscribe {
-            print("loginResult is", $0)
-            UserDefaultKeyCase().setUserToken($0.result)
-
-        }.disposed(by: bag)
-    }
+//        output?.loginResult.subscribe {
+//            print("loginResult is", $0)
+//            UserDefaultKeyCase().setUserToken($0.result)
+//
+//        }.disposed(by: bag)
+//    }
 }
 

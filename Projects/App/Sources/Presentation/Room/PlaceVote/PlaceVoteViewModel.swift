@@ -30,6 +30,7 @@ final class PlaceVoteViewModel: BaseViewModel {
         var totalVote = PublishRelay<Int>()
         var updateSelected = BehaviorRelay<[String]>(value: [])
         var voteButtonStatus = PublishRelay<MeetingStatus>()
+        var pop = PublishRelay<Bool>()
     }
     
     init(usecase: PlaceVoteUseCase, roomId: Int, status: MeetingStatus) {
@@ -83,6 +84,7 @@ final class PlaceVoteViewModel: BaseViewModel {
                             output.placeVoteList.accept(list)
                         }).disposed(by: disposeBag)
                     output.voteButtonStatus.accept(self?.meetingStatus ?? .voted)
+                    output.pop.accept(true)
                 }
             })
             .disposed(by: disposeBag)
