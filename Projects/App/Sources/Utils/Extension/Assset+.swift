@@ -63,6 +63,13 @@ public enum WWWAssset: String {
     case yaksoki_rest
     case yaksoki_work
     
+    // RoomMain
+    case chevron_right
+    case gradient_room
+    case rank1
+    case rank2
+    case rank3
+    
     case gradient_round
     case painting
 }

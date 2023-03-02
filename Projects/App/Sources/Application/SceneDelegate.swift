@@ -22,7 +22,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             
             if UserDefaultKeyCase().getOnBoarding() {
                 let mainHomeVC = MainHomeViewController(viewModel: MainHomeViewModel(mainHomeUseCase: .init(meetingRepository: MainHomeDAO.init(network: MeetingAPIManager.provider))))
-                self.window?.rootViewController = UINavigationController(rootViewController: SampleViewController())
+                self.window?.rootViewController = UINavigationController(rootViewController: mainHomeVC)
+                
+                // roomMainVC
+                let roomMainVC = RoomMainViewController(viewModel: RoomHomeViewModel(mainRoomUseCase: MainRoomUseCase(meetingRoomRepository: MainRoomDAO(network: MeetingAPIManager.provider))))
+                self.window?.rootViewController = UINavigationController(rootViewController: roomMainVC)
+                
             } else {
                 lazy var onBoarding = OnBoardingPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
                 self.window?.rootViewController = UINavigationController(rootViewController: onBoarding)
